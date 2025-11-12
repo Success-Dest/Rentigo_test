@@ -16,8 +16,8 @@
             </div>
             <div class="stat-info">
                 <div class="stat-label">Total Properties</div>
-                <h3>24</h3>
-                <div class="stat-change positive">+2 this month</div>
+                <h3><?php echo $data['totalProperties'] ?? 0; ?></h3>
+                <div class="stat-change">Assigned to you</div>
             </div>
         </div>
 
@@ -27,8 +27,8 @@
             </div>
             <div class="stat-info">
                 <div class="stat-label">Total Units</div>
-                <h3>156</h3>
-                <div class="stat-change positive">+8 this month</div>
+                <h3><?php echo $data['totalUnits'] ?? 0; ?></h3>
+                <div class="stat-change"><?php echo $data['occupiedUnits'] ?? 0; ?> occupied</div>
             </div>
         </div>
 
@@ -38,8 +38,8 @@
             </div>
             <div class="stat-info">
                 <div class="stat-label">Total Income</div>
-                <h3>Rs 84,250</h3>
-                <div class="stat-change positive">+12.5% from last month</div>
+                <h3>LKR <?php echo number_format($data['totalIncome'] ?? 0, 0); ?></h3>
+                <div class="stat-change">From completed payments</div>
             </div>
         </div>
 
@@ -49,8 +49,8 @@
             </div>
             <div class="stat-info">
                 <div class="stat-label">Total Expenses</div>
-                <h3>Rs 42,180</h3>
-                <div class="stat-change negative">-3.2% from last month</div>
+                <h3>LKR <?php echo number_format($data['totalExpenses'] ?? 0, 0); ?></h3>
+                <div class="stat-change">Maintenance costs</div>
             </div>
         </div>
     </div>
@@ -75,34 +75,25 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td class="font-medium">Sarah Johnson</td>
-                            <td>Oak Street Apt 2A</td>
-                            <td>Rs 20,000</td>
-                            <td>Dec 1, 2024</td>
-                            <td><span class="status-badge approved">Paid</span></td>
-                        </tr>
-                        <tr>
-                            <td class="font-medium">Mike Chen</td>
-                            <td>Pine Avenue House</td>
-                            <td>Rs 30,000</td>
-                            <td>Dec 1, 2024</td>
-                            <td><span class="status-badge approved">Paid</span></td>
-                        </tr>
-                        <tr>
-                            <td class="font-medium">Emily Davis</td>
-                            <td>Maple Drive Apt 1B</td>
-                            <td>Rs 45,000</td>
-                            <td>Nov 28, 2024</td>
-                            <td><span class="status-badge pending">Pending</span></td>
-                        </tr>
-                        <tr>
-                            <td class="font-medium">John Smith</td>
-                            <td>Cedar Lane Townhome</td>
-                            <td>Rs 30,000</td>
-                            <td>Nov 25, 2024</td>
-                            <td><span class="status-badge approved">Paid</span></td>
-                        </tr>
+                        <?php if (!empty($data['recentPayments'])): ?>
+                            <?php foreach ($data['recentPayments'] as $payment): ?>
+                                <tr>
+                                    <td class="font-medium"><?php echo htmlspecialchars($payment->tenant_name ?? 'N/A'); ?></td>
+                                    <td><?php echo htmlspecialchars($payment->property_address ?? 'N/A'); ?></td>
+                                    <td>LKR <?php echo number_format($payment->amount, 0); ?></td>
+                                    <td><?php echo date('M d, Y', strtotime($payment->payment_date ?? $payment->due_date)); ?></td>
+                                    <td>
+                                        <span class="status-badge <?php echo $payment->status === 'completed' ? 'approved' : ($payment->status === 'pending' ? 'pending' : 'rejected'); ?>">
+                                            <?php echo ucfirst($payment->status); ?>
+                                        </span>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <tr>
+                                <td colspan="5" class="text-center text-muted">No payment records</td>
+                            </tr>
+                        <?php endif; ?>
                     </tbody>
                 </table>
             </div>
@@ -115,46 +106,36 @@
                 <a href="<?php echo URLROOT; ?>/manager/maintenance" class="btn btn-sm btn-secondary">View All</a>
             </div>
             <div class="maintenance-list">
-                <div class="maintenance-item">
-                    <div class="maintenance-info">
-                        <h4>Plumbing Repair</h4>
-                        <p class="text-muted">Oak Street Apt 2A</p>
-                    </div>
-                    <div class="maintenance-status">
-                        <span class="status-badge pending">In Progress</span>
-                        <small class="text-muted">Due: Dec 15</small>
-                    </div>
-                </div>
-                <div class="maintenance-item">
-                    <div class="maintenance-info">
-                        <h4>HVAC Maintenance</h4>
-                        <p class="text-muted">Maple Drive Complex</p>
-                    </div>
-                    <div class="maintenance-status">
-                        <span class="status-badge approved">Completed</span>
-                        <small class="text-muted">Completed: Dec 10</small>
-                    </div>
-                </div>
-                <div class="maintenance-item">
-                    <div class="maintenance-info">
-                        <h4>Electrical Issue</h4>
-                        <p class="text-muted">Pine Avenue House</p>
-                    </div>
-                    <div class="maintenance-status">
-                        <span class="status-badge rejected">Urgent</span>
-                        <small class="text-muted">Reported: Dec 12</small>
-                    </div>
-                </div>
-                <div class="maintenance-item">
-                    <div class="maintenance-info">
-                        <h4>Carpet Cleaning</h4>
-                        <p class="text-muted">Cedar Lane Townhome</p>
-                    </div>
-                    <div class="maintenance-status">
-                        <span class="status-badge pending">Scheduled</span>
-                        <small class="text-muted">Due: Dec 20</small>
-                    </div>
-                </div>
+                <?php if (!empty($data['recentMaintenance'])): ?>
+                    <?php foreach ($data['recentMaintenance'] as $maintenance): ?>
+                        <div class="maintenance-item">
+                            <div class="maintenance-info">
+                                <h4><?php echo htmlspecialchars($maintenance->title ?? 'Maintenance Request'); ?></h4>
+                                <p class="text-muted"><?php echo htmlspecialchars($maintenance->property_address ?? 'N/A'); ?></p>
+                            </div>
+                            <div class="maintenance-status">
+                                <span class="status-badge <?php
+                                    echo $maintenance->status === 'completed' ? 'approved' :
+                                        ($maintenance->status === 'in_progress' || $maintenance->status === 'approved' ? 'pending' :
+                                        ($maintenance->status === 'urgent' ? 'rejected' : 'pending'));
+                                ?>">
+                                    <?php echo ucfirst(str_replace('_', ' ', $maintenance->status)); ?>
+                                </span>
+                                <small class="text-muted">
+                                    <?php
+                                        if ($maintenance->status === 'completed' && !empty($maintenance->completed_at)) {
+                                            echo 'Completed: ' . date('M d', strtotime($maintenance->completed_at));
+                                        } else {
+                                            echo 'Reported: ' . date('M d', strtotime($maintenance->created_at));
+                                        }
+                                    ?>
+                                </small>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <p class="text-muted" style="text-align: center; padding: 2rem;">No maintenance requests</p>
+                <?php endif; ?>
             </div>
         </div>
     </div>

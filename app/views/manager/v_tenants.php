@@ -24,9 +24,9 @@
         <!-- Tenant Status Tabs -->
         <div class="tabs-container">
             <div class="tabs-nav">
-                <button class="tab-button active" onclick="showTab('active')">Active (2)</button>
-                <button class="tab-button" onclick="showTab('pending')">Pending (1)</button>
-                <button class="tab-button" onclick="showTab('vacated')">Vacated (0)</button>
+                <button class="tab-button active" onclick="showTab('active')">Active (<?php echo $data['activeCount'] ?? 0; ?>)</button>
+                <button class="tab-button" onclick="showTab('pending')">Pending (<?php echo $data['pendingCount'] ?? 0; ?>)</button>
+                <button class="tab-button" onclick="showTab('vacated')">Vacated (<?php echo $data['vacatedCount'] ?? 0; ?>)</button>
             </div>
 
             <!-- Active Tenants Tab -->
@@ -45,48 +45,32 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td class="font-medium">Sarah Johnson</td>
-                                <td>
-                                    <div>sarah.j@email.com</div>
-                                    <div class="text-muted small">(555) 123-4567</div>
-                                </td>
-                                <td>Oak Street Apt 2A</td>
-                                <td>2023-06-01</td>
-                                <td>2024-05-31</td>
-                                <td><span class="status-badge approved">Active</span></td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <button class="btn-icon" title="View Details">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                        <button class="btn-icon" title="Edit Tenant">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="font-medium">Mike Chen</td>
-                                <td>
-                                    <div>mike.chen@email.com</div>
-                                    <div class="text-muted small">(555) 234-5678</div>
-                                </td>
-                                <td>Pine Avenue House</td>
-                                <td>2023-09-01</td>
-                                <td>2024-08-31</td>
-                                <td><span class="status-badge approved">Active</span></td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <button class="btn-icon" title="View Details">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                        <button class="btn-icon" title="Edit Tenant">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
+                            <?php if (!empty($data['activeBookings'])): ?>
+                                <?php foreach ($data['activeBookings'] as $booking): ?>
+                                    <tr>
+                                        <td class="font-medium"><?php echo htmlspecialchars($booking->tenant_name ?? 'N/A'); ?></td>
+                                        <td>
+                                            <div><?php echo htmlspecialchars($booking->tenant_email ?? 'N/A'); ?></div>
+                                            <div class="text-muted small"><?php echo htmlspecialchars($booking->tenant_phone ?? 'N/A'); ?></div>
+                                        </td>
+                                        <td><?php echo htmlspecialchars($booking->address ?? 'N/A'); ?></td>
+                                        <td><?php echo date('Y-m-d', strtotime($booking->move_in_date)); ?></td>
+                                        <td><?php echo $booking->move_out_date ? date('Y-m-d', strtotime($booking->move_out_date)) : 'N/A'; ?></td>
+                                        <td><span class="status-badge approved">Active</span></td>
+                                        <td>
+                                            <div class="action-buttons">
+                                                <button class="btn-icon" title="View Details">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <tr>
+                                    <td colspan="7" class="text-center text-muted">No active tenants</td>
+                                </tr>
+                            <?php endif; ?>
                         </tbody>
                     </table>
                 </div>
@@ -108,27 +92,32 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td class="font-medium">Emily Davis</td>
-                                <td>
-                                    <div>emily.davis@email.com</div>
-                                    <div class="text-muted small">(555) 345-6789</div>
-                                </td>
-                                <td>Maple Drive Apt 1B</td>
-                                <td>2023-03-15</td>
-                                <td>2024-03-14</td>
-                                <td><span class="status-badge pending">Pending</span></td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <button class="btn-icon" title="View Details">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                        <button class="btn-icon" title="Edit Tenant">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
+                            <?php if (!empty($data['pendingBookings'])): ?>
+                                <?php foreach ($data['pendingBookings'] as $booking): ?>
+                                    <tr>
+                                        <td class="font-medium"><?php echo htmlspecialchars($booking->tenant_name ?? 'N/A'); ?></td>
+                                        <td>
+                                            <div><?php echo htmlspecialchars($booking->tenant_email ?? 'N/A'); ?></div>
+                                            <div class="text-muted small"><?php echo htmlspecialchars($booking->tenant_phone ?? 'N/A'); ?></div>
+                                        </td>
+                                        <td><?php echo htmlspecialchars($booking->address ?? 'N/A'); ?></td>
+                                        <td><?php echo date('Y-m-d', strtotime($booking->move_in_date)); ?></td>
+                                        <td><?php echo $booking->move_out_date ? date('Y-m-d', strtotime($booking->move_out_date)) : 'N/A'; ?></td>
+                                        <td><span class="status-badge pending">Pending</span></td>
+                                        <td>
+                                            <div class="action-buttons">
+                                                <button class="btn-icon" title="View Details">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <tr>
+                                    <td colspan="7" class="text-center text-muted">No pending tenants</td>
+                                </tr>
+                            <?php endif; ?>
                         </tbody>
                     </table>
                 </div>
@@ -136,10 +125,50 @@
 
             <!-- Vacated Tenants Tab -->
             <div id="vacated-tab" class="tab-content">
-                <div class="empty-state">
-                    <i class="fas fa-users" style="font-size: 3rem; color: var(--text-muted); margin-bottom: 1rem;"></i>
-                    <p class="text-muted">No vacated tenants found</p>
-                </div>
+                <?php if (!empty($data['vacatedBookings'])): ?>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Contact</th>
+                                    <th>Property</th>
+                                    <th>Lease Start</th>
+                                    <th>Lease End</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($data['vacatedBookings'] as $booking): ?>
+                                    <tr>
+                                        <td class="font-medium"><?php echo htmlspecialchars($booking->tenant_name ?? 'N/A'); ?></td>
+                                        <td>
+                                            <div><?php echo htmlspecialchars($booking->tenant_email ?? 'N/A'); ?></div>
+                                            <div class="text-muted small"><?php echo htmlspecialchars($booking->tenant_phone ?? 'N/A'); ?></div>
+                                        </td>
+                                        <td><?php echo htmlspecialchars($booking->address ?? 'N/A'); ?></td>
+                                        <td><?php echo date('Y-m-d', strtotime($booking->move_in_date)); ?></td>
+                                        <td><?php echo $booking->move_out_date ? date('Y-m-d', strtotime($booking->move_out_date)) : 'N/A'; ?></td>
+                                        <td><span class="status-badge rejected"><?php echo ucfirst($booking->status); ?></span></td>
+                                        <td>
+                                            <div class="action-buttons">
+                                                <button class="btn-icon" title="View Details">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                <?php else: ?>
+                    <div class="empty-state">
+                        <i class="fas fa-users" style="font-size: 3rem; color: var(--text-muted); margin-bottom: 1rem;"></i>
+                        <p class="text-muted">No vacated tenants found</p>
+                    </div>
+                <?php endif; ?>
             </div>
         </div>
     </div>
