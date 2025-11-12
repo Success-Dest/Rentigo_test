@@ -4,14 +4,11 @@
 <div class="page-header">
     <div class="header-left">
         <h1 class="page-title">Tenant Feedback</h1>
-        <p class="page-subtitle">View and manage tenant feedback and reviews</p>
-    </div>
-    <div class="header-actions">
-        <button class="btn btn-primary" onclick="exportFeedback()">
-            <i class="fas fa-download"></i> Export Report
-        </button>
+        <p class="page-subtitle">View tenant reviews and manage your reviews</p>
     </div>
 </div>
+
+<?php flash('review_message'); ?>
 
 <!-- Feedback Stats -->
 <div class="stats-grid">
@@ -20,9 +17,9 @@
             <i class="fas fa-comments"></i>
         </div>
         <div class="stat-content">
-            <h3 class="stat-label">Total Feedback</h3>
-            <div class="stat-value">156</div>
-            <div class="stat-change">This month</div>
+            <h3 class="stat-label">Reviews About You</h3>
+            <div class="stat-value"><?php echo count($data['reviewsAboutMe'] ?? []); ?></div>
+            <div class="stat-change">From tenants</div>
         </div>
     </div>
     <div class="stat-card">
@@ -31,304 +28,302 @@
         </div>
         <div class="stat-content">
             <h3 class="stat-label">Average Rating</h3>
-            <div class="stat-value">4.2</div>
-            <div class="stat-change positive">+0.3 from last month</div>
-        </div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-icon" style="background-color: var(--warning-color);">
-            <i class="fas fa-clock"></i>
-        </div>
-        <div class="stat-content">
-            <h3 class="stat-label">Pending Response</h3>
-            <div class="stat-value">12</div>
-            <div class="stat-change">Awaiting reply</div>
+            <div class="stat-value">
+                <?php
+                    if (!empty($data['reviewsAboutMe'])) {
+                        $totalRating = 0;
+                        foreach ($data['reviewsAboutMe'] as $review) {
+                            $totalRating += $review->rating;
+                        }
+                        echo number_format($totalRating / count($data['reviewsAboutMe']), 1);
+                    } else {
+                        echo '0.0';
+                    }
+                ?>
+            </div>
+            <div class="stat-change">Tenant ratings</div>
         </div>
     </div>
     <div class="stat-card">
         <div class="stat-icon" style="background-color: var(--info-color);">
-            <i class="fas fa-chart-line"></i>
+            <i class="fas fa-pen"></i>
         </div>
         <div class="stat-content">
-            <h3 class="stat-label">Satisfaction Rate</h3>
-            <div class="stat-value">87%</div>
-            <div class="stat-change positive">+5% from last month</div>
+            <h3 class="stat-label">Your Reviews</h3>
+            <div class="stat-value"><?php echo count($data['myReviews'] ?? []); ?></div>
+            <div class="stat-change">Reviews written</div>
         </div>
     </div>
 </div>
 
-<!-- Filters -->
+<!-- Reviews About You (From Tenants) -->
 <div class="content-card">
-    <div class="card-body" style="padding: 1rem 1.5rem;">
-        <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
-            <div class="search-box" style="flex: 1; min-width: 200px;">
-                <input type="text" placeholder="Search feedback..." id="feedbackSearch" class="form-control">
+    <div class="card-header">
+        <h2 class="card-title">Reviews About You</h2>
+    </div>
+    <div class="card-body">
+        <?php if (!empty($data['reviewsAboutMe'])): ?>
+            <div class="feedback-container">
+                <?php foreach ($data['reviewsAboutMe'] as $review): ?>
+                    <div class="feedback-item">
+                        <div class="feedback-header">
+                            <div class="tenant-info">
+                                <div class="tenant-avatar">
+                                    <?php
+                                        $name = $review->reviewer_name ?? 'T';
+                                        $initials = strtoupper(substr($name, 0, 1));
+                                        if (strpos($name, ' ') !== false) {
+                                            $parts = explode(' ', $name);
+                                            $initials = strtoupper(substr($parts[0], 0, 1) . substr($parts[1], 0, 1));
+                                        }
+                                        echo $initials;
+                                    ?>
+                                </div>
+                                <div>
+                                    <h4><?php echo htmlspecialchars($review->reviewer_name ?? 'Tenant'); ?></h4>
+                                    <p><?php echo htmlspecialchars($review->property_address ?? 'Property'); ?></p>
+                                </div>
+                            </div>
+                            <div class="feedback-meta">
+                                <div class="rating">
+                                    <span class="stars">
+                                        <?php
+                                            for ($i = 1; $i <= 5; $i++) {
+                                                echo $i <= $review->rating ? '★' : '☆';
+                                            }
+                                        ?>
+                                    </span>
+                                    <span class="rating-number"><?php echo number_format($review->rating, 1); ?></span>
+                                </div>
+                                <span class="feedback-date"><?php echo date('M d, Y', strtotime($review->created_at)); ?></span>
+                            </div>
+                        </div>
+                        <div class="feedback-content">
+                            <p>"<?php echo htmlspecialchars($review->comment); ?>"</p>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
             </div>
-            <select id="propertyFilter" class="form-control" style="min-width: 150px;">
-                <option value="">All Properties</option>
-                <option value="sunset-apartments">Sunset Apartments</option>
-                <option value="downtown-loft">Downtown Loft</option>
-                <option value="garden-view">Garden View Condos</option>
-            </select>
-            <select id="ratingFilter" class="form-control" style="min-width: 120px;">
-                <option value="">All Ratings</option>
-                <option value="5">5 Stars</option>
-                <option value="4">4 Stars</option>
-                <option value="3">3 Stars</option>
-                <option value="2">2 Stars</option>
-                <option value="1">1 Star</option>
-            </select>
-            <select id="statusFilter" class="form-control" style="min-width: 140px;">
-                <option value="">All Status</option>
-                <option value="responded">Responded</option>
-                <option value="pending">Pending Response</option>
-            </select>
-            <input type="date" id="dateFilter" class="form-control" style="min-width: 140px;">
-        </div>
+        <?php else: ?>
+            <div class="empty-state">
+                <i class="fas fa-star-half-alt"></i>
+                <p>No reviews yet</p>
+                <span>Tenant reviews about your properties and management will appear here.</span>
+            </div>
+        <?php endif; ?>
     </div>
 </div>
 
-<!-- Feedback List -->
-<div class="feedback-container">
-    <div class="feedback-item" data-rating="5" data-property="sunset-apartments" data-status="responded">
-        <div class="feedback-header">
-            <div class="tenant-info">
-                <div class="tenant-avatar" style="width: 48px; height: 48px; border-radius: 50%; background: var(--primary-color); color: white; display: flex; align-items: center; justify-content: center; font-weight: 600;">SJ</div>
-                <div>
-                    <h4>Sarah Johnson</h4>
-                    <p>Sunset Apartments - Unit 204</p>
-                </div>
-            </div>
-            <div class="feedback-meta">
-                <div class="rating">
-                    <span class="stars" style="color: #fbbf24;">★★★★★</span>
-                    <span class="rating-number">5.0</span>
-                </div>
-                <span class="feedback-date">Jan 15, 2024</span>
-            </div>
-        </div>
-        <div class="feedback-content">
-            <p>"Excellent maintenance response time! The team fixed my heating issue within 24 hours. Very professional and courteous service."</p>
-            <div class="feedback-tags">
-                <span class="tag">Maintenance</span>
-                <span class="tag">Response Time</span>
-            </div>
-        </div>
-        <div class="feedback-actions">
-            <span class="badge badge-success">Responded</span>
-            <div style="display: flex; gap: 0.5rem;">
-                <button class="btn btn-outline btn-sm" onclick="viewFeedbackDetails('FB001')">
-                    <i class="fas fa-eye"></i> View Details
-                </button>
-                <button class="btn btn-primary btn-sm" onclick="respondToFeedback('FB001')">
-                    <i class="fas fa-reply"></i> Add Response
-                </button>
-            </div>
-        </div>
+<!-- Your Reviews (About Tenants) -->
+<div class="content-card">
+    <div class="card-header">
+        <h2 class="card-title">Your Reviews About Tenants</h2>
     </div>
-
-    <div class="feedback-item" data-rating="3" data-property="downtown-loft" data-status="pending">
-        <div class="feedback-header">
-            <div class="tenant-info">
-                <div class="tenant-avatar" style="width: 48px; height: 48px; border-radius: 50%; background: var(--secondary-color); color: white; display: flex; align-items: center; justify-content: center; font-weight: 600;">MC</div>
-                <div>
-                    <h4>Mike Chen</h4>
-                    <p>Downtown Loft - Unit 12B</p>
-                </div>
+    <div class="card-body">
+        <?php if (!empty($data['myReviews'])): ?>
+            <div class="feedback-container">
+                <?php foreach ($data['myReviews'] as $review): ?>
+                    <div class="feedback-item">
+                        <div class="feedback-header">
+                            <div class="tenant-info">
+                                <div class="tenant-avatar">
+                                    <?php
+                                        $name = $review->reviewee_name ?? 'T';
+                                        $initials = strtoupper(substr($name, 0, 1));
+                                        if (strpos($name, ' ') !== false) {
+                                            $parts = explode(' ', $name);
+                                            $initials = strtoupper(substr($parts[0], 0, 1) . substr($parts[1], 0, 1));
+                                        }
+                                        echo $initials;
+                                    ?>
+                                </div>
+                                <div>
+                                    <h4><?php echo htmlspecialchars($review->reviewee_name ?? 'Tenant'); ?></h4>
+                                    <p><?php echo htmlspecialchars($review->property_address ?? 'Property'); ?></p>
+                                </div>
+                            </div>
+                            <div class="feedback-meta">
+                                <div class="rating">
+                                    <span class="stars">
+                                        <?php
+                                            for ($i = 1; $i <= 5; $i++) {
+                                                echo $i <= $review->rating ? '★' : '☆';
+                                            }
+                                        ?>
+                                    </span>
+                                    <span class="rating-number"><?php echo number_format($review->rating, 1); ?></span>
+                                </div>
+                                <span class="feedback-date"><?php echo date('M d, Y', strtotime($review->created_at)); ?></span>
+                            </div>
+                        </div>
+                        <div class="feedback-content">
+                            <p>"<?php echo htmlspecialchars($review->comment); ?>"</p>
+                        </div>
+                        <div class="feedback-actions">
+                            <a href="<?php echo URLROOT; ?>/reviews/update/<?php echo $review->id; ?>"
+                               class="btn btn-sm btn-secondary">
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
+                            <a href="<?php echo URLROOT; ?>/reviews/delete/<?php echo $review->id; ?>"
+                               onclick="return confirm('Are you sure you want to delete this review?')"
+                               class="btn btn-sm btn-outline">
+                                <i class="fas fa-trash"></i> Delete
+                            </a>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
             </div>
-            <div class="feedback-meta">
-                <div class="rating">
-                    <span class="stars" style="color: #fbbf24;">★★★☆☆</span>
-                    <span class="rating-number">3.0</span>
-                </div>
-                <span class="feedback-date">Jan 12, 2024</span>
+        <?php else: ?>
+            <div class="empty-state">
+                <i class="fas fa-pen"></i>
+                <p>No reviews written</p>
+                <span>You haven't written any reviews about your tenants yet.</span>
             </div>
-        </div>
-        <div class="feedback-content">
-            <p>"The apartment is nice but the noise from upstairs neighbors is quite disturbing, especially during night hours. Would appreciate if this could be addressed."</p>
-            <div class="feedback-tags">
-                <span class="tag">Noise Complaint</span>
-                <span class="tag">Neighbors</span>
-            </div>
-        </div>
-        <div class="feedback-actions">
-            <span class="badge badge-warning">Pending Response</span>
-            <div style="display: flex; gap: 0.5rem;">
-                <button class="btn btn-outline btn-sm" onclick="viewFeedbackDetails('FB002')">
-                    <i class="fas fa-eye"></i> View Details
-                </button>
-                <button class="btn btn-primary btn-sm" onclick="respondToFeedback('FB002')">
-                    <i class="fas fa-reply"></i> Respond
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <div class="feedback-item" data-rating="4" data-property="garden-view" data-status="responded">
-        <div class="feedback-header">
-            <div class="tenant-info">
-                <div class="tenant-avatar" style="width: 48px; height: 48px; border-radius: 50%; background: var(--success-color); color: white; display: flex; align-items: center; justify-content: center; font-weight: 600;">LW</div>
-                <div>
-                    <h4>Lisa Wilson</h4>
-                    <p>Garden View Condos - Unit 8A</p>
-                </div>
-            </div>
-            <div class="feedback-meta">
-                <div class="rating">
-                    <span class="stars" style="color: #fbbf24;">★★★★☆</span>
-                    <span class="rating-number">4.0</span>
-                </div>
-                <span class="feedback-date">Jan 10, 2024</span>
-            </div>
-        </div>
-        <div class="feedback-content">
-            <p>"Great location and amenities. The building is well-maintained and the management is responsive. Would love to see more parking spaces available."</p>
-            <div class="feedback-tags">
-                <span class="tag">Location</span>
-                <span class="tag">Amenities</span>
-                <span class="tag">Parking</span>
-            </div>
-        </div>
-        <div class="feedback-actions">
-            <span class="badge badge-success">Responded</span>
-            <div style="display: flex; gap: 0.5rem;">
-                <button class="btn btn-outline btn-sm" onclick="viewFeedbackDetails('FB003')">
-                    <i class="fas fa-eye"></i> View Details
-                </button>
-                <button class="btn btn-outline btn-sm" onclick="viewResponse('FB003')">
-                    <i class="fas fa-comments"></i> View Response
-                </button>
-            </div>
-        </div>
+        <?php endif; ?>
     </div>
 </div>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Initialize filter functionality
-        initFilters();
+<style>
+.feedback-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
 
-        // Search functionality
-        const searchInput = document.getElementById('feedbackSearch');
-        if (searchInput) {
-            searchInput.addEventListener('input', function() {
-                filterFeedback();
-            });
-        }
+.feedback-item {
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+}
 
-        // Filter change events
-        ['propertyFilter', 'ratingFilter', 'statusFilter', 'dateFilter'].forEach(filterId => {
-            const filter = document.getElementById(filterId);
-            if (filter) {
-                filter.addEventListener('change', filterFeedback);
-            }
-        });
-    });
+.feedback-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 15px;
+}
 
-    function initFilters() {
-        // Initialize any filter-specific functionality here
-    }
+.tenant-info {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
 
-    function filterFeedback() {
-        const searchTerm = document.getElementById('feedbackSearch').value.toLowerCase();
-        const propertyFilter = document.getElementById('propertyFilter').value;
-        const ratingFilter = document.getElementById('ratingFilter').value;
-        const statusFilter = document.getElementById('statusFilter').value;
-        const dateFilter = document.getElementById('dateFilter').value;
+.tenant-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 18px;
+    flex-shrink: 0;
+}
 
-        const feedbackItems = document.querySelectorAll('.feedback-item');
+.tenant-info h4 {
+    margin: 0 0 4px 0;
+    font-size: 16px;
+    color: #333;
+}
 
-        feedbackItems.forEach(item => {
-            let show = true;
+.tenant-info p {
+    margin: 0;
+    font-size: 14px;
+    color: #666;
+}
 
-            // Search filter
-            if (searchTerm) {
-                const content = item.textContent.toLowerCase();
-                if (!content.includes(searchTerm)) {
-                    show = false;
-                }
-            }
+.feedback-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 5px;
+}
 
-            // Property filter
-            if (propertyFilter && item.dataset.property !== propertyFilter) {
-                show = false;
-            }
+.rating {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
 
-            // Rating filter
-            if (ratingFilter && item.dataset.rating !== ratingFilter) {
-                show = false;
-            }
+.stars {
+    color: #fbbf24;
+    font-size: 18px;
+    letter-spacing: 2px;
+}
 
-            // Status filter
-            if (statusFilter && item.dataset.status !== statusFilter) {
-                show = false;
-            }
+.rating-number {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+}
 
-            item.style.display = show ? 'block' : 'none';
-        });
-    }
+.feedback-date {
+    font-size: 13px;
+    color: #999;
+}
 
-    function exportFeedback() {
-        showNotification('Exporting feedback report...', 'info');
-    }
+.feedback-content {
+    margin-bottom: 15px;
+}
 
-    function viewFeedbackDetails(feedbackId) {
-        showNotification(`Opening details for feedback ${feedbackId}`, 'info');
-    }
+.feedback-content p {
+    font-size: 15px;
+    line-height: 1.6;
+    color: #444;
+    font-style: italic;
+    margin: 0;
+}
 
-    function respondToFeedback(feedbackId) {
-        showNotification(`Opening response form for feedback ${feedbackId}`, 'info');
-    }
+.feedback-tags {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+}
 
-    function viewResponse(feedbackId) {
-        showNotification(`Opening response for feedback ${feedbackId}`, 'info');
-    }
+.tag {
+    padding: 4px 12px;
+    background: white;
+    border-radius: 16px;
+    font-size: 12px;
+    color: #667eea;
+    border: 1px solid #667eea;
+}
 
-    // Notification function
-    function showNotification(message, type = 'info') {
-        const notification = document.createElement('div');
-        notification.className = `notification notification-${type}`;
-        notification.textContent = message;
+.feedback-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: flex-end;
+    padding-top: 15px;
+    border-top: 1px solid #e0e0e0;
+}
 
-        Object.assign(notification.style, {
-            position: 'fixed',
-            top: '20px',
-            right: '20px',
-            padding: '1rem 1.5rem',
-            borderRadius: '0.5rem',
-            color: 'white',
-            fontWeight: '500',
-            zIndex: '9999',
-            opacity: '0',
-            transform: 'translateY(-20px)',
-            transition: 'all 0.3s ease'
-        });
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+}
 
-        const colors = {
-            success: '#10b981',
-            warning: '#f59e0b',
-            error: '#ef4444',
-            info: '#3b82f6'
-        };
-        notification.style.backgroundColor = colors[type] || colors.info;
+.empty-state i {
+    font-size: 64px;
+    color: #ddd;
+    margin-bottom: 20px;
+}
 
-        document.body.appendChild(notification);
+.empty-state p {
+    font-size: 20px;
+    font-weight: 600;
+    color: #666;
+    margin-bottom: 10px;
+}
 
-        setTimeout(() => {
-            notification.style.opacity = '1';
-            notification.style.transform = 'translateY(0)';
-        }, 100);
-
-        setTimeout(() => {
-            notification.style.opacity = '0';
-            notification.style.transform = 'translateY(-20px)';
-            setTimeout(() => {
-                if (document.body.contains(notification)) {
-                    document.body.removeChild(notification);
-                }
-            }, 300);
-        }, 3000);
-    }
-</script>
+.empty-state span {
+    font-size: 14px;
+    color: #999;
+}
+</style>
 
 <?php require APPROOT . '/views/inc/landlord_footer.php'; ?>
