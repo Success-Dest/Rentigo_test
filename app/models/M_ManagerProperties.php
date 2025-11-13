@@ -8,15 +8,14 @@ class M_ManagerProperties
         $this->db = new Database;
     }
 
-    // Get all properties assigned to a manager (only approved properties) WITH OWNER NAME
+    // Get all properties assigned to a manager WITH OWNER NAME
     public function getAssignedProperties($manager_id)
     {
         $this->db->query(
             "SELECT p.*, u.name AS owner_name
              FROM properties p
              JOIN users u ON p.landlord_id = u.id
-             WHERE p.manager_id = :manager_id
-               AND p.approval_status = 'approved'
+             WHERE p.landlord_id = :manager_id
              ORDER BY p.id DESC"
         );
         $this->db->bind(':manager_id', $manager_id);
@@ -30,8 +29,7 @@ class M_ManagerProperties
             "SELECT p.*
              FROM properties p
              WHERE p.id = :id
-               AND p.manager_id = :manager_id
-               AND p.approval_status = 'approved'
+               AND p.landlord_id = :manager_id
              LIMIT 1"
         );
         $this->db->bind(':id', $id);

@@ -266,4 +266,14 @@ class M_Properties
     {
         return $this->updateStatus($propertyId, $status);
     }
+
+    // Get all properties (for admin)
+    public function getAllProperties()
+    {
+        $this->db->query('SELECT p.*, u.name as landlord_name, u.email as landlord_email
+                         FROM properties p
+                         LEFT JOIN users u ON p.landlord_id = u.id
+                         ORDER BY p.created_at DESC');
+        return $this->db->resultSet();
+    }
 }
