@@ -17,9 +17,9 @@ class Admin extends Controller
     public function index()
     {
         // Load models for dashboard data
-        $propertyModel = $this->model('M_Property');
-        $bookingModel = $this->model('M_Booking');
-        $paymentModel = $this->model('M_Payment');
+        $propertyModel = $this->model('M_Properties');
+        $bookingModel = $this->model('M_Bookings');
+        $paymentModel = $this->model('M_Payments');
 
         // Get statistics
         $allProperties = $propertyModel->getAllProperties();
@@ -89,7 +89,7 @@ class Admin extends Controller
     public function financials()
     {
         // Load payment model
-        $paymentModel = $this->model('M_Payment');
+        $paymentModel = $this->model('M_Payments');
         $maintenanceModel = $this->model('M_Maintenance');
 
         // Get all payments
@@ -149,7 +149,7 @@ class Admin extends Controller
     public function notifications()
     {
         // Load notification model if exists, otherwise use dummy data
-        $notificationModel = $this->model('M_Notification');
+        $notificationModel = $this->model('M_Notifications');
 
         // Get all notifications sent by admin
         $allNotifications = $notificationModel->getAllAdminNotifications();

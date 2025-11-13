@@ -23,7 +23,7 @@ class LeaseAgreements extends Controller
     }
 
     // View lease details
-    public function view($id)
+    public function details($id)
     {
         $lease = $this->leaseModel->getLeaseById($id);
 

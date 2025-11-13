@@ -119,7 +119,7 @@ class Bookings extends Controller
     }
 
     // View booking details
-    public function view($id)
+    public function details($id)
     {
         $booking = $this->bookingModel->getBookingById($id);
 

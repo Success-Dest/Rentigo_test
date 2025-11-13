@@ -25,7 +25,7 @@ class Payments extends Controller
     }
 
     // View payment details
-    public function view($id)
+    public function details($id)
     {
         $payment = $this->paymentModel->getPaymentById($id);
 

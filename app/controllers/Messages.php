@@ -55,7 +55,7 @@ class Messages extends Controller
     }
 
     // View message thread
-    public function view($id)
+    public function thread($id)
     {
         $thread = $this->messageModel->getConversationThread($id);
 
@@ -159,7 +159,7 @@ class Messages extends Controller
 
             if (empty($message)) {
                 flash('message_flash', 'Please enter a message', 'alert alert-danger');
-                redirect('messages/view/' . $parent_id);
+                redirect('messages/thread/' . $parent_id);
             }
 
             // Determine recipient (the other party in the conversation)
@@ -182,7 +182,7 @@ class Messages extends Controller
                 flash('message_flash', 'Failed to send reply', 'alert alert-danger');
             }
 
-            redirect('messages/view/' . $parent_id);
+            redirect('messages/thread/' . $parent_id);
         } else {
             redirect('messages/inbox');
         }
@@ -192,7 +192,7 @@ class Messages extends Controller
     public function markRead($id)
     {
         $this->messageModel->markAsRead($id);
-        redirect('messages/view/' . $id);
+        redirect('messages/thread/' . $id);
     }
 
     // Mark all messages as read

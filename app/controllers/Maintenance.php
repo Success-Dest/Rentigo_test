@@ -108,7 +108,7 @@ class Maintenance extends Controller
     }
 
     // View maintenance request details
-    public function view($id)
+    public function details($id)
     {
         $maintenance = $this->maintenanceModel->getMaintenanceById($id);
 
@@ -152,7 +152,7 @@ class Maintenance extends Controller
                 flash('maintenance_message', 'Failed to assign service provider', 'alert alert-danger');
             }
 
-            redirect('maintenance/view/' . $id);
+            redirect('maintenance/details/' . $id);
         }
     }
 
@@ -170,7 +170,7 @@ class Maintenance extends Controller
                 flash('maintenance_message', 'Failed to update status', 'alert alert-danger');
             }
 
-            redirect('maintenance/view/' . $id);
+            redirect('maintenance/details/' . $id);
         }
     }
 
@@ -189,7 +189,7 @@ class Maintenance extends Controller
                 flash('maintenance_message', 'Failed to complete maintenance request', 'alert alert-danger');
             }
 
-            redirect('maintenance/view/' . $id);
+            redirect('maintenance/details/' . $id);
         }
     }
 

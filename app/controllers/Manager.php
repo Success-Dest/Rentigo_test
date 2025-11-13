@@ -23,7 +23,7 @@ class Manager extends Controller
         // Load models
         $propertyModel = $this->model('M_ManagerProperties');
         $maintenanceModel = $this->model('M_Maintenance');
-        $paymentModel = $this->model('M_Payment');
+        $paymentModel = $this->model('M_Payments');
 
         // Get manager's data
         $manager_id = $_SESSION['user_id'];
@@ -81,7 +81,7 @@ class Manager extends Controller
     public function tenants()
     {
         // Load models
-        $bookingModel = $this->model('M_Booking');
+        $bookingModel = $this->model('M_Bookings');
         $userModel = $this->model('M_Users');
 
         // Get all bookings to get tenant information
