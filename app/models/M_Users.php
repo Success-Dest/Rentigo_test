@@ -171,11 +171,11 @@ class M_Users
     // Get pending Property Managers for admin approval (JOIN both tables)
     public function getPendingPMs()
     {
-        $this->db->query('SELECT u.id, u.name, u.email, u.created_at, 
-                                 pm.employee_id_filename, pm.employee_id_filetype, pm.employee_id_filesize 
+        $this->db->query('SELECT u.id, u.name, u.email, u.created_at,
+                                 pm.approval_status
                           FROM users u
                           INNER JOIN property_manager pm ON u.id = pm.user_id
-                          WHERE u.user_type = :user_type AND pm.approval_status = :status 
+                          WHERE u.user_type = :user_type AND pm.approval_status = :status
                           ORDER BY u.created_at DESC');
 
         $this->db->bind(':user_type', 'property_manager');
@@ -188,13 +188,12 @@ class M_Users
     public function getAllPropertyManagers()
     {
         $this->db->query('SELECT u.id, u.name, u.email, u.account_status, u.created_at,
-                                 pm.employee_id_filename, pm.employee_id_filetype, pm.employee_id_filesize, 
                                  pm.approval_status, pm.phone, pm.approved_at
                           FROM users u
                           INNER JOIN property_manager pm ON u.id = pm.user_id
-                          WHERE u.user_type = :user_type 
-                          ORDER BY 
-                              CASE 
+                          WHERE u.user_type = :user_type
+                          ORDER BY
+                              CASE
                                   WHEN pm.approval_status = "pending" THEN 1
                                   WHEN pm.approval_status = "approved" THEN 2
                                   WHEN pm.approval_status = "rejected" THEN 3

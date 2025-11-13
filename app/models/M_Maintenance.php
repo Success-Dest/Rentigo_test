@@ -322,4 +322,10 @@ class M_Maintenance
         $this->db->bind(':id', $id);
         return $this->db->execute();
     }
+
+    // Alias for getAllMaintenance (used by Manager controller)
+    public function getAllMaintenanceRequests()
+    {
+        return $this->getAllMaintenance();
+    }
 }
