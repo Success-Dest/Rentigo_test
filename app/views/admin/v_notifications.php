@@ -21,7 +21,7 @@
                 <i class="fas fa-bell"></i>
             </div>
             <div class="stat-info">
-                <h3 class="stat-number">3</h3>
+                <h3 class="stat-number"><?php echo $data['totalSent'] ?? 0; ?></h3>
                 <p class="stat-label">Total Sent</p>
                 <span class="stat-change">All notifications</span>
             </div>
@@ -32,7 +32,7 @@
                 <i class="fas fa-check-circle"></i>
             </div>
             <div class="stat-info">
-                <h3 class="stat-number">2</h3>
+                <h3 class="stat-number"><?php echo $data['delivered'] ?? 0; ?></h3>
                 <p class="stat-label">Delivered</p>
                 <span class="stat-change positive">Successfully sent</span>
             </div>
@@ -43,7 +43,7 @@
                 <i class="fas fa-clock"></i>
             </div>
             <div class="stat-info">
-                <h3 class="stat-number">1</h3>
+                <h3 class="stat-number"><?php echo $data['draft'] ?? 0; ?></h3>
                 <p class="stat-label">Draft</p>
                 <span class="stat-change">Pending send</span>
             </div>
@@ -54,7 +54,7 @@
                 <i class="fas fa-users"></i>
             </div>
             <div class="stat-info">
-                <h3 class="stat-number">245</h3>
+                <h3 class="stat-number"><?php echo $data['totalRecipients'] ?? 0; ?></h3>
                 <p class="stat-label">Recipients</p>
                 <span class="stat-change">Total reach</span>
             </div>

@@ -16,9 +16,9 @@
                 <i class="fas fa-dollar-sign"></i>
             </div>
             <div class="stat-info">
-                <h3 class="stat-number">Rs124,500</h3>
+                <h3 class="stat-number">LKR <?php echo number_format($data['totalRevenue'] ?? 0, 0); ?></h3>
                 <p class="stat-label">Total Revenue</p>
-                <span class="stat-change positive">+15% from last month</span>
+                <span class="stat-change">All transactions</span>
             </div>
         </div>
 
@@ -27,9 +27,9 @@
                 <i class="fas fa-check-circle"></i>
             </div>
             <div class="stat-info">
-                <h3 class="stat-number">Rs 98,200</h3>
+                <h3 class="stat-number">LKR <?php echo number_format($data['collected'] ?? 0, 0); ?></h3>
                 <p class="stat-label">Collected</p>
-                <span class="stat-change positive">+8% from last month</span>
+                <span class="stat-change positive">Completed payments</span>
             </div>
         </div>
 
@@ -38,9 +38,9 @@
                 <i class="fas fa-clock"></i>
             </div>
             <div class="stat-info">
-                <h3 class="stat-number">Rs 26,300</h3>
+                <h3 class="stat-number">LKR <?php echo number_format($data['pending'] ?? 0, 0); ?></h3>
                 <p class="stat-label">Pending</p>
-                <span class="stat-change">3 transactions</span>
+                <span class="stat-change"><?php echo $data['pendingCount'] ?? 0; ?> transactions</span>
             </div>
         </div>
 
@@ -49,9 +49,9 @@
                 <i class="fas fa-exclamation-triangle"></i>
             </div>
             <div class="stat-info">
-                <h3 class="stat-number">Rs 8,450</h3>
+                <h3 class="stat-number">LKR <?php echo number_format($data['overdue'] ?? 0, 0); ?></h3>
                 <p class="stat-label">Overdue</p>
-                <span class="stat-change negative">2 transactions</span>
+                <span class="stat-change negative"><?php echo $data['overdueCount'] ?? 0; ?> transactions</span>
             </div>
         </div>
     </div>
@@ -78,149 +78,59 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr data-type="income" data-status="approved" data-date="2024-01-07">
-                        <td>
-                            <div class="transaction-type">
-                                <div class="type-icon income">
-                                    <i class="fas fa-arrow-down"></i>
-                                </div>
-                                <span class="type-label">Income</span>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="transaction-description">
-                                <div class="description-title">Monthly rent - Luxury Apartment</div>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="property-info">
-                                <div class="property-name">Luxury Apartment Downtown</div>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="amount-display income">Rs 25,500</div>
-                        </td>
-                        <td>01/07/2024</td>
-                        <td><span class="status-badge approved">Approved</span></td>
-                        <td>
-                            <div class="transaction-actions">
-                                <button class="action-btn view-btn" onclick="viewTransaction('TXN001')" title="View">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-
-                    <tr data-type="payment" data-status="pending" data-date="2024-02-07">
-                        <td>
-                            <div class="transaction-type">
-                                <div class="type-icon payment">
-                                    <i class="fas fa-arrow-up"></i>
-                                </div>
-                                <span class="type-label">Payment</span>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="transaction-description">
-                                <div class="description-title">Property manager commission</div>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="property-info">
-                                <div class="property-name">Family House Suburbs</div>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="amount-display payment">Rs 65,500</div>
-                        </td>
-                        <td>02/07/2024</td>
-                        <td><span class="status-badge pending">Pending</span></td>
-                        <td>
-                            <div class="transaction-actions">
-                                <button class="action-btn view-btn" onclick="viewTransaction('TXN002')" title="View">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                                <button class="action-btn approve-btn" onclick="approveTransaction('TXN002')" title="Approve">
-                                    <i class="fas fa-check"></i>
-                                </button>
-                                <button class="action-btn reject-btn" onclick="rejectTransaction('TXN002')" title="Reject">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-
-                    <tr data-type="expense" data-status="approved" data-date="2024-03-07">
-                        <td>
-                            <div class="transaction-type">
-                                <div class="type-icon expense">
-                                    <i class="fas fa-arrow-up"></i>
-                                </div>
-                                <span class="type-label">Expense</span>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="transaction-description">
-                                <div class="description-title">Maintenance - Plumbing repair</div>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="property-info">
-                                <div class="property-name">Studio Near University</div>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="amount-display expense">Rs 20,500</div>
-                        </td>
-                        <td>03/07/2024</td>
-                        <td><span class="status-badge approved">Approved</span></td>
-                        <td>
-                            <div class="transaction-actions">
-                                <button class="action-btn view-btn" onclick="viewTransaction('TXN003')" title="View">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-
-                    <tr data-type="income" data-status="pending" data-date="2024-04-07">
-                        <td>
-                            <div class="transaction-type">
-                                <div class="type-icon income">
-                                    <i class="fas fa-arrow-down"></i>
-                                </div>
-                                <span class="type-label">Income</span>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="transaction-description">
-                                <div class="description-title">Security deposit</div>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="property-info">
-                                <div class="property-name">Modern Condo</div>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="amount-display income">Rs 45,500</div>
-                        </td>
-                        <td>04/07/2024</td>
-                        <td><span class="status-badge pending">Pending</span></td>
-                        <td>
-                            <div class="transaction-actions">
-                                <button class="action-btn view-btn" onclick="viewTransaction('TXN004')" title="View">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                                <button class="action-btn approve-btn" onclick="approveTransaction('TXN004')" title="Approve">
-                                    <i class="fas fa-check"></i>
-                                </button>
-                                <button class="action-btn reject-btn" onclick="rejectTransaction('TXN004')" title="Reject">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
+                    <?php if (!empty($data['recentTransactions'])): ?>
+                        <?php foreach ($data['recentTransactions'] as $transaction): ?>
+                            <tr data-type="income" data-status="<?php echo htmlspecialchars($transaction->status); ?>" data-date="<?php echo date('Y-m-d', strtotime($transaction->payment_date ?? $transaction->due_date)); ?>">
+                                <td>
+                                    <div class="transaction-type">
+                                        <div class="type-icon income">
+                                            <i class="fas fa-arrow-down"></i>
+                                        </div>
+                                        <span class="type-label">Payment</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="transaction-description">
+                                        <div class="description-title">
+                                            <?php echo htmlspecialchars($transaction->payment_method ?? 'Rental payment'); ?>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="property-info">
+                                        <div class="property-name">
+                                            <?php echo htmlspecialchars($transaction->property_address ?? 'N/A'); ?>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="amount-display income">
+                                        LKR <?php echo number_format($transaction->amount, 0); ?>
+                                    </div>
+                                </td>
+                                <td><?php echo date('m/d/Y', strtotime($transaction->payment_date ?? $transaction->due_date)); ?></td>
+                                <td>
+                                    <span class="status-badge <?php
+                                        echo $transaction->status === 'completed' ? 'approved' :
+                                            ($transaction->status === 'pending' ? 'pending' : 'rejected');
+                                    ?>">
+                                        <?php echo ucfirst($transaction->status); ?>
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="transaction-actions">
+                                        <button class="action-btn view-btn" onclick="viewTransaction('TXN<?php echo $transaction->id; ?>')" title="View">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="7" class="text-center text-muted">No transactions found</td>
+                        </tr>
+                    <?php endif; ?>
                 </tbody>
             </table>
         </div>

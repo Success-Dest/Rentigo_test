@@ -94,17 +94,7 @@ class Payments extends Controller
             $this->paymentModel->updatePaymentStatus($payment_id, 'completed');
 
             // Update with transaction details
-            $this->db = new Database();
-            $this->db->query('UPDATE payments SET
-                             transaction_id = :transaction_id,
-                             payment_method = :payment_method,
-                             payment_date = :payment_date
-                             WHERE id = :id');
-            $this->db->bind(':transaction_id', $transaction_id);
-            $this->db->bind(':payment_method', $payment_method);
-            $this->db->bind(':payment_date', $payment_date);
-            $this->db->bind(':id', $payment_id);
-            $this->db->execute();
+            $this->paymentModel->updatePaymentTransaction($payment_id, $transaction_id, $payment_method, $payment_date);
 
             // Create notification for landlord
             $this->notificationModel->notifyPaymentReceived(

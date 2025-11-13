@@ -115,6 +115,22 @@ class M_Payments
         return $this->db->execute();
     }
 
+    // Update payment transaction details
+    public function updatePaymentTransaction($id, $transaction_id, $payment_method, $payment_date)
+    {
+        $this->db->query('UPDATE payments SET
+                         transaction_id = :transaction_id,
+                         payment_method = :payment_method,
+                         payment_date = :payment_date,
+                         updated_at = NOW()
+                         WHERE id = :id');
+        $this->db->bind(':id', $id);
+        $this->db->bind(':transaction_id', $transaction_id);
+        $this->db->bind(':payment_method', $payment_method);
+        $this->db->bind(':payment_date', $payment_date);
+        return $this->db->execute();
+    }
+
     // Get pending payments for a tenant
     public function getPendingPaymentsByTenant($tenant_id)
     {

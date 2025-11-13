@@ -56,78 +56,48 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr class="agreement-row" onclick="selectAgreement('AGR-001')">
-                                        <td class="font-medium">AGR-001</td>
-                                        <td>Sarah Johnson</td>
-                                        <td>Sunset Apartments 2A</td>
-                                        <td>2023-06-01 to 2024-05-31</td>
-                                        <td class="font-semibold text-primary">Rs 20,000</td>
-                                        <td><span class="status-badge approved">Validated</span></td>
-                                        <td>
-                                            <div class="action-buttons">
-                                                <button class="btn-icon" title="View Agreement">
-                                                    <i class="fas fa-eye"></i>
-                                                </button>
-                                                <button class="btn-icon" title="Download">
-                                                    <i class="fas fa-download"></i>
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr class="agreement-row" onclick="selectAgreement('AGR-002')">
-                                        <td class="font-medium">AGR-002</td>
-                                        <td>Mike Chen</td>
-                                        <td>Downtown Lofts 5B</td>
-                                        <td>2023-09-15 to 2024-09-14</td>
-                                        <td class="font-semibold text-primary">Rs 30,000</td>
-                                        <td><span class="status-badge pending">Pending Review</span></td>
-                                        <td>
-                                            <div class="action-buttons">
-                                                <button class="btn-icon" title="View Agreement">
-                                                    <i class="fas fa-eye"></i>
-                                                </button>
-                                                <button class="btn-icon" title="Download">
-                                                    <i class="fas fa-download"></i>
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr class="agreement-row" onclick="selectAgreement('AGR-003')">
-                                        <td class="font-medium">AGR-003</td>
-                                        <td>Emma Davis</td>
-                                        <td>Riverside Houses 12</td>
-                                        <td>2023-03-01 to 2024-02-29</td>
-                                        <td class="font-semibold text-primary">Rs 25,000</td>
-                                        <td><span class="status-badge approved">Validated</span></td>
-                                        <td>
-                                            <div class="action-buttons">
-                                                <button class="btn-icon" title="View Agreement">
-                                                    <i class="fas fa-eye"></i>
-                                                </button>
-                                                <button class="btn-icon" title="Download">
-                                                    <i class="fas fa-download"></i>
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr class="agreement-row" onclick="selectAgreement('AGR-004')">
-                                        <td class="font-medium">AGR-004</td>
-                                        <td>Alex Rodriguez</td>
-                                        <td>Garden View Condos 3C</td>
-                                        <td>2024-01-15 to 2025-01-14</td>
-                                        <td class="font-semibold text-primary">Rs 20,000</td>
-                                        <td><span class="status-badge rejected">Rejected</span></td>
-                                        <td>
-                                            <div class="action-buttons">
-                                                <button class="btn-icon" title="View Agreement">
-                                                    <i class="fas fa-eye"></i>
-                                                </button>
-                                                <button class="btn-icon" title="Download">
-                                                    <i class="fas fa-download"></i>
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
+                                    <?php if (!empty($data['allLeases'])): ?>
+                                        <?php foreach ($data['allLeases'] as $lease): ?>
+                                            <tr class="agreement-row" onclick="selectAgreement('AGR-<?php echo $lease->id; ?>')">
+                                                <td class="font-medium">AGR-<?php echo str_pad($lease->id, 3, '0', STR_PAD_LEFT); ?></td>
+                                                <td><?php echo htmlspecialchars($lease->tenant_name ?? 'N/A'); ?></td>
+                                                <td><?php echo htmlspecialchars($lease->property_address ?? 'N/A'); ?></td>
+                                                <td>
+                                                    <?php
+                                                        echo date('Y-m-d', strtotime($lease->lease_start_date));
+                                                        echo ' to ';
+                                                        echo date('Y-m-d', strtotime($lease->lease_end_date));
+                                                    ?>
+                                                </td>
+                                                <td class="font-semibold text-primary">
+                                                    LKR <?php echo number_format($lease->monthly_rent ?? 0, 0); ?>
+                                                </td>
+                                                <td>
+                                                    <span class="status-badge <?php
+                                                        $status = $lease->validation_status ?? 'pending';
+                                                        echo ($status === 'validated' || $status === 'approved') ? 'approved' :
+                                                             ($status === 'rejected' ? 'rejected' : 'pending');
+                                                    ?>">
+                                                        <?php echo ucfirst(str_replace('_', ' ', $status)); ?>
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <div class="action-buttons">
+                                                        <button class="btn-icon" title="View Agreement">
+                                                            <i class="fas fa-eye"></i>
+                                                        </button>
+                                                        <button class="btn-icon" title="Download">
+                                                            <i class="fas fa-download"></i>
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    <?php else: ?>
+                                        <tr>
+                                            <td colspan="7" class="text-center text-muted">No lease agreements</td>
+                                        </tr>
+                                    <?php endif; ?>
                                 </tbody>
                             </table>
                         </div>

@@ -8,9 +8,9 @@
                 <i class="fas fa-home"></i>
             </div>
             <div class="stat-info">
-                <h3 class="stat-number">1,234</h3>
+                <h3 class="stat-number"><?php echo number_format($data['totalProperties'] ?? 0); ?></h3>
                 <p class="stat-label">Total Properties</p>
-                <span class="stat-change positive">+12% from last month</span>
+                <span class="stat-change">All properties in system</span>
             </div>
         </div>
 
@@ -19,9 +19,9 @@
                 <i class="fas fa-users"></i>
             </div>
             <div class="stat-info">
-                <h3 class="stat-number">856</h3>
+                <h3 class="stat-number"><?php echo number_format($data['activeTenants'] ?? 0); ?></h3>
                 <p class="stat-label">Active Tenants</p>
-                <span class="stat-change positive">+8% from last month</span>
+                <span class="stat-change">Currently renting</span>
             </div>
         </div>
 
@@ -30,9 +30,9 @@
                 <i class="fas fa-dollar-sign"></i>
             </div>
             <div class="stat-info">
-                <h3 class="stat-number">Rs 12,540</h3>
+                <h3 class="stat-number">LKR <?php echo number_format($data['monthlyRevenue'] ?? 0, 0); ?></h3>
                 <p class="stat-label">Monthly Revenue</p>
-                <span class="stat-change positive">+15% from last month</span>
+                <span class="stat-change">This month</span>
             </div>
         </div>
 
@@ -41,9 +41,9 @@
                 <i class="fas fa-clock"></i>
             </div>
             <div class="stat-info">
-                <h3 class="stat-number">23</h3>
+                <h3 class="stat-number"><?php echo $data['pendingApprovals'] ?? 0; ?></h3>
                 <p class="stat-label">Pending Approvals</p>
-                <span class="stat-change negative">-5% from last month</span>
+                <span class="stat-change">Requires attention</span>
             </div>
         </div>
     </div>

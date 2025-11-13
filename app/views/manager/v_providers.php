@@ -20,149 +20,66 @@
 
     <!-- Service Provider Cards -->
     <div class="providers-grid">
-        <div class="provider-card">
-            <div class="provider-header">
-                <div class="provider-info">
-                    <h3 class="provider-name">ABC Plumbing Services</h3>
-                    <p class="provider-specialty">Plumbing</p>
-                    <div class="provider-rating">
-                        <div class="stars">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
+        <?php if (!empty($data['providers'])): ?>
+            <?php foreach ($data['providers'] as $provider): ?>
+                <div class="provider-card">
+                    <div class="provider-header">
+                        <div class="provider-info">
+                            <h3 class="provider-name"><?php echo htmlspecialchars($provider->company_name ?? $provider->name ?? 'N/A'); ?></h3>
+                            <p class="provider-specialty"><?php echo htmlspecialchars($provider->service_type ?? $provider->specialty ?? 'General'); ?></p>
+                            <div class="provider-rating">
+                                <div class="stars">
+                                    <?php
+                                        $rating = $provider->rating ?? 5;
+                                        for ($i = 1; $i <= 5; $i++) {
+                                            if ($i <= $rating) {
+                                                echo '<i class="fas fa-star"></i>';
+                                            } else {
+                                                echo '<i class="far fa-star"></i>';
+                                            }
+                                        }
+                                    ?>
+                                </div>
+                                <span class="rating-text"><?php echo number_format($rating, 1); ?> (<?php echo $provider->review_count ?? 0; ?> reviews)</span>
+                            </div>
                         </div>
-                        <span class="rating-text">4.8 (124 reviews)</span>
+                        <span class="status-badge <?php echo ($provider->status ?? 'active') === 'active' ? 'approved' : 'pending'; ?>">
+                            <?php echo ucfirst($provider->status ?? 'Active'); ?>
+                        </span>
+                    </div>
+
+                    <div class="provider-contact">
+                        <div class="contact-item">
+                            <i class="fas fa-phone"></i>
+                            <span><?php echo htmlspecialchars($provider->phone ?? 'N/A'); ?></span>
+                        </div>
+                        <div class="contact-item">
+                            <i class="fas fa-envelope"></i>
+                            <span><?php echo htmlspecialchars($provider->email ?? 'N/A'); ?></span>
+                        </div>
+                        <div class="contact-item">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span><?php echo htmlspecialchars($provider->address ?? 'N/A'); ?></span>
+                        </div>
+                    </div>
+
+                    <div class="provider-stats">
+                        <span><strong>Completed Jobs:</strong> <?php echo $provider->completed_jobs ?? 0; ?></span>
+                        <span class="status-badge approved">Available</span>
+                    </div>
+
+                    <div class="provider-actions">
+                        <button class="btn btn-secondary">View Profile</button>
+                        <button class="btn btn-primary">
+                            <i class="fas fa-user-check"></i>
+                            Assign
+                        </button>
                     </div>
                 </div>
-                <span class="status-badge approved">Active</span>
-            </div>
-
-            <div class="provider-contact">
-                <div class="contact-item">
-                    <i class="fas fa-phone"></i>
-                    <span>(555) 123-4567</span>
-                </div>
-                <div class="contact-item">
-                    <i class="fas fa-envelope"></i>
-                    <span>contact@abcplumbing.com</span>
-                </div>
-                <div class="contact-item">
-                    <i class="fas fa-map-marker-alt"></i>
-                    <span>123 Service St, City</span>
-                </div>
-            </div>
-
-            <div class="provider-stats">
-                <span><strong>Completed Jobs:</strong> 45</span>
-                <span class="status-badge approved">Available</span>
-            </div>
-
-            <div class="provider-actions">
-                <button class="btn btn-secondary">View Profile</button>
-                <button class="btn btn-primary">
-                    <i class="fas fa-user-check"></i>
-                    Assign
-                </button>
-            </div>
-        </div>
-
-        <div class="provider-card">
-            <div class="provider-header">
-                <div class="provider-info">
-                    <h3 class="provider-name">Cool Air HVAC</h3>
-                    <p class="provider-specialty">HVAC</p>
-                    <div class="provider-rating">
-                        <div class="stars">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="far fa-star"></i>
-                        </div>
-                        <span class="rating-text">4.6 (89 reviews)</span>
-                    </div>
-                </div>
-                <span class="status-badge approved">Active</span>
-            </div>
-
-            <div class="provider-contact">
-                <div class="contact-item">
-                    <i class="fas fa-phone"></i>
-                    <span>(555) 234-5678</span>
-                </div>
-                <div class="contact-item">
-                    <i class="fas fa-envelope"></i>
-                    <span>info@coolair.com</span>
-                </div>
-                <div class="contact-item">
-                    <i class="fas fa-map-marker-alt"></i>
-                    <span>456 Climate Ave, City</span>
-                </div>
-            </div>
-
-            <div class="provider-stats">
-                <span><strong>Completed Jobs:</strong> 32</span>
-                <span class="status-badge approved">Available</span>
-            </div>
-
-            <div class="provider-actions">
-                <button class="btn btn-secondary">View Profile</button>
-                <button class="btn btn-primary">
-                    <i class="fas fa-user-check"></i>
-                    Assign
-                </button>
-            </div>
-        </div>
-
-        <div class="provider-card">
-            <div class="provider-header">
-                <div class="provider-info">
-                    <h3 class="provider-name">ElectricPro Solutions</h3>
-                    <p class="provider-specialty">Electrical</p>
-                    <div class="provider-rating">
-                        <div class="stars">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                        </div>
-                        <span class="rating-text">4.9 (156 reviews)</span>
-                    </div>
-                </div>
-                <span class="status-badge approved">Active</span>
-            </div>
-
-            <div class="provider-contact">
-                <div class="contact-item">
-                    <i class="fas fa-phone"></i>
-                    <span>(555) 345-6789</span>
-                </div>
-                <div class="contact-item">
-                    <i class="fas fa-envelope"></i>
-                    <span>hello@electricpro.com</span>
-                </div>
-                <div class="contact-item">
-                    <i class="fas fa-map-marker-alt"></i>
-                    <span>789 Power Ln, City</span>
-                </div>
-            </div>
-
-            <div class="provider-stats">
-                <span><strong>Completed Jobs:</strong> 67</span>
-                <span class="status-badge approved">Available</span>
-            </div>
-
-            <div class="provider-actions">
-                <button class="btn btn-secondary">View Profile</button>
-                <button class="btn btn-primary">
-                    <i class="fas fa-user-check"></i>
-                    Assign
-                </button>
-            </div>
-        </div>
+            <?php endforeach; ?>
+        <?php else: ?>
+            <p class="text-muted" style="text-align: center; padding: 2rem; width: 100%;">No service providers registered</p>
+        <?php endif; ?>
     </div>
 
     <!-- Manual Status Update -->

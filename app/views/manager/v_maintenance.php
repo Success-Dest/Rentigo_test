@@ -56,55 +56,43 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td class="font-medium">MNT-001</td>
-                                <td>Sunset Apartments 2A</td>
-                                <td>Leaking faucet in kitchen</td>
-                                <td>2024-01-15</td>
-                                <td>ABC Plumbing</td>
-                                <td class="font-semibold text-primary">Rs 3000</td>
-                                <td><span class="status-badge pending">Quoted</span></td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <button class="btn btn-sm btn-success">Approve</button>
-                                        <button class="btn-icon" title="View Details">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="font-medium">MNT-002</td>
-                                <td>Downtown Lofts 5B</td>
-                                <td>AC unit not cooling properly</td>
-                                <td>2024-01-14</td>
-                                <td>Cool Air Services</td>
-                                <td class="font-semibold text-primary">Rs 2000</td>
-                                <td><span class="status-badge approved">Completed</span></td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <button class="btn-icon" title="View Details">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="font-medium">MNT-003</td>
-                                <td>Garden View Condos 3C</td>
-                                <td>Broken window latch</td>
-                                <td>2024-01-13</td>
-                                <td>Fix-It Pros</td>
-                                <td class="font-semibold text-primary">Rs 5000</td>
-                                <td><span class="status-badge approved">Approved</span></td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <button class="btn-icon" title="View Details">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
+                            <?php if (!empty($data['allRequests'])): ?>
+                                <?php foreach ($data['allRequests'] as $request): ?>
+                                    <tr>
+                                        <td class="font-medium">MNT-<?php echo str_pad($request->id, 3, '0', STR_PAD_LEFT); ?></td>
+                                        <td><?php echo htmlspecialchars($request->property_address ?? 'N/A'); ?></td>
+                                        <td><?php echo htmlspecialchars($request->title ?? $request->description ?? 'N/A'); ?></td>
+                                        <td><?php echo date('Y-m-d', strtotime($request->created_at)); ?></td>
+                                        <td><?php echo htmlspecialchars($request->provider_name ?? 'Not assigned'); ?></td>
+                                        <td class="font-semibold text-primary">
+                                            LKR <?php echo number_format($request->estimated_cost ?? 0, 0); ?>
+                                        </td>
+                                        <td>
+                                            <span class="status-badge <?php
+                                                echo $request->status === 'completed' ? 'approved' :
+                                                    ($request->status === 'approved' || $request->status === 'in_progress' ? 'approved' :
+                                                    ($request->status === 'quoted' ? 'pending' : 'pending'));
+                                            ?>">
+                                                <?php echo ucfirst(str_replace('_', ' ', $request->status)); ?>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div class="action-buttons">
+                                                <?php if ($request->status === 'quoted'): ?>
+                                                    <button class="btn btn-sm btn-success">Approve</button>
+                                                <?php endif; ?>
+                                                <button class="btn-icon" title="View Details">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <tr>
+                                    <td colspan="8" class="text-center text-muted">No maintenance requests</td>
+                                </tr>
+                            <?php endif; ?>
                         </tbody>
                     </table>
                 </div>
@@ -118,20 +106,26 @@
             <h3>Pending Quotation Approvals</h3>
         </div>
         <div class="approval-cards">
-            <div class="approval-card">
-                <div class="card-content">
-                    <div class="card-info">
-                        <h4 class="font-medium">MNT-001</h4>
-                        <p class="text-muted">Sunset Apartments 2A</p>
-                        <p>Leaking faucet in kitchen</p>
-                        <p class="quotation-amount">Rs 1500</p>
+            <?php if (!empty($data['pendingApprovals'])): ?>
+                <?php foreach ($data['pendingApprovals'] as $request): ?>
+                    <div class="approval-card">
+                        <div class="card-content">
+                            <div class="card-info">
+                                <h4 class="font-medium">MNT-<?php echo str_pad($request->id, 3, '0', STR_PAD_LEFT); ?></h4>
+                                <p class="text-muted"><?php echo htmlspecialchars($request->property_address ?? 'N/A'); ?></p>
+                                <p><?php echo htmlspecialchars($request->title ?? $request->description ?? 'N/A'); ?></p>
+                                <p class="quotation-amount">LKR <?php echo number_format($request->estimated_cost ?? 0, 0); ?></p>
+                            </div>
+                            <div class="card-actions">
+                                <button class="btn btn-success">Approve Quote</button>
+                                <button class="btn btn-secondary">Request Revision</button>
+                            </div>
+                        </div>
                     </div>
-                    <div class="card-actions">
-                        <button class="btn btn-success">Approve Quote</button>
-                        <button class="btn btn-secondary">Request Revision</button>
-                    </div>
-                </div>
-            </div>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <p class="text-muted" style="text-align: center; padding: 2rem;">No pending quotation approvals</p>
+            <?php endif; ?>
         </div>
     </div>
 </div>
