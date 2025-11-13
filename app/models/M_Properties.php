@@ -30,11 +30,11 @@ class M_Properties
     public function addProperty($data)
     {
         $this->db->query('INSERT INTO properties (
-            landlord_id, address, property_type, bedrooms, bathrooms, sqft, rent, deposit, 
-            available_date, parking, pet_policy, laundry, description, status, listing_type, current_occupant
+            landlord_id, address, property_type, bedrooms, bathrooms, sqft, rent, deposit,
+            available_date, parking, pet_policy, laundry, description, status, listing_type
         ) VALUES (
-            :landlord_id, :address, :property_type, :bedrooms, :bathrooms, :sqft, :rent, :deposit, 
-            :available_date, :parking, :pet_policy, :laundry, :description, :status, :listing_type, :current_occupant
+            :landlord_id, :address, :property_type, :bedrooms, :bathrooms, :sqft, :rent, :deposit,
+            :available_date, :parking, :pet_policy, :laundry, :description, :status, :listing_type
         )');
 
         // Bind values
@@ -52,8 +52,7 @@ class M_Properties
         $this->db->bind(':laundry', $data['laundry']);
         $this->db->bind(':description', $data['description']);
         $this->db->bind(':status', $data['status']);
-        $this->db->bind(':listing_type', $data['listing_type'] ?? 'rent');
-        $this->db->bind(':current_occupant', $data['current_occupant'] ?? null);
+        $this->db->bind(':listing_type', $data['listing_type'] ?? 'rental');
 
         return $this->db->execute();
     }
@@ -62,11 +61,11 @@ class M_Properties
     public function addPropertyAndReturnId($data)
     {
         $this->db->query('INSERT INTO properties (
-            landlord_id, address, property_type, bedrooms, bathrooms, sqft, rent, deposit, 
-            available_date, parking, pet_policy, laundry, description, status, listing_type, current_occupant
+            landlord_id, address, property_type, bedrooms, bathrooms, sqft, rent, deposit,
+            available_date, parking, pet_policy, laundry, description, status, listing_type
         ) VALUES (
-            :landlord_id, :address, :property_type, :bedrooms, :bathrooms, :sqft, :rent, :deposit, 
-            :available_date, :parking, :pet_policy, :laundry, :description, :status, :listing_type, :current_occupant
+            :landlord_id, :address, :property_type, :bedrooms, :bathrooms, :sqft, :rent, :deposit,
+            :available_date, :parking, :pet_policy, :laundry, :description, :status, :listing_type
         )');
 
         // Bind values
@@ -84,8 +83,7 @@ class M_Properties
         $this->db->bind(':laundry', $data['laundry']);
         $this->db->bind(':description', $data['description']);
         $this->db->bind(':status', $data['status']);
-        $this->db->bind(':listing_type', $data['listing_type'] ?? 'rent');
-        $this->db->bind(':current_occupant', $data['current_occupant'] ?? null);
+        $this->db->bind(':listing_type', $data['listing_type'] ?? 'rental');
 
         if ($this->db->execute()) {
             return $this->db->lastInsertId();
@@ -97,20 +95,19 @@ class M_Properties
     // Update property
     public function update($data)
     {
-        $this->db->query('UPDATE properties SET 
-                         address = :address, 
-                         property_type = :property_type, 
-                         bedrooms = :bedrooms, 
-                         bathrooms = :bathrooms, 
-                         sqft = :sqft, 
-                         rent = :rent, 
-                         deposit = :deposit, 
-                         available_date = :available_date, 
-                         parking = :parking, 
-                         pet_policy = :pet_policy, 
-                         laundry = :laundry, 
-                         description = :description,
-                         current_occupant = :current_occupant
+        $this->db->query('UPDATE properties SET
+                         address = :address,
+                         property_type = :property_type,
+                         bedrooms = :bedrooms,
+                         bathrooms = :bathrooms,
+                         sqft = :sqft,
+                         rent = :rent,
+                         deposit = :deposit,
+                         available_date = :available_date,
+                         parking = :parking,
+                         pet_policy = :pet_policy,
+                         laundry = :laundry,
+                         description = :description
                          WHERE id = :id');
 
         // Bind values
@@ -127,7 +124,6 @@ class M_Properties
         $this->db->bind(':pet_policy', $data['pet_policy']);
         $this->db->bind(':laundry', $data['laundry']);
         $this->db->bind(':description', $data['description']);
-        $this->db->bind(':current_occupant', $data['current_occupant'] ?? null);
 
         return $this->db->execute();
     }
@@ -257,5 +253,17 @@ class M_Properties
 
         $result = $this->db->single();
         return $result ? $result->count : 0;
+    }
+
+    // Alias for getPropertyStats (used by Landlord controller)
+    public function getPropertyStatsByLandlord($landlordId)
+    {
+        return $this->getPropertyStats($landlordId);
+    }
+
+    // Alias for updateStatus (used by various controllers)
+    public function updatePropertyStatus($propertyId, $status)
+    {
+        return $this->updateStatus($propertyId, $status);
     }
 }

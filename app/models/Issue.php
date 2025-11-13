@@ -115,7 +115,7 @@ class Issue
     public function getAllIssues()
     {
         $this->db->query("
-            SELECT i.*, 
+            SELECT i.*,
                    p.address AS property_address,
                    p.property_type,
                    u.name AS tenant_name,
@@ -123,8 +123,8 @@ class Issue
             FROM issues i
             LEFT JOIN properties p ON i.property_id = p.id
             LEFT JOIN users u ON i.tenant_id = u.id
-            ORDER BY 
-                CASE 
+            ORDER BY
+                CASE
                     WHEN i.priority = 'emergency' THEN 1
                     WHEN i.priority = 'high' THEN 2
                     WHEN i.priority = 'medium' THEN 3
@@ -134,5 +134,11 @@ class Issue
         ");
 
         return $this->db->resultSet();
+    }
+
+    // Alias for getRecentIssuesByTenant (used by Tenant controller)
+    public function getRecentIssues($tenantId, $limit = 5)
+    {
+        return $this->getRecentIssuesByTenant($tenantId, $limit);
     }
 }
