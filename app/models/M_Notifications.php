@@ -237,4 +237,35 @@ class M_Notifications
             'link' => URLROOT . '/properties/index'
         ]);
     }
+
+    // Get all admin-related notifications (for admin dashboard)
+    public function getAllAdminNotifications()
+    {
+        // Get all notifications grouped by type with aggregated statistics
+        $this->db->query("SELECT
+                            type,
+                            COUNT(*) as recipient_count,
+                            MAX(created_at) as created_at,
+                            MIN(title) as title,
+                            MIN(message) as message,
+                            'sent' as status
+                         FROM notifications
+                         GROUP BY type
+                         ORDER BY MAX(created_at) DESC");
+
+        return $this->db->resultSet();
+    }
+
+    // Get notification statistics for admin
+    public function getNotificationStats()
+    {
+        $this->db->query("SELECT
+                            COUNT(*) as total_sent,
+                            COUNT(DISTINCT user_id) as total_recipients,
+                            COUNT(CASE WHEN is_read = 1 THEN 1 END) as read_count,
+                            COUNT(CASE WHEN is_read = 0 THEN 1 END) as unread_count
+                         FROM notifications");
+
+        return $this->db->single();
+    }
 }
