@@ -205,7 +205,7 @@
                                             <i class="fas fa-bell"></i> Remind
                                         </button>
                                     <?php else: ?>
-                                        <a href="<?php echo URLROOT; ?>/payments/view/<?php echo $payment->id; ?>"
+                                        <a href="<?php echo URLROOT; ?>/payments/details/<?php echo $payment->id; ?>"
                                            class="btn btn-outline btn-sm">
                                             <i class="fas fa-eye"></i> View
                                         </a>

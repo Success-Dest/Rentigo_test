@@ -58,7 +58,7 @@
                 </div>
             </div>
             <div class="lease-actions">
-                <a href="<?php echo URLROOT; ?>/leaseagreements/view/<?php echo $data['activeLease']->id; ?>"
+                <a href="<?php echo URLROOT; ?>/leaseagreements/details/<?php echo $data['activeLease']->id; ?>"
                    class="btn btn-secondary">
                     <i class="fas fa-eye"></i> View Full Agreement
                 </a>
@@ -180,7 +180,7 @@
                                         <i class="fas fa-pen"></i> Sign Agreement
                                     </a>
                                 <?php endif; ?>
-                                <a href="<?php echo URLROOT; ?>/leaseagreements/view/<?php echo $lease->id; ?>"
+                                <a href="<?php echo URLROOT; ?>/leaseagreements/details/<?php echo $lease->id; ?>"
                                    class="btn btn-secondary btn-sm">
                                     <i class="fas fa-eye"></i> View
                                 </a>
