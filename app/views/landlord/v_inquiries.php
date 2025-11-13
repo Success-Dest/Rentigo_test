@@ -98,7 +98,7 @@
                            class="btn btn-primary btn-sm">
                             <i class="fas fa-reply"></i> Reply
                         </a>
-                        <a href="<?php echo URLROOT; ?>/messages/view/<?php echo $message->id; ?>"
+                        <a href="<?php echo URLROOT; ?>/messages/thread/<?php echo $message->id; ?>"
                            class="btn btn-secondary btn-sm">
                             <i class="fas fa-eye"></i> View Full Thread
                         </a>

@@ -245,7 +245,7 @@
                                     </span>
                                 </td>
                                 <td>
-                                    <a href="<?php echo URLROOT; ?>/bookings/view/<?php echo $booking->id; ?>"
+                                    <a href="<?php echo URLROOT; ?>/bookings/details/<?php echo $booking->id; ?>"
                                        class="btn btn-outline btn-sm">
                                         View
                                     </a>

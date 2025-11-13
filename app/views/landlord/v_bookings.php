@@ -123,7 +123,7 @@
                                 </td>
                                 <td>
                                     <div class="btn-group">
-                                        <a href="<?php echo URLROOT; ?>/bookings/view/<?php echo $booking->id; ?>"
+                                        <a href="<?php echo URLROOT; ?>/bookings/details/<?php echo $booking->id; ?>"
                                            class="btn btn-sm btn-outline">
                                             <i class="fas fa-eye"></i> View
                                         </a>
