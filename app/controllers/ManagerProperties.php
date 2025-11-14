@@ -37,11 +37,8 @@ class ManagerProperties extends Controller
     // View details for a single assigned property
     public function details($id)
     {
-
         $manager_id = $_SESSION['user_id'];
         $property = $this->managerPropertyModel->getPropertyById($id, $manager_id);
-
-        error_log('DEBUG PROPERTY RESULT: ' . print_r($property, true));
 
         if (!$property) {
             flash('manager_property_message', 'Property not found or not assigned to you', 'alert alert-danger');

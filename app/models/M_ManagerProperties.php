@@ -15,7 +15,7 @@ class M_ManagerProperties
             "SELECT p.*, u.name AS owner_name
              FROM properties p
              JOIN users u ON p.landlord_id = u.id
-             WHERE p.landlord_id = :manager_id
+             WHERE p.manager_id = :manager_id
              ORDER BY p.id DESC"
         );
         $this->db->bind(':manager_id', $manager_id);
@@ -29,7 +29,7 @@ class M_ManagerProperties
             "SELECT p.*
              FROM properties p
              WHERE p.id = :id
-               AND p.landlord_id = :manager_id
+               AND p.manager_id = :manager_id
              LIMIT 1"
         );
         $this->db->bind(':id', $id);
