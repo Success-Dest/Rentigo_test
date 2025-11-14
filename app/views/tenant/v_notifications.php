@@ -111,7 +111,7 @@
                                 </button>
                             <?php endif; ?>
                             <?php if ($notification->link): ?>
-                                <a href="<?php echo $notification->link; ?>"
+                                <a href="<?php echo URLROOT . '/' . $notification->link; ?>"
                                    class="btn btn-sm btn-primary">
                                     <i class="fas fa-arrow-right"></i> View
                                 </a>
