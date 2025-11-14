@@ -97,6 +97,25 @@
                         </a>
                         <div class="tooltip">Service Providers</div>
                     </li>
+                    <li class="nav-item">
+                        <a href="<?php echo URLROOT; ?>/manager/notifications"
+                            class="nav-link <?php echo ($data['page'] ?? '') === 'notifications' ? 'active' : ''; ?>"
+                            data-tooltip="Notifications">
+                            <i class="fas fa-bell"></i>
+                            <span class="nav-text">Notifications</span>
+                            <?php
+                            // Show notification badge if there are unread notifications
+                            if (isset($_SESSION['user_id'])) {
+                                $notifModel = new M_Notifications();
+                                $unreadCount = $notifModel->getUnreadCount($_SESSION['user_id']);
+                                if ($unreadCount > 0) {
+                                    echo '<span class="notification-badge">' . $unreadCount . '</span>';
+                                }
+                            }
+                            ?>
+                        </a>
+                        <div class="tooltip">Notifications</div>
+                    </li>
                 </ul>
             </nav>
         </aside>

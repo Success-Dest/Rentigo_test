@@ -200,6 +200,30 @@
   display: none;
 }
 
+/* Notification Badge */
+.notification-badge {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  background: var(--danger-color);
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.125rem 0.375rem;
+  border-radius: 10px;
+  min-width: 18px;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.sidebar.collapsed .notification-badge {
+  top: 4px;
+  right: 4px;
+  font-size: 0.625rem;
+  padding: 0.125rem 0.25rem;
+  min-width: 16px;
+}
+
 /* ============================================
    TOOLTIP STYLES
    ============================================ */
