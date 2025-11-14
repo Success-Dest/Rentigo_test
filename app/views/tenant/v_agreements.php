@@ -22,7 +22,7 @@
             <div class="lease-header">
                 <div class="lease-property">
                     <i class="fas fa-home"></i>
-                    <h4><?php echo htmlspecialchars($data['activeLease']->property_address ?? 'Property'); ?></h4>
+                    <h4><?php echo htmlspecialchars($data['activeLease']->address ?? 'Property'); ?></h4>
                 </div>
                 <span class="status-badge approved">Active</span>
             </div>
@@ -135,17 +135,17 @@
                                 break;
                         }
 
-                        $needsSignature = ($lease->status === 'pending_signatures' && !$lease->tenant_signed_at);
+                        $needsSignature = ($lease->status === 'pending_signatures' && !$lease->signed_by_tenant);
                     ?>
                     <div class="agreement-card">
                         <div class="agreement-icon">
                             <i class="fas fa-file-contract"></i>
                         </div>
                         <div class="agreement-details">
-                            <h4><?php echo htmlspecialchars($lease->property_address ?? 'Rental Agreement'); ?></h4>
+                            <h4><?php echo htmlspecialchars($lease->address ?? 'Rental Agreement'); ?></h4>
                             <p class="agreement-property">
                                 <i class="fas fa-map-marker-alt"></i>
-                                <?php echo htmlspecialchars($lease->property_address ?? 'N/A'); ?>
+                                <?php echo htmlspecialchars($lease->address ?? 'N/A'); ?>
                             </p>
                             <div class="agreement-info">
                                 <span>
@@ -159,13 +159,13 @@
 
                             <!-- Signature Status -->
                             <div class="signature-status">
-                                <span class="signature-item <?php echo $lease->tenant_signed_at ? 'signed' : 'pending'; ?>">
-                                    <i class="fas fa-<?php echo $lease->tenant_signed_at ? 'check-circle' : 'clock'; ?>"></i>
-                                    Tenant: <?php echo $lease->tenant_signed_at ? 'Signed' : 'Pending'; ?>
+                                <span class="signature-item <?php echo $lease->signed_by_tenant ? 'signed' : 'pending'; ?>">
+                                    <i class="fas fa-<?php echo $lease->signed_by_tenant ? 'check-circle' : 'clock'; ?>"></i>
+                                    Tenant: <?php echo $lease->signed_by_tenant ? 'Signed' : 'Pending'; ?>
                                 </span>
-                                <span class="signature-item <?php echo $lease->landlord_signed_at ? 'signed' : 'pending'; ?>">
-                                    <i class="fas fa-<?php echo $lease->landlord_signed_at ? 'check-circle' : 'clock'; ?>"></i>
-                                    Landlord: <?php echo $lease->landlord_signed_at ? 'Signed' : 'Pending'; ?>
+                                <span class="signature-item <?php echo $lease->signed_by_landlord ? 'signed' : 'pending'; ?>">
+                                    <i class="fas fa-<?php echo $lease->signed_by_landlord ? 'check-circle' : 'clock'; ?>"></i>
+                                    Landlord: <?php echo $lease->signed_by_landlord ? 'Signed' : 'Pending'; ?>
                                 </span>
                             </div>
                         </div>
@@ -221,7 +221,7 @@
                 </div>
                 <div class="term-content">
                     <h4>Property</h4>
-                    <p><?php echo htmlspecialchars($data['activeLease']->property_address ?? 'N/A'); ?></p>
+                    <p><?php echo htmlspecialchars($data['activeLease']->address ?? 'N/A'); ?></p>
                 </div>
             </div>
 
