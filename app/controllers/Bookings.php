@@ -99,15 +99,18 @@ class Bookings extends Controller
             $booking_id = $this->bookingModel->createBooking($data);
 
             if ($booking_id) {
-                // Create notification for landlord
-                $this->notificationModel->notifyBookingCreated(
-                    $property->landlord_id,
-                    $_SESSION['user_name'],
-                    $property->address,
-                    $booking_id
-                );
+                // Send notification to property manager (if assigned)
+                if ($property->manager_id) {
+                    $this->notificationModel->createNotification([
+                        'user_id' => $property->manager_id,
+                        'type' => 'booking',
+                        'title' => 'New Booking Request',
+                        'message' => $_SESSION['user_name'] . ' has requested to book property at "' . substr($property->address, 0, 50) . '..."',
+                        'link' => 'bookings/details/' . $booking_id
+                    ]);
+                }
 
-                flash('booking_message', 'Booking request submitted successfully! Waiting for landlord approval.', 'alert alert-success');
+                flash('booking_message', 'Booking request submitted successfully! Waiting for Property Manager approval.', 'alert alert-success');
                 redirect('tenant/bookings');
             } else {
                 flash('booking_message', 'Something went wrong. Please try again.', 'alert alert-danger');
@@ -146,11 +149,11 @@ class Bookings extends Controller
         }
     }
 
-    // Approve booking (Landlord)
+    // Approve booking (Property Manager)
     public function approve($id)
     {
-        if (!isLandlord()) {
-            flash('booking_message', 'Unauthorized access', 'alert alert-danger');
+        if (!isPropertyManager()) {
+            flash('booking_message', 'Only Property Managers can approve bookings', 'alert alert-danger');
             redirect('users/login');
         }
 
@@ -158,12 +161,14 @@ class Bookings extends Controller
 
         if (!$booking) {
             flash('booking_message', 'Booking not found', 'alert alert-danger');
-            redirect('landlord/dashboard');
+            redirect('manager/dashboard');
         }
 
-        if ($booking->landlord_id != $_SESSION['user_id']) {
-            flash('booking_message', 'Unauthorized access', 'alert alert-danger');
-            redirect('landlord/dashboard');
+        // Check if this property is assigned to this PM
+        $property = $this->propertyModel->getPropertyById($booking->property_id);
+        if ($property->manager_id != $_SESSION['user_id']) {
+            flash('booking_message', 'Unauthorized - This property is not assigned to you', 'alert alert-danger');
+            redirect('manager/dashboard');
         }
 
         if ($this->bookingModel->updateBookingStatus($id, 'approved')) {
@@ -199,23 +204,32 @@ class Bookings extends Controller
             flash('booking_message', 'Failed to approve booking', 'alert alert-danger');
         }
 
-        redirect('landlord/bookings');
+        redirect('manager/bookings');
     }
 
-    // Reject booking (Landlord)
+    // Reject booking (Property Manager)
     public function reject($id)
     {
-        if (!isLandlord()) {
-            flash('booking_message', 'Unauthorized access', 'alert alert-danger');
+        if (!isPropertyManager()) {
+            flash('booking_message', 'Only Property Managers can reject bookings', 'alert alert-danger');
             redirect('users/login');
         }
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $booking = $this->bookingModel->getBookingById($id);
 
-            if (!$booking || $booking->landlord_id != $_SESSION['user_id']) {
-                flash('booking_message', 'Unauthorized access', 'alert alert-danger');
-                redirect('landlord/dashboard');
+            if (!$booking) {
+                flash('booking_message', 'Booking not found', 'alert alert-danger');
+                redirect('manager/dashboard');
+                return;
+            }
+
+            // Check if this property is assigned to this PM
+            $property = $this->propertyModel->getPropertyById($booking->property_id);
+            if ($property->manager_id != $_SESSION['user_id']) {
+                flash('booking_message', 'Unauthorized - This property is not assigned to you', 'alert alert-danger');
+                redirect('manager/dashboard');
+                return;
             }
 
             $rejection_reason = trim($_POST['rejection_reason']);
@@ -234,7 +248,7 @@ class Bookings extends Controller
             }
         }
 
-        redirect('landlord/bookings');
+        redirect('manager/bookings');
     }
 
     // Cancel booking (Tenant)

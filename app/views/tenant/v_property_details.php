@@ -214,10 +214,33 @@
             <?php endif; ?>
 
             <div class="action-buttons">
-                <button class="btn btn-outline-primary" type="button"
-                    onclick="reserveProperty(<?php echo $property->id; ?>)">
-                    <i class="fas fa-calendar-check"></i> Reserve Property
-                </button>
+                <?php if (isTenant()): ?>
+                    <?php if ($property->status === 'available'): ?>
+                        <!-- Reserve Property Button -->
+                        <form method="POST" action="<?php echo URLROOT; ?>/tenantproperties/reserve/<?php echo $property->id; ?>"
+                              onsubmit="return confirm('Are you sure you want to reserve this property? You will be notified to visit our office for viewing.');">
+                            <button class="btn btn-primary" type="submit">
+                                <i class="fas fa-calendar-check"></i> Reserve Property
+                            </button>
+                        </form>
+                    <?php elseif ($property->status === 'reserved'): ?>
+                        <!-- Book Property Button (after physical visit) -->
+                        <button class="btn btn-success" type="button" onclick="openBookingModal(<?php echo $property->id; ?>)">
+                            <i class="fas fa-file-signature"></i> Book Property
+                        </button>
+                        <p style="color: #92400e; margin-top: 0.8em;">
+                            <i class="fas fa-info-circle"></i> This property is reserved. After visiting our office and viewing the property, you can proceed with booking.
+                        </p>
+                    <?php elseif ($property->status === 'occupied'): ?>
+                        <p style="color: #dc2626; margin-top: 0.8em;">
+                            <i class="fas fa-lock"></i> This property is currently occupied and not available for reservation.
+                        </p>
+                    <?php endif; ?>
+                <?php else: ?>
+                    <p style="color: #6b7280; margin-top: 0.8em;">
+                        <i class="fas fa-sign-in-alt"></i> Please <a href="<?php echo URLROOT; ?>/users/login">login as a tenant</a> to reserve this property.
+                    </p>
+                <?php endif; ?>
             </div>
         </div>
     <?php else: ?>
@@ -227,30 +250,154 @@
     <?php endif; ?>
 </div>
 
-<!-- Reservation Modal (optional, if you want to reuse from previous) -->
-<div id="reservationModal" class="modal-overlay hidden">
-    <div class="modal-content">
+<!-- Booking Modal -->
+<div id="bookingModal" class="modal-overlay hidden">
+    <div class="modal-content" style="max-width: 600px;">
         <div class="modal-header">
-            <h3>Confirm Reservation</h3>
-            <button class="modal-close" onclick="closeModal()">
+            <h3>Book Property</h3>
+            <button class="modal-close" onclick="closeBookingModal()">
                 <i class="fas fa-times"></i>
             </button>
         </div>
-        <div class="modal-body" id="modalBody">
-            <!-- Content will be populated by JavaScript -->
-        </div>
+        <form method="POST" action="<?php echo URLROOT; ?>/bookings/create/<?php echo $property->id ?? ''; ?>" id="bookingForm">
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="move_in_date">Move-in Date <span style="color: red;">*</span></label>
+                    <input type="date" class="form-control" id="move_in_date" name="move_in_date" required
+                           min="<?php echo date('Y-m-d'); ?>">
+                </div>
+                <div class="form-group">
+                    <label for="move_out_date">Move-out Date <span style="color: red;">*</span></label>
+                    <input type="date" class="form-control" id="move_out_date" name="move_out_date" required
+                           min="<?php echo date('Y-m-d'); ?>">
+                </div>
+                <div class="form-group">
+                    <label for="notes">Additional Notes (Optional)</label>
+                    <textarea class="form-control" id="notes" name="notes" rows="3"
+                              placeholder="Any special requests or requirements..."></textarea>
+                </div>
+                <div class="alert alert-info" style="margin-top: 1rem;">
+                    <i class="fas fa-info-circle"></i> You are booking this reserved property. The Property Manager will review your booking request.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeBookingModal()">Cancel</button>
+                <button type="submit" class="btn btn-success">
+                    <i class="fas fa-file-signature"></i> Submit Booking Request
+                </button>
+            </div>
+        </form>
     </div>
 </div>
 
-<script>
-    function reserveProperty(id) {
-        document.getElementById('reservationModal').classList.remove('hidden');
-        document.getElementById('modalBody').innerHTML = 'Reservation for property #' + id + ' coming soon!';
+<style>
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
     }
 
-    function closeModal() {
-        document.getElementById('reservationModal').classList.add('hidden');
+    .modal-overlay.hidden {
+        display: none;
     }
+
+    .modal-content {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        max-width: 90%;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+
+    .modal-header {
+        padding: 1.5rem;
+        border-bottom: 1px solid #e5e7eb;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .modal-header h3 {
+        margin: 0;
+        font-size: 1.5rem;
+        color: #1f2937;
+    }
+
+    .modal-close {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        color: #6b7280;
+        cursor: pointer;
+        padding: 0.25rem 0.5rem;
+    }
+
+    .modal-close:hover {
+        color: #1f2937;
+    }
+
+    .modal-body {
+        padding: 1.5rem;
+    }
+
+    .modal-footer {
+        padding: 1rem 1.5rem;
+        border-top: 1px solid #e5e7eb;
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.75rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.25rem;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: #374151;
+        font-weight: 500;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 0.625rem 0.875rem;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        font-size: 1rem;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+</style>
+
+<script>
+    function openBookingModal(propertyId) {
+        document.getElementById('bookingModal').classList.remove('hidden');
+    }
+
+    function closeBookingModal() {
+        document.getElementById('bookingModal').classList.add('hidden');
+    }
+
+    // Validate move-out date is after move-in date
+    document.getElementById('move_in_date')?.addEventListener('change', function() {
+        const moveOutDate = document.getElementById('move_out_date');
+        if (moveOutDate) {
+            moveOutDate.min = this.value;
+        }
+    });
 </script>
 
 <?php require APPROOT . '/views/inc/tenant_footer.php'; ?>

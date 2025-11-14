@@ -241,4 +241,32 @@ class M_Bookings
                          ORDER BY b.created_at DESC');
         return $this->db->resultSet();
     }
+
+    // Get all bookings for multiple properties (for property manager)
+    public function getBookingsByProperties($propertyIds)
+    {
+        if (empty($propertyIds)) {
+            return [];
+        }
+
+        $placeholders = implode(',', array_fill(0, count($propertyIds), '?'));
+
+        $this->db->query("SELECT b.*,
+                         p.address, p.property_type, p.bedrooms, p.bathrooms,
+                         t.name as tenant_name, t.email as tenant_email, t.phone as tenant_phone,
+                         l.name as landlord_name, l.email as landlord_email
+                         FROM bookings b
+                         LEFT JOIN properties p ON b.property_id = p.id
+                         LEFT JOIN users t ON b.tenant_id = t.id
+                         LEFT JOIN users l ON b.landlord_id = l.id
+                         WHERE b.property_id IN ($placeholders)
+                         ORDER BY b.created_at DESC");
+
+        // Bind property IDs
+        foreach ($propertyIds as $index => $propertyId) {
+            $this->db->bind($index + 1, $propertyId);
+        }
+
+        return $this->db->resultSet();
+    }
 }

@@ -53,6 +53,15 @@
                         <div class="tooltip">Tenants</div>
                     </li>
                     <li class="nav-item">
+                        <a href="<?php echo URLROOT; ?>/manager/bookings"
+                            class="nav-link <?php echo ($data['page'] ?? '') === 'bookings' ? 'active' : ''; ?>"
+                            data-tooltip="Bookings">
+                            <i class="fas fa-calendar-check"></i>
+                            <span class="nav-text">Bookings</span>
+                        </a>
+                        <div class="tooltip">Bookings</div>
+                    </li>
+                    <li class="nav-item">
                         <a href="<?php echo URLROOT; ?>/manager/maintenance"
                             class="nav-link <?php echo ($data['page'] ?? '') === 'maintenance' ? 'active' : ''; ?>"
                             data-tooltip="Maintenance">

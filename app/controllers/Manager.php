@@ -222,6 +222,46 @@ class Manager extends Controller
         $this->view('manager/v_providers', $data);
     }
 
+    public function bookings()
+    {
+        // Load booking model
+        $bookingModel = $this->model('M_Bookings');
+        $propertyModel = $this->model('M_ManagerProperties');
+
+        // Get manager's assigned properties
+        $manager_id = $_SESSION['user_id'];
+        $assignedProperties = $propertyModel->getAssignedProperties($manager_id);
+
+        // Get property IDs
+        $propertyIds = array_map(fn($p) => $p->id, $assignedProperties ?? []);
+
+        // Get all bookings for assigned properties
+        $allBookings = [];
+        if (!empty($propertyIds)) {
+            $allBookings = $bookingModel->getBookingsByProperties($propertyIds);
+        }
+
+        // Filter by status
+        $pendingBookings = array_filter($allBookings, fn($b) => $b->status === 'pending');
+        $approvedBookings = array_filter($allBookings, fn($b) => $b->status === 'approved');
+        $rejectedBookings = array_filter($allBookings, fn($b) => $b->status === 'rejected');
+
+        $data = [
+            'title' => 'Booking Management',
+            'page' => 'bookings',
+            'user_name' => $_SESSION['user_name'],
+            'allBookings' => $allBookings,
+            'pendingBookings' => $pendingBookings,
+            'approvedBookings' => $approvedBookings,
+            'rejectedBookings' => $rejectedBookings,
+            'pendingCount' => count($pendingBookings),
+            'approvedCount' => count($approvedBookings),
+            'rejectedCount' => count($rejectedBookings),
+            'unread_notifications' => $this->getUnreadNotificationCount()
+        ];
+        $this->view('manager/v_bookings', $data);
+    }
+
     public function notifications()
     {
         // Get all notifications for the property manager

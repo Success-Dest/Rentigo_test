@@ -2,6 +2,8 @@
 class TenantProperties extends Controller
 {
     private $tenantPropertyModel;
+    private $propertyModel;
+    private $notificationModel;
 
     public function __construct()
     {
@@ -11,6 +13,8 @@ class TenantProperties extends Controller
         // }
 
         $this->tenantPropertyModel = $this->model('M_TenantProperties');
+        $this->propertyModel = $this->model('M_Properties');
+        $this->notificationModel = $this->model('M_Notifications');
     }
 
     // List all approved and available properties
@@ -59,6 +63,53 @@ class TenantProperties extends Controller
         // If using AJAX, receive parameters and return JSON or filtered view
         // Not implemented here—client-side filtering used in view.
         $this->index();
+    }
+
+    // Reserve property - Step 1 (Tenant)
+    public function reserve($id)
+    {
+        if (!isLoggedIn() || $_SESSION['user_type'] !== 'tenant') {
+            flash('reservation_message', 'Only tenants can reserve properties', 'alert alert-danger');
+            redirect('users/login');
+            return;
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $property = $this->propertyModel->getPropertyById($id);
+
+            if (!$property) {
+                flash('reservation_message', 'Property not found', 'alert alert-danger');
+                redirect('tenantproperties/index');
+                return;
+            }
+
+            // Check if property is available
+            if ($property->status !== 'available') {
+                flash('reservation_message', 'This property is not available for reservation', 'alert alert-danger');
+                redirect('tenantproperties/details/' . $id);
+                return;
+            }
+
+            // Update property status to reserved
+            if ($this->propertyModel->updatePropertyStatus($id, 'reserved')) {
+                // Send notification to tenant
+                $this->notificationModel->createNotification([
+                    'user_id' => $_SESSION['user_id'],
+                    'type' => 'property',
+                    'title' => 'Property Reserved Successfully',
+                    'message' => 'Your reservation for "' . substr($property->address, 0, 50) . '..." has been confirmed. Please visit our office to proceed with the property viewing and booking process.',
+                    'link' => 'tenantproperties/details/' . $id
+                ]);
+
+                flash('reservation_message', 'Property reserved successfully! Please visit our office to view the property and proceed with booking.', 'alert alert-success');
+                redirect('tenant/dashboard');
+            } else {
+                flash('reservation_message', 'Failed to reserve property. Please try again.', 'alert alert-danger');
+                redirect('tenantproperties/details/' . $id);
+            }
+        } else {
+            redirect('tenantproperties/index');
+        }
     }
 
     // Helpers (reuse your existing image/document helpers)
