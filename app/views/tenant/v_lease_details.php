@@ -237,7 +237,7 @@
     }
 
     .card-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #45a9ea 0%, #3b8fd9 100%);
         color: white;
         padding: 2rem;
         display: flex;
@@ -310,7 +310,7 @@
     }
 
     .info-section h4 i {
-        color: #667eea;
+        color: #45a9ea;
         font-size: 1.25rem;
     }
 
@@ -347,7 +347,7 @@
 
     .amount.total {
         font-size: 1.375rem;
-        color: #667eea;
+        color: #45a9ea;
     }
 
     .badge {
@@ -377,7 +377,7 @@
         padding: 1.5rem;
         color: #4b5563;
         line-height: 1.6;
-        border-left: 4px solid #667eea;
+        border-left: 4px solid #45a9ea;
     }
 
     .payment-schedule {
@@ -393,7 +393,7 @@
         padding: 1rem;
         background: #f9fafb;
         border-radius: 8px;
-        border-left: 3px solid #667eea;
+        border-left: 3px solid #45a9ea;
         transition: all 0.2s;
     }
 

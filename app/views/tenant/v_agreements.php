@@ -311,7 +311,7 @@
 
 <style>
 .active-lease-card {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #45a9ea 0%, #3b8fd9 100%);
     color: white;
     padding: 25px;
     border-radius: 12px;
@@ -403,7 +403,7 @@
     height: 60px;
     background: #f8f9fa;
     border-radius: 8px;
-    color: #667eea;
+    color: #45a9ea;
     font-size: 24px;
 }
 
@@ -480,7 +480,7 @@
     height: 50px;
     background: #f8f9fa;
     border-radius: 8px;
-    color: #667eea;
+    color: #45a9ea;
     font-size: 20px;
     flex-shrink: 0;
 }
