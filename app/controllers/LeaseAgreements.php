@@ -29,13 +29,42 @@ class LeaseAgreements extends Controller
 
         if (!$lease) {
             flash('lease_message', 'Lease agreement not found', 'alert alert-danger');
-            redirect('tenant/dashboard');
+            if (isPropertyManager()) {
+                redirect('manager/leases');
+            } else if (isTenant()) {
+                redirect('tenant/agreements');
+            } else {
+                redirect('users/login');
+            }
+            return;
         }
 
         // Check if user has permission to view this lease
-        if ($lease->tenant_id != $_SESSION['user_id'] && $lease->landlord_id != $_SESSION['user_id']) {
+        $has_permission = false;
+
+        if (isTenant() && $lease->tenant_id == $_SESSION['user_id']) {
+            $has_permission = true;
+        } else if (isLandlord() && $lease->landlord_id == $_SESSION['user_id']) {
+            $has_permission = true;
+        } else if (isPropertyManager()) {
+            // Check if this PM is assigned to the property
+            $propertyModel = $this->model('M_Properties');
+            $property = $propertyModel->getPropertyById($lease->property_id);
+            if ($property && $property->manager_id == $_SESSION['user_id']) {
+                $has_permission = true;
+            }
+        }
+
+        if (!$has_permission) {
             flash('lease_message', 'Unauthorized access', 'alert alert-danger');
-            redirect('tenant/dashboard');
+            if (isPropertyManager()) {
+                redirect('manager/leases');
+            } else if (isTenant()) {
+                redirect('tenant/agreements');
+            } else {
+                redirect('users/login');
+            }
+            return;
         }
 
         $data = [
@@ -46,6 +75,8 @@ class LeaseAgreements extends Controller
             $this->view('tenant/v_lease_details', $data);
         } else if (isLandlord()) {
             $this->view('landlord/v_lease_details', $data);
+        } else if (isPropertyManager()) {
+            $this->view('manager/v_lease_details', $data);
         }
     }
 

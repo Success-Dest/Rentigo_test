@@ -98,9 +98,9 @@
                                         </span>
                                     </td>
                                     <td class="actions">
-                                        <button class="btn btn-sm btn-primary">
+                                        <a href="<?php echo URLROOT; ?>/leaseagreements/details/<?php echo $lease->id; ?>" class="btn btn-sm btn-primary">
                                             <i class="fas fa-eye"></i> View
-                                        </button>
+                                        </a>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
@@ -144,9 +144,9 @@
                                     <td>Rs <?php echo number_format($lease->monthly_rent); ?></td>
                                     <td><?php echo date('M d, Y', strtotime($lease->created_at)); ?></td>
                                     <td class="actions">
-                                        <button class="btn btn-sm btn-primary">
+                                        <a href="<?php echo URLROOT; ?>/leaseagreements/details/<?php echo $lease->id; ?>" class="btn btn-sm btn-primary">
                                             <i class="fas fa-eye"></i> View
-                                        </button>
+                                        </a>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
@@ -193,9 +193,9 @@
                                     <td><?php echo date('M d, Y', strtotime($lease->end_date)); ?></td>
                                     <td>Rs <?php echo number_format($lease->monthly_rent); ?></td>
                                     <td class="actions">
-                                        <button class="btn btn-sm btn-primary">
+                                        <a href="<?php echo URLROOT; ?>/leaseagreements/details/<?php echo $lease->id; ?>" class="btn btn-sm btn-primary">
                                             <i class="fas fa-eye"></i> View
-                                        </button>
+                                        </a>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
@@ -240,9 +240,9 @@
                                     </td>
                                     <td>Rs <?php echo number_format($lease->monthly_rent * ($lease->lease_duration_months ?? 1)); ?></td>
                                     <td class="actions">
-                                        <button class="btn btn-sm btn-primary">
+                                        <a href="<?php echo URLROOT; ?>/leaseagreements/details/<?php echo $lease->id; ?>" class="btn btn-sm btn-primary">
                                             <i class="fas fa-eye"></i> View
-                                        </button>
+                                        </a>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>

@@ -214,7 +214,7 @@ class M_LeaseAgreements
                             SUM(CASE WHEN status = "pending_signatures" THEN 1 ELSE 0 END) as pending_signatures,
                             SUM(CASE WHEN status = "active" THEN 1 ELSE 0 END) as active,
                             SUM(CASE WHEN status = "completed" THEN 1 ELSE 0 END) as completed,
-                            SUM(CASE WHEN status = "terminated" THEN 1 ELSE 0 END) as terminated
+                            SUM(CASE WHEN status = "terminated" THEN 1 ELSE 0 END) as `terminated`
                             FROM lease_agreements WHERE tenant_id = :user_id');
         } else if ($user_type == 'landlord') {
             $this->db->query('SELECT
@@ -223,7 +223,7 @@ class M_LeaseAgreements
                             SUM(CASE WHEN status = "pending_signatures" THEN 1 ELSE 0 END) as pending_signatures,
                             SUM(CASE WHEN status = "active" THEN 1 ELSE 0 END) as active,
                             SUM(CASE WHEN status = "completed" THEN 1 ELSE 0 END) as completed,
-                            SUM(CASE WHEN status = "terminated" THEN 1 ELSE 0 END) as terminated
+                            SUM(CASE WHEN status = "terminated" THEN 1 ELSE 0 END) as `terminated`
                             FROM lease_agreements WHERE landlord_id = :user_id');
         }
 
