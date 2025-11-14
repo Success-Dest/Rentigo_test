@@ -412,7 +412,7 @@ CREATE TABLE `properties` (
   `deposit` decimal(10,2) DEFAULT NULL,
   `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `current_occupant` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `status` enum('available','occupied','maintenance','pending','approved','rejected') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT 'pending',
+  `status` enum('available','occupied','maintenance','pending','approved','rejected','reserved') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT 'pending',
   `approval_status` enum('pending','approved','rejected') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT 'pending',
   `approved_at` timestamp NULL DEFAULT NULL,
   `available_date` date DEFAULT NULL,
