@@ -233,7 +233,7 @@ class M_Properties
                          COUNT(CASE WHEN listing_type = "rent" THEN 1 END) as rental_properties,
                          COUNT(CASE WHEN listing_type = "maintenance" THEN 1 END) as maintenance_properties,
                          COUNT(CASE WHEN status = "occupied" THEN 1 END) as occupied,
-                         COUNT(CASE WHEN status = "vacant" THEN 1 END) as vacant,
+                         COUNT(CASE WHEN status = "available" THEN 1 END) as available,
                          COUNT(CASE WHEN status = "maintenance" THEN 1 END) as maintenance,
                          COUNT(CASE WHEN status = "maintenance_only" THEN 1 END) as maintenance_only,
                          AVG(CASE WHEN listing_type = "rent" THEN rent ELSE NULL END) as average_rent,

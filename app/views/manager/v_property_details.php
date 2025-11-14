@@ -78,7 +78,7 @@ if (!isset($property) && isset($data['property'])) {
         border: 1px solid #ef4444;
     }
 
-    .status-badge.vacant,
+    .status-badge.available,
     .status-badge.available {
         background: #e0e7ff;
         color: #3730a3;

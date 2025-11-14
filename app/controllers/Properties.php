@@ -168,7 +168,7 @@ class Properties extends Controller
             'pet_policy'    => trim($postData['pets'] ?? 'no'),
             'laundry'       => trim($postData['laundry'] ?? 'none'),
             'description'   => trim($postData['description'] ?? ''),
-            'status'        => 'vacant',
+            'status'        => 'available',
             'listing_type'  => 'rent'
         ];
 

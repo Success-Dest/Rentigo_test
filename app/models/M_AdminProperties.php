@@ -69,8 +69,8 @@ class M_AdminProperties
             // Don't change status for maintenance property
             $this->db->query("UPDATE properties SET approval_status = 'approved', approved_at = NOW() WHERE id = :id");
         } else {
-            // Rental property: set to vacant/available
-            $this->db->query("UPDATE properties SET approval_status = 'approved', status = 'vacant', approved_at = NOW() WHERE id = :id");
+            // Rental property: set to available
+            $this->db->query("UPDATE properties SET approval_status = 'approved', status = 'available', approved_at = NOW() WHERE id = :id");
         }
         $this->db->bind(':id', $id);
         return $this->db->execute();

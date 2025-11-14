@@ -147,7 +147,7 @@
                             $statusValue = $property->status ?? 'unknown';
 
                             if ($statusValue === 'occupied') $statusClass = 'badge-success';
-                            elseif ($statusValue === 'vacant') $statusClass = 'badge-warning';
+                            elseif ($statusValue === 'available') $statusClass = 'badge-warning';
                             elseif ($statusValue === 'maintenance') $statusClass = 'badge-danger';
                             elseif ($statusValue === 'maintenance_only') $statusClass = 'badge-info';
                             ?>

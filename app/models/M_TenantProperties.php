@@ -15,7 +15,7 @@ class M_TenantProperties
             "SELECT *
              FROM properties
              WHERE approval_status = 'approved'
-               AND status = 'vacant'
+               AND status = 'available'
              ORDER BY created_at DESC"
         );
         return $this->db->resultSet();
@@ -29,7 +29,7 @@ class M_TenantProperties
              FROM properties
              WHERE id = :id
                AND approval_status = 'approved'
-               AND status = 'vacant'
+               AND status = 'available'
              LIMIT 1"
         );
         $this->db->bind(':id', $id);
@@ -39,7 +39,7 @@ class M_TenantProperties
     // Optional: filter/search with more advanced logic
     public function searchProperties($filters)
     {
-        $sql = "SELECT * FROM properties WHERE approval_status = 'approved' AND status = 'vacant'";
+        $sql = "SELECT * FROM properties WHERE approval_status = 'approved' AND status = 'available'";
         $params = [];
 
         if (!empty($filters['location'])) {

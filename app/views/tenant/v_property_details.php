@@ -54,7 +54,7 @@
         letter-spacing: 0.03em;
     }
 
-    .status-badge.vacant,
+    .status-badge.available,
     .status-badge.available {
         background: #d1fae5;
         color: #047857;

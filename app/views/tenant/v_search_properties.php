@@ -56,7 +56,7 @@
                             <img src="<?php echo !empty($property->primary_image) ? $property->primary_image : URLROOT . '/img/property-placeholder.jpg'; ?>"
                                 alt="<?php echo htmlspecialchars($property->address); ?>">
                             <div class="property-status">
-                                <?php if ($property->status === 'vacant'): ?>
+                                <?php if ($property->status === 'available'): ?>
                                     <span class="status-badge available">Available</span>
                                 <?php else: ?>
                                     <span class="status-badge reserved">Reserved</span>
@@ -94,7 +94,7 @@
                                     href="<?php echo URLROOT . '/tenantproperties/details/' . $property->id; ?>">
                                     View Details
                                 </a>
-                                <?php if ($property->status === 'vacant'): ?>
+                                <?php if ($property->status === 'available'): ?>
                                     <button class="btn-property-action" id="btn-reserve-property" onclick=" reserveProperty(<?php echo $property->id; ?>)">
                                         Reserve Property
                                     </button>
