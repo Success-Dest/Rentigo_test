@@ -93,9 +93,9 @@
                                     <td>Rs <?php echo number_format($booking->deposit_amount); ?></td>
                                     <td><?php echo date('M d, Y', strtotime($booking->created_at)); ?></td>
                                     <td class="actions">
-                                        <button class="btn btn-sm btn-success" onclick="viewBookingDetails(<?php echo $booking->id; ?>)">
+                                        <a href="<?php echo URLROOT; ?>/bookings/details/<?php echo $booking->id; ?>" class="btn btn-sm btn-primary">
                                             <i class="fas fa-eye"></i> View
-                                        </button>
+                                        </a>
                                         <form method="POST" action="<?php echo URLROOT; ?>/bookings/approve/<?php echo $booking->id; ?>" style="display:inline;"
                                               onsubmit="return confirm('Approve this booking request?');">
                                             <button type="submit" class="btn btn-sm btn-success">
@@ -153,9 +153,9 @@
                                     <td>Rs <?php echo number_format($booking->monthly_rent); ?></td>
                                     <td><span class="badge badge-success">Approved</span></td>
                                     <td class="actions">
-                                        <button class="btn btn-sm btn-primary" onclick="viewBookingDetails(<?php echo $booking->id; ?>)">
+                                        <a href="<?php echo URLROOT; ?>/bookings/details/<?php echo $booking->id; ?>" class="btn btn-sm btn-primary">
                                             <i class="fas fa-eye"></i> View
-                                        </button>
+                                        </a>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
@@ -202,9 +202,9 @@
                                     <td><?php echo htmlspecialchars($booking->rejection_reason ?? 'No reason provided'); ?></td>
                                     <td><?php echo date('M d, Y', strtotime($booking->created_at)); ?></td>
                                     <td class="actions">
-                                        <button class="btn btn-sm btn-primary" onclick="viewBookingDetails(<?php echo $booking->id; ?>)">
+                                        <a href="<?php echo URLROOT; ?>/bookings/details/<?php echo $booking->id; ?>" class="btn btn-sm btn-primary">
                                             <i class="fas fa-eye"></i> View
-                                        </button>
+                                        </a>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
@@ -217,21 +217,6 @@
                     <p>No rejected bookings</p>
                 </div>
             <?php endif; ?>
-        </div>
-    </div>
-</div>
-
-<!-- Booking Details Modal -->
-<div id="bookingDetailsModal" class="modal-overlay" style="display: none;">
-    <div class="modal-content" style="max-width: 700px;">
-        <div class="modal-header">
-            <h3>Booking Details</h3>
-            <button class="modal-close" onclick="closeBookingDetailsModal()">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        <div class="modal-body" id="bookingDetailsContent">
-            <p>Loading...</p>
         </div>
     </div>
 </div>
@@ -546,17 +531,6 @@
         });
     });
 
-    // View booking details
-    function viewBookingDetails(bookingId) {
-        // In a real implementation, fetch booking details via AJAX
-        document.getElementById('bookingDetailsModal').style.display = 'flex';
-        document.getElementById('bookingDetailsContent').innerHTML = '<p>Booking details for ID: ' + bookingId + ' would be loaded here via AJAX.</p>';
-    }
-
-    function closeBookingDetailsModal() {
-        document.getElementById('bookingDetailsModal').style.display = 'none';
-    }
-
     // Reject booking modal
     function showRejectModal(bookingId) {
         const form = document.getElementById('rejectForm');
@@ -572,7 +546,6 @@
     // Close modal when clicking outside
     window.addEventListener('click', (e) => {
         if (e.target.classList.contains('modal-overlay')) {
-            closeBookingDetailsModal();
             closeRejectModal();
         }
     });

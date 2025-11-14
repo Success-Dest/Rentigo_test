@@ -128,13 +128,41 @@ class Bookings extends Controller
 
         if (!$booking) {
             flash('booking_message', 'Booking not found', 'alert alert-danger');
-            redirect('tenant/dashboard');
+            if (isPropertyManager()) {
+                redirect('manager/bookings');
+            } else if (isTenant()) {
+                redirect('tenant/bookings');
+            } else {
+                redirect('users/login');
+            }
+            return;
         }
 
         // Check if user has permission to view this booking
-        if ($booking->tenant_id != $_SESSION['user_id'] && $booking->landlord_id != $_SESSION['user_id']) {
+        $has_permission = false;
+
+        if (isTenant() && $booking->tenant_id == $_SESSION['user_id']) {
+            $has_permission = true;
+        } else if (isLandlord() && $booking->landlord_id == $_SESSION['user_id']) {
+            $has_permission = true;
+        } else if (isPropertyManager()) {
+            // Check if this PM is assigned to the property
+            $property = $this->propertyModel->getPropertyById($booking->property_id);
+            if ($property && $property->manager_id == $_SESSION['user_id']) {
+                $has_permission = true;
+            }
+        }
+
+        if (!$has_permission) {
             flash('booking_message', 'Unauthorized access', 'alert alert-danger');
-            redirect('tenant/dashboard');
+            if (isPropertyManager()) {
+                redirect('manager/bookings');
+            } else if (isTenant()) {
+                redirect('tenant/bookings');
+            } else {
+                redirect('users/login');
+            }
+            return;
         }
 
         $data = [
@@ -146,6 +174,8 @@ class Bookings extends Controller
             $this->view('tenant/v_booking_details', $data);
         } else if (isLandlord()) {
             $this->view('landlord/v_booking_details', $data);
+        } else if (isPropertyManager()) {
+            $this->view('manager/v_booking_details', $data);
         }
     }
 

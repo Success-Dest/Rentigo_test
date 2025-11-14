@@ -119,7 +119,7 @@ class M_Notifications
             'type' => 'booking',
             'title' => 'New Booking Request',
             'message' => "$tenant_name has requested to book your property at $property_address",
-            'link' => URLROOT . '/landlord/view_booking/' . $booking_id
+            'link' => 'landlord/view_booking/' . $booking_id
         ]);
     }
 
@@ -130,7 +130,7 @@ class M_Notifications
             'type' => 'booking',
             'title' => 'Booking Approved',
             'message' => "Your booking request for $property_address has been approved",
-            'link' => URLROOT . '/tenant/bookings'
+            'link' => 'bookings/details/' . $booking_id
         ]);
     }
 
@@ -141,7 +141,7 @@ class M_Notifications
             'type' => 'booking',
             'title' => 'Booking Rejected',
             'message' => "Your booking request for $property_address has been rejected. Reason: $reason",
-            'link' => URLROOT . '/tenant/bookings'
+            'link' => 'tenant/bookings'
         ]);
     }
 
@@ -153,7 +153,7 @@ class M_Notifications
             'type' => 'payment',
             'title' => 'Rent Payment Due',
             'message' => "Your rent payment of LKR $amount for $property_address is due on $due_date",
-            'link' => URLROOT . '/tenant/pay_rent'
+            'link' => 'tenant/pay_rent'
         ]);
     }
 
@@ -164,7 +164,7 @@ class M_Notifications
             'type' => 'payment',
             'title' => 'Payment Received',
             'message' => "Received payment of LKR $amount from $tenant_name for $property_address",
-            'link' => URLROOT . '/landlord/payment_history'
+            'link' => 'landlord/payment_history'
         ]);
     }
 
@@ -176,7 +176,7 @@ class M_Notifications
             'type' => 'issue',
             'title' => 'New Issue Reported',
             'message' => "A tenant has reported an issue: $issue_title at $property_address",
-            'link' => URLROOT . '/issues/track_issues'
+            'link' => 'issues/track_issues'
         ]);
     }
 
@@ -187,7 +187,7 @@ class M_Notifications
             'type' => 'issue',
             'title' => 'Issue Status Updated',
             'message' => "Your issue '$issue_title' status has been updated to: $new_status",
-            'link' => URLROOT . '/issues/track_issues'
+            'link' => 'issues/track_issues'
         ]);
     }
 
@@ -199,7 +199,7 @@ class M_Notifications
             'type' => 'inspection',
             'title' => 'Inspection Scheduled',
             'message' => "An inspection has been scheduled for $property_address on $inspection_date",
-            'link' => URLROOT . '/tenant/dashboard'
+            'link' => 'tenant/dashboard'
         ]);
     }
 
@@ -211,7 +211,7 @@ class M_Notifications
             'type' => 'lease',
             'title' => 'Lease Expiring Soon',
             'message' => "Your lease for $property_address will expire in $days_remaining days",
-            'link' => URLROOT . '/tenant/agreements'
+            'link' => 'tenant/agreements'
         ]);
     }
 
@@ -223,7 +223,7 @@ class M_Notifications
             'type' => 'property',
             'title' => 'Property Approved',
             'message' => "Your property at $property_address has been approved and is now visible to tenants",
-            'link' => URLROOT . '/properties/index'
+            'link' => 'properties/index'
         ]);
     }
 
@@ -234,7 +234,7 @@ class M_Notifications
             'type' => 'property',
             'title' => 'Property Rejected',
             'message' => "Your property at $property_address has been rejected. Reason: $reason",
-            'link' => URLROOT . '/properties/index'
+            'link' => 'properties/index'
         ]);
     }
 
