@@ -2,6 +2,7 @@
 class AdminProperties extends Controller
 {
     private $adminPropertyModel;
+    private $notificationModel;
 
     public function __construct()
     {
@@ -9,6 +10,7 @@ class AdminProperties extends Controller
             redirect('users/login');
         }
         $this->adminPropertyModel = $this->model('M_AdminProperties');
+        $this->notificationModel = $this->model('M_Notifications');
     }
 
     public function index()
@@ -160,6 +162,15 @@ class AdminProperties extends Controller
             }
 
             if ($this->adminPropertyModel->approveProperty($id)) {
+                // Send notification to landlord
+                $this->notificationModel->createNotification([
+                    'user_id' => $property->landlord_id,
+                    'type' => 'property',
+                    'title' => 'Property Approved',
+                    'message' => 'Your property at "' . substr($property->address, 0, 50) . '..." has been approved and is now live!',
+                    'link' => 'properties/index'
+                ]);
+
                 flash('admin_property_message', 'Property approved successfully!', 'alert alert-success');
                 redirect('adminproperties/propertyDetails/' . $id);
             } else {
@@ -183,6 +194,15 @@ class AdminProperties extends Controller
             }
 
             if ($this->adminPropertyModel->rejectProperty($id)) {
+                // Send notification to landlord
+                $this->notificationModel->createNotification([
+                    'user_id' => $property->landlord_id,
+                    'type' => 'property',
+                    'title' => 'Property Rejected',
+                    'message' => 'Your property at "' . substr($property->address, 0, 50) . '..." has been rejected. Please contact support for more information.',
+                    'link' => 'properties/index'
+                ]);
+
                 flash('admin_property_message', 'Property rejected', 'alert alert-success');
                 redirect('adminproperties/propertyDetails/' . $id);
             } else {
@@ -208,6 +228,18 @@ class AdminProperties extends Controller
             }
 
             if ($this->adminPropertyModel->assignPropertyToManager($id, $manager_id)) {
+                // Get property details for notification
+                $property = $this->adminPropertyModel->getPropertyById($id);
+
+                // Send notification to property manager
+                $this->notificationModel->createNotification([
+                    'user_id' => $manager_id,
+                    'type' => 'property',
+                    'title' => 'New Property Assigned',
+                    'message' => 'You have been assigned to manage property at "' . substr($property->address, 0, 50) . '..."',
+                    'link' => 'managerproperties/details/' . $id
+                ]);
+
                 flash('admin_property_message', 'Property assigned successfully!', 'alert alert-success');
                 redirect('adminproperties/propertyDetails/' . $id);
             } else {

@@ -4,10 +4,12 @@ require_once '../app/helpers/helper.php';
 class Manager extends Controller
 {
     private $userModel;
+    private $notificationModel;
 
     public function __construct()
     {
         $this->userModel = $this->model('M_Users');
+        $this->notificationModel = $this->model('M_Notifications');
         if (!isLoggedIn() || $_SESSION['user_type'] !== 'property_manager') {
             redirect('users/login');
         }
@@ -206,5 +208,55 @@ class Manager extends Controller
             'providers' => $allProviders
         ];
         $this->view('manager/v_providers', $data);
+    }
+
+    public function notifications()
+    {
+        // Get all notifications for the property manager
+        $notifications = $this->notificationModel->getNotificationsByUser($_SESSION['user_id']);
+        $unreadCount = $this->notificationModel->getUnreadCount($_SESSION['user_id']);
+
+        $data = [
+            'title' => 'Notifications',
+            'page' => 'notifications',
+            'user_name' => $_SESSION['user_name'],
+            'notifications' => $notifications,
+            'unreadCount' => $unreadCount
+        ];
+        $this->view('manager/v_notifications', $data);
+    }
+
+    // Mark notification as read
+    public function markNotificationRead($id)
+    {
+        if ($this->notificationModel->markAsRead($id)) {
+            echo json_encode(['success' => true]);
+        } else {
+            echo json_encode(['success' => false]);
+        }
+    }
+
+    // Mark all notifications as read
+    public function markAllNotificationsRead()
+    {
+        if ($this->notificationModel->markAllAsRead($_SESSION['user_id'])) {
+            flash('notification_message', 'All notifications marked as read', 'alert alert-success');
+        } else {
+            flash('notification_message', 'Failed to mark notifications as read', 'alert alert-danger');
+        }
+
+        redirect('manager/notifications');
+    }
+
+    // Delete notification
+    public function deleteNotification($id)
+    {
+        if ($this->notificationModel->deleteNotification($id)) {
+            flash('notification_message', 'Notification deleted', 'alert alert-success');
+        } else {
+            flash('notification_message', 'Failed to delete notification', 'alert alert-danger');
+        }
+
+        redirect('manager/notifications');
     }
 }
