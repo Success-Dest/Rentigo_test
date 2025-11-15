@@ -100,7 +100,7 @@
                     <div class="info-grid">
                         <div class="info-item">
                             <label>Monthly Rent:</label>
-                            <span class="amount">Rs <?php echo number_format($booking->monthly_rent); ?></span>
+                            <span class="amount">Rs <?php echo number_format($booking->monthly_rent * 1.10); ?></span>
                         </div>
                         <div class="info-item">
                             <label>Deposit Amount:</label>
@@ -108,7 +108,7 @@
                         </div>
                         <div class="info-item">
                             <label>Total Amount:</label>
-                            <span class="amount total">Rs <?php echo number_format($booking->total_amount); ?></span>
+                            <span class="amount total">Rs <?php echo number_format($booking->total_amount * 1.10); ?></span>
                         </div>
                     </div>
                 </div>
