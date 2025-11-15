@@ -152,18 +152,6 @@
                                 <span><strong>Rent:</strong> LKR <?php echo number_format($lease->monthly_rent * 1.10, 2); ?>/mo</span>
                                 <span><strong>Deposit:</strong> LKR <?php echo number_format($lease->deposit_amount, 2); ?></span>
                             </div>
-
-                            <!-- Signature Status -->
-                            <div class="signature-status">
-                                <span class="signature-item <?php echo $lease->signed_by_tenant ? 'signed' : 'pending'; ?>">
-                                    <i class="fas fa-<?php echo $lease->signed_by_tenant ? 'check-circle' : 'clock'; ?>"></i>
-                                    Tenant: <?php echo $lease->signed_by_tenant ? 'Signed' : 'Pending'; ?>
-                                </span>
-                                <span class="signature-item <?php echo $lease->signed_by_landlord ? 'signed' : 'pending'; ?>">
-                                    <i class="fas fa-<?php echo $lease->signed_by_landlord ? 'check-circle' : 'clock'; ?>"></i>
-                                    Landlord: <?php echo $lease->signed_by_landlord ? 'Signed' : 'Pending'; ?>
-                                </span>
-                            </div>
                         </div>
                         <div class="agreement-status">
                             <span class="status-badge <?php echo $statusClass; ?>">
@@ -411,27 +399,6 @@
     flex-direction: column;
     gap: 8px;
     margin-bottom: 12px;
-}
-
-.signature-status {
-    display: flex;
-    gap: 15px;
-    margin-top: 10px;
-}
-
-.signature-item {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    font-size: 14px;
-}
-
-.signature-item.signed {
-    color: #2ecc71;
-}
-
-.signature-item.pending {
-    color: #f39c12;
 }
 
 .agreement-status {
