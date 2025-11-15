@@ -95,10 +95,6 @@
                    class="btn btn-secondary">
                     <i class="fas fa-eye"></i> View Full Agreement
                 </a>
-                <a href="<?php echo URLROOT; ?>/leaseagreements/download/<?php echo $data['activeLease']->id; ?>"
-                   class="btn btn-primary" target="_blank">
-                    <i class="fas fa-download"></i> Download PDF
-                </a>
             </div>
         </div>
     </div>
@@ -184,12 +180,6 @@
                                    class="btn btn-secondary btn-sm">
                                     <i class="fas fa-eye"></i> View
                                 </a>
-                                <?php if ($lease->status === 'active' || $lease->status === 'completed'): ?>
-                                    <a href="<?php echo URLROOT; ?>/leaseagreements/download/<?php echo $lease->id; ?>"
-                                       class="btn btn-primary btn-sm" target="_blank">
-                                        <i class="fas fa-download"></i> Download
-                                    </a>
-                                <?php endif; ?>
                             </div>
                         </div>
                     </div>
@@ -372,11 +362,11 @@
 }
 
 .stat-icon.active {
-    background: #2ecc71;
+    background: #45a9ea;
 }
 
 .stat-icon.completed {
-    background: #95a5a6;
+    background: #45a9ea;
 }
 
 .agreements-list {
