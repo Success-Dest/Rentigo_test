@@ -7,6 +7,7 @@ class Maintenance extends Controller
     private $propertyModel;
     private $providerModel;
     private $notificationModel;
+    private $quotationModel;
 
     public function __construct()
     {
@@ -18,6 +19,7 @@ class Maintenance extends Controller
         $this->propertyModel = $this->model('M_Properties');
         $this->providerModel = $this->model('M_ServiceProviders');
         $this->notificationModel = $this->model('M_Notifications');
+        $this->quotationModel = $this->model('M_MaintenanceQuotations');
     }
 
     public function index()
@@ -123,11 +125,23 @@ class Maintenance extends Controller
             redirect('maintenance/index');
         }
 
+        // Get quotations for this request
+        $quotations = $this->quotationModel->getQuotationsByRequest($id);
+
+        // Get payment info if exists
+        $payment = $this->quotationModel->getPaymentByRequest($id);
+
+        // Get service providers for assignment
+        $providers = $this->providerModel->getActiveProviders();
+
         $data = [
             'title' => 'Maintenance Details',
             'page' => 'maintenance',
             'user_name' => $_SESSION['user_name'],
-            'maintenance' => $maintenance
+            'maintenance' => $maintenance,
+            'quotations' => $quotations,
+            'payment' => $payment,
+            'providers' => $providers
         ];
 
         if ($_SESSION['user_type'] == 'landlord') {
@@ -234,5 +248,209 @@ class Maintenance extends Controller
         }
 
         redirect('maintenance/index');
+    }
+
+    // Upload quotation (Property Manager only)
+    public function uploadQuotation($request_id)
+    {
+        // Ensure only property managers can upload quotations
+        if ($_SESSION['user_type'] !== 'property_manager') {
+            flash('maintenance_message', 'Unauthorized access', 'alert alert-danger');
+            redirect('maintenance/index');
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
+
+            $data = [
+                'request_id' => $request_id,
+                'provider_id' => trim($_POST['provider_id']),
+                'uploaded_by' => $_SESSION['user_id'],
+                'amount' => trim($_POST['amount']),
+                'description' => trim($_POST['description']),
+                'quotation_file' => null,
+                'status' => 'pending'
+            ];
+
+            // Validate required fields
+            if (empty($data['provider_id']) || empty($data['amount']) || empty($data['description'])) {
+                flash('maintenance_message', 'Please fill in all required fields', 'alert alert-danger');
+                redirect('maintenance/details/' . $request_id);
+            }
+
+            // Handle file upload if provided
+            if (isset($_FILES['quotation_file']) && $_FILES['quotation_file']['error'] == 0) {
+                $upload_dir = 'public/uploads/quotations/';
+                if (!is_dir($upload_dir)) {
+                    mkdir($upload_dir, 0777, true);
+                }
+
+                $file_extension = pathinfo($_FILES['quotation_file']['name'], PATHINFO_EXTENSION);
+                $file_name = 'quotation_' . $request_id . '_' . time() . '.' . $file_extension;
+                $file_path = $upload_dir . $file_name;
+
+                if (move_uploaded_file($_FILES['quotation_file']['tmp_name'], $file_path)) {
+                    $data['quotation_file'] = $file_name;
+                }
+            }
+
+            // Create quotation
+            if ($this->quotationModel->createQuotation($data)) {
+                // Send notification to landlord
+                $maintenance = $this->maintenanceModel->getMaintenanceById($request_id);
+                $this->notificationModel->createNotification([
+                    'user_id' => $maintenance->landlord_id,
+                    'type' => 'maintenance_quotation',
+                    'title' => 'New Maintenance Quotation',
+                    'message' => 'A quotation has been uploaded for your maintenance request: ' . $maintenance->title,
+                    'link' => '/maintenance/details/' . $request_id
+                ]);
+
+                flash('maintenance_message', 'Quotation uploaded successfully', 'alert alert-success');
+            } else {
+                flash('maintenance_message', 'Failed to upload quotation', 'alert alert-danger');
+            }
+
+            redirect('maintenance/details/' . $request_id);
+        }
+    }
+
+    // Approve quotation (Landlord only)
+    public function approveQuotation($quotation_id)
+    {
+        // Ensure only landlords can approve quotations
+        if ($_SESSION['user_type'] !== 'landlord') {
+            flash('maintenance_message', 'Unauthorized access', 'alert alert-danger');
+            redirect('maintenance/index');
+        }
+
+        $quotation = $this->quotationModel->getQuotationById($quotation_id);
+
+        if (!$quotation) {
+            flash('maintenance_message', 'Quotation not found', 'alert alert-danger');
+            redirect('maintenance/index');
+        }
+
+        // Verify this is landlord's request
+        $maintenance = $this->maintenanceModel->getMaintenanceById($quotation->request_id);
+        if ($maintenance->landlord_id != $_SESSION['user_id']) {
+            flash('maintenance_message', 'Unauthorized access', 'alert alert-danger');
+            redirect('maintenance/index');
+        }
+
+        if ($this->quotationModel->approveQuotation($quotation_id, $_SESSION['user_id'])) {
+            flash('maintenance_message', 'Quotation approved. Please proceed with payment.', 'alert alert-success');
+        } else {
+            flash('maintenance_message', 'Failed to approve quotation', 'alert alert-danger');
+        }
+
+        redirect('maintenance/details/' . $quotation->request_id);
+    }
+
+    // Reject quotation (Landlord only)
+    public function rejectQuotation($quotation_id)
+    {
+        // Ensure only landlords can reject quotations
+        if ($_SESSION['user_type'] !== 'landlord') {
+            flash('maintenance_message', 'Unauthorized access', 'alert alert-danger');
+            redirect('maintenance/index');
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
+
+            $quotation = $this->quotationModel->getQuotationById($quotation_id);
+
+            if (!$quotation) {
+                flash('maintenance_message', 'Quotation not found', 'alert alert-danger');
+                redirect('maintenance/index');
+            }
+
+            // Verify this is landlord's request
+            $maintenance = $this->maintenanceModel->getMaintenanceById($quotation->request_id);
+            if ($maintenance->landlord_id != $_SESSION['user_id']) {
+                flash('maintenance_message', 'Unauthorized access', 'alert alert-danger');
+                redirect('maintenance/index');
+            }
+
+            $rejection_reason = trim($_POST['rejection_reason']);
+
+            if ($this->quotationModel->rejectQuotation($quotation_id, $rejection_reason)) {
+                flash('maintenance_message', 'Quotation rejected', 'alert alert-success');
+            } else {
+                flash('maintenance_message', 'Failed to reject quotation', 'alert alert-danger');
+            }
+
+            redirect('maintenance/details/' . $quotation->request_id);
+        }
+    }
+
+    // Pay for quotation (Landlord only)
+    public function payQuotation($quotation_id)
+    {
+        // Ensure only landlords can pay quotations
+        if ($_SESSION['user_type'] !== 'landlord') {
+            flash('maintenance_message', 'Unauthorized access', 'alert alert-danger');
+            redirect('maintenance/index');
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
+
+            $quotation = $this->quotationModel->getQuotationById($quotation_id);
+
+            if (!$quotation || $quotation->status !== 'approved') {
+                flash('maintenance_message', 'Invalid quotation', 'alert alert-danger');
+                redirect('maintenance/index');
+            }
+
+            // Verify this is landlord's request
+            $maintenance = $this->maintenanceModel->getMaintenanceById($quotation->request_id);
+            if ($maintenance->landlord_id != $_SESSION['user_id']) {
+                flash('maintenance_message', 'Unauthorized access', 'alert alert-danger');
+                redirect('maintenance/index');
+            }
+
+            // Check if already paid
+            if ($this->quotationModel->isQuotationPaid($quotation_id)) {
+                flash('maintenance_message', 'Quotation already paid', 'alert alert-warning');
+                redirect('maintenance/details/' . $quotation->request_id);
+            }
+
+            $payment_data = [
+                'request_id' => $quotation->request_id,
+                'quotation_id' => $quotation_id,
+                'landlord_id' => $_SESSION['user_id'],
+                'amount' => $quotation->amount,
+                'payment_method' => trim($_POST['payment_method']),
+                'transaction_id' => trim($_POST['transaction_id']) ?: null,
+                'status' => 'completed',
+                'payment_date' => date('Y-m-d H:i:s'),
+                'notes' => trim($_POST['notes']) ?: ''
+            ];
+
+            if ($this->quotationModel->createPayment($payment_data)) {
+                // Update maintenance request status to 'scheduled' or 'in_progress'
+                $this->maintenanceModel->updateMaintenanceStatus($quotation->request_id, 'scheduled');
+
+                // Send notification to property manager
+                $property = $this->propertyModel->getPropertyById($maintenance->property_id);
+                if ($property && $property->manager_id) {
+                    $this->notificationModel->createNotification([
+                        'user_id' => $property->manager_id,
+                        'type' => 'maintenance_payment',
+                        'title' => 'Maintenance Payment Received',
+                        'message' => 'Payment received for maintenance request: ' . $maintenance->title . '. Please coordinate with the service provider.',
+                        'link' => '/maintenance/details/' . $quotation->request_id
+                    ]);
+                }
+
+                flash('maintenance_message', 'Payment successful! The property manager has been notified.', 'alert alert-success');
+            } else {
+                flash('maintenance_message', 'Payment failed. Please try again.', 'alert alert-danger');
+            }
+
+            redirect('maintenance/details/' . $quotation->request_id);
+        }
     }
 }
