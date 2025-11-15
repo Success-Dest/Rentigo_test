@@ -28,7 +28,7 @@
                 <i class="fas fa-receipt"></i>
             </div>
             <div class="stat-details">
-                <h4><?php echo $data['totalPayments']->payment_count ?? 0; ?></h4>
+                <h4><?php echo $data['totalPayments']->total_payments ?? 0; ?></h4>
                 <p>Payments Made</p>
             </div>
         </div>

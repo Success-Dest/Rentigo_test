@@ -27,8 +27,8 @@ class Admin extends Controller
         $allPayments = $paymentModel->getAllPayments();
         $pendingPMs = $this->userModel->getPendingPMs();
 
-        // Calculate active tenants
-        $activeBookings = array_filter($allBookings, fn($b) => $b->status === 'active');
+        // Calculate active tenants (approved and active bookings)
+        $activeBookings = array_filter($allBookings, fn($b) => $b->status === 'active' || $b->status === 'approved');
 
         // Calculate monthly revenue (10% platform service fee)
         $currentMonth = date('Y-m');

@@ -11,6 +11,39 @@
 
     <?php flash('lease_message'); ?>
 
+    <!-- Lease Statistics -->
+    <?php if (isset($data['leaseStats'])): ?>
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-file-contract"></i>
+            </div>
+            <div class="stat-details">
+                <h4><?php echo $data['leaseStats']->total ?? 0; ?></h4>
+                <p>Total Agreements</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon active">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="stat-details">
+                <h4><?php echo $data['leaseStats']->active ?? 0; ?></h4>
+                <p>Active Leases</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon completed">
+                <i class="fas fa-history"></i>
+            </div>
+            <div class="stat-details">
+                <h4><?php echo $data['leaseStats']->completed ?? 0; ?></h4>
+                <p>Completed</p>
+            </div>
+        </div>
+    </div>
+    <?php endif; ?>
+
     <!-- Active Lease Summary -->
     <?php if (isset($data['activeLease']) && $data['activeLease']): ?>
     <div class="dashboard-section">
@@ -66,39 +99,6 @@
                    class="btn btn-primary" target="_blank">
                     <i class="fas fa-download"></i> Download PDF
                 </a>
-            </div>
-        </div>
-    </div>
-    <?php endif; ?>
-
-    <!-- Lease Statistics -->
-    <?php if (isset($data['leaseStats'])): ?>
-    <div class="stats-grid">
-        <div class="stat-card">
-            <div class="stat-icon">
-                <i class="fas fa-file-contract"></i>
-            </div>
-            <div class="stat-details">
-                <h4><?php echo $data['leaseStats']->total_leases ?? 0; ?></h4>
-                <p>Total Agreements</p>
-            </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon active">
-                <i class="fas fa-check-circle"></i>
-            </div>
-            <div class="stat-details">
-                <h4><?php echo $data['leaseStats']->active_leases ?? 0; ?></h4>
-                <p>Active Leases</p>
-            </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon completed">
-                <i class="fas fa-history"></i>
-            </div>
-            <div class="stat-details">
-                <h4><?php echo $data['leaseStats']->completed_leases ?? 0; ?></h4>
-                <p>Completed</p>
             </div>
         </div>
     </div>

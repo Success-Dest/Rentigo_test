@@ -16,11 +16,11 @@
                 <i class="fas fa-calendar"></i>
             </div>
             <div class="stat-info">
-                <h3 class="stat-number"><?php echo $data['bookingStats']->total_bookings ?? 0; ?></h3>
+                <h3 class="stat-number"><?php echo $data['bookingStats']->total ?? 0; ?></h3>
                 <p class="stat-label">Total Bookings</p>
                 <span class="stat-subtext">
-                    <?php echo $data['bookingStats']->active_bookings ?? 0; ?> active,
-                    <?php echo $data['bookingStats']->pending_bookings ?? 0; ?> pending
+                    <?php echo $data['bookingStats']->active ?? 0; ?> active,
+                    <?php echo $data['bookingStats']->pending ?? 0; ?> pending
                 </span>
             </div>
         </div>
@@ -327,7 +327,7 @@
     display: flex;
     gap: 20px;
     padding: 20px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #45a9ea 0%, #3b8fd9 100%);
     color: white;
     border-radius: 12px;
 }
@@ -469,7 +469,7 @@
     height: 40px;
     background: #f8f9fa;
     border-radius: 8px;
-    color: #667eea;
+    color: #45a9ea;
     font-size: 18px;
     flex-shrink: 0;
 }
