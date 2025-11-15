@@ -99,10 +99,21 @@ class Maintenance extends Controller
             }
         } else {
             $data = [
-                'title' => 'New Maintenance Request - Rentigo',
                 'page' => 'maintenance',
                 'user_name' => $_SESSION['user_name'],
-                'properties' => $properties
+                'properties' => $properties,
+                'property_id' => '',
+                'property_err' => '',
+                'title' => '',
+                'title_err' => '',
+                'category' => '',
+                'category_err' => '',
+                'priority' => '',
+                'priority_err' => '',
+                'description' => '',
+                'description_err' => '',
+                'notes' => '',
+                'estimated_cost' => ''
             ];
 
             $this->view('landlord/v_new_maintenance_request', $data);
