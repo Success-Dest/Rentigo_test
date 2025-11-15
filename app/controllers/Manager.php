@@ -92,10 +92,18 @@ class Manager extends Controller
     {
         // Load models
         $bookingModel = $this->model('M_Bookings');
-        $userModel = $this->model('M_Users');
+        $propertyModel = $this->model('M_ManagerProperties');
+        $manager_id = $_SESSION['user_id'];
 
-        // Get all bookings to get tenant information
-        $allBookings = $bookingModel->getAllBookings();
+        // Get properties assigned to this manager
+        $assignedProperties = $propertyModel->getAssignedProperties($manager_id);
+        $propertyIds = array_map(fn($p) => $p->id, $assignedProperties ?? []);
+
+        // Get bookings only for assigned properties
+        $allBookings = [];
+        if (!empty($propertyIds)) {
+            $allBookings = $bookingModel->getBookingsByProperties($propertyIds);
+        }
 
         // Separate by status
         $activeBookings = array_filter($allBookings, fn($b) => $b->status === 'active');
