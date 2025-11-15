@@ -106,7 +106,7 @@ class Manager extends Controller
         }
 
         // Separate by status
-        $activeBookings = array_filter($allBookings, fn($b) => $b->status === 'active');
+        $activeBookings = array_filter($allBookings, fn($b) => $b->status === 'active' || $b->status === 'approved');
         $pendingBookings = array_filter($allBookings, fn($b) => $b->status === 'pending');
         $vacatedBookings = array_filter($allBookings, fn($b) => $b->status === 'completed' || $b->status === 'cancelled');
 
@@ -114,6 +114,7 @@ class Manager extends Controller
             'title' => 'Tenant Management',
             'page' => 'tenants',
             'user_name' => $_SESSION['user_name'],
+            'assignedPropertiesCount' => count($assignedProperties ?? []),
             'activeBookings' => $activeBookings,
             'pendingBookings' => $pendingBookings,
             'vacatedBookings' => $vacatedBookings,

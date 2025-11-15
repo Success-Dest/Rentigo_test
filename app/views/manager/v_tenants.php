@@ -31,52 +31,63 @@
 
             <!-- Active Tenants Tab -->
             <div id="active-tab" class="tab-content active">
-                <div class="table-container">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Contact</th>
-                                <th>Property</th>
-                                <th>Monthly Rent</th>
-                                <th>Platform Fee</th>
-                                <th>Lease Start</th>
-                                <th>Lease End</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php if (!empty($data['activeBookings'])): ?>
-                                <?php foreach ($data['activeBookings'] as $booking): ?>
+                <?php if (($data['assignedPropertiesCount'] ?? 0) === 0): ?>
+                    <div class="empty-state">
+                        <i class="fas fa-home"></i>
+                        <h3>No Properties Assigned</h3>
+                        <p>You don't have any properties assigned to you yet. Please contact the administrator to assign properties to your account.</p>
+                    </div>
+                <?php else: ?>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Contact</th>
+                                    <th>Property</th>
+                                    <th>Monthly Rent</th>
+                                    <th>Platform Fee</th>
+                                    <th>Lease Start</th>
+                                    <th>Lease End</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php if (!empty($data['activeBookings'])): ?>
+                                    <?php foreach ($data['activeBookings'] as $booking): ?>
+                                        <tr>
+                                            <td class="font-medium"><?php echo htmlspecialchars($booking->tenant_name ?? 'N/A'); ?></td>
+                                            <td>
+                                                <div><?php echo htmlspecialchars($booking->tenant_email ?? 'N/A'); ?></div>
+                                            </td>
+                                            <td><?php echo htmlspecialchars($booking->address ?? 'N/A'); ?></td>
+                                            <td>LKR <?php echo number_format($booking->monthly_rent * 1.10 ?? 0, 0); ?></td>
+                                            <td><strong class="text-success">LKR <?php echo number_format($booking->monthly_rent * 0.10 ?? 0, 0); ?></strong></td>
+                                            <td><?php echo date('Y-m-d', strtotime($booking->move_in_date)); ?></td>
+                                            <td><?php echo $booking->move_out_date ? date('Y-m-d', strtotime($booking->move_out_date)) : 'N/A'; ?></td>
+                                            <td><span class="status-badge approved"><?php echo ucfirst($booking->status); ?></span></td>
+                                            <td>
+                                                <div class="action-buttons">
+                                                    <button class="btn-icon" title="View Details">
+                                                        <i class="fas fa-eye"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
                                     <tr>
-                                        <td class="font-medium"><?php echo htmlspecialchars($booking->tenant_name ?? 'N/A'); ?></td>
-                                        <td>
-                                            <div><?php echo htmlspecialchars($booking->tenant_email ?? 'N/A'); ?></div>
-                                        </td>
-                                        <td><?php echo htmlspecialchars($booking->address ?? 'N/A'); ?></td>
-                                        <td>LKR <?php echo number_format($booking->monthly_rent * 1.10 ?? 0, 0); ?></td>
-                                        <td><strong class="text-success">LKR <?php echo number_format($booking->monthly_rent * 0.10 ?? 0, 0); ?></strong></td>
-                                        <td><?php echo date('Y-m-d', strtotime($booking->move_in_date)); ?></td>
-                                        <td><?php echo $booking->move_out_date ? date('Y-m-d', strtotime($booking->move_out_date)) : 'N/A'; ?></td>
-                                        <td><span class="status-badge approved">Active</span></td>
-                                        <td>
-                                            <div class="action-buttons">
-                                                <button class="btn-icon" title="View Details">
-                                                    <i class="fas fa-eye"></i>
-                                                </button>
-                                            </div>
+                                        <td colspan="9" class="text-center text-muted">
+                                            <p>No active tenants in your assigned properties</p>
+                                            <small>Tenants will appear here once bookings are approved</small>
                                         </td>
                                     </tr>
-                                <?php endforeach; ?>
-                            <?php else: ?>
-                                <tr>
-                                    <td colspan="9" class="text-center text-muted">No active tenants</td>
-                                </tr>
-                            <?php endif; ?>
-                        </tbody>
-                    </table>
-                </div>
+                                <?php endif; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                <?php endif; ?>
             </div>
 
             <!-- Pending Tenants Tab -->
