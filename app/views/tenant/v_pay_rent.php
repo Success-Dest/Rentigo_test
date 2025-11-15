@@ -31,7 +31,7 @@
                 <div class="rent-payment-card <?php echo $isOverdue ? 'overdue' : ''; ?>">
                     <div class="rent-details">
                         <h4><?php echo htmlspecialchars($payment->property_address ?? 'Property'); ?></h4>
-                        <div class="rent-amount">LKR <?php echo number_format($payment->amount, 2); ?></div>
+                        <div class="rent-amount">LKR <?php echo number_format($payment->amount * 1.10, 2); ?></div>
                         <div class="due-date">
                             <i class="fas fa-calendar"></i>
                             Due: <?php echo date('F d, Y', strtotime($payment->due_date)); ?>
@@ -43,7 +43,7 @@
                             </div>
                         <?php endif; ?>
                         <span class="status-badge <?php echo $statusClass; ?>"><?php echo $statusText; ?></span>
-                        <button class="btn btn-primary" onclick="openPaymentModal(<?php echo $payment->id; ?>, <?php echo $payment->amount; ?>, '<?php echo htmlspecialchars($payment->property_address ?? 'Property'); ?>')">
+                        <button class="btn btn-primary" onclick="openPaymentModal(<?php echo $payment->id; ?>, <?php echo $payment->amount * 1.10; ?>, '<?php echo htmlspecialchars($payment->property_address ?? 'Property'); ?>')">
                             <i class="fas fa-credit-card"></i>
                             Pay Now
                         </button>
@@ -67,7 +67,7 @@
                 <i class="fas fa-money-bill-wave"></i>
             </div>
             <div class="stat-details">
-                <h4>LKR <?php echo number_format($data['totalPayments']->total_paid ?? 0, 2); ?></h4>
+                <h4>LKR <?php echo number_format(($data['totalPayments']->total_paid ?? 0) * 1.10, 2); ?></h4>
                 <p>Total Paid</p>
             </div>
         </div>
@@ -140,7 +140,7 @@
                                     ?>
                                 </td>
                                 <td><?php echo htmlspecialchars($payment->property_address ?? 'N/A'); ?></td>
-                                <td>LKR <?php echo number_format($payment->amount, 2); ?></td>
+                                <td>LKR <?php echo number_format($payment->amount * 1.10, 2); ?></td>
                                 <td><?php echo htmlspecialchars(ucfirst($payment->payment_method ?? 'N/A')); ?></td>
                                 <td>
                                     <?php if ($payment->transaction_id): ?>
@@ -161,7 +161,7 @@
                                             <i class="fas fa-download"></i> Receipt
                                         </a>
                                     <?php elseif ($payment->status === 'pending'): ?>
-                                        <button onclick="openPaymentModal(<?php echo $payment->id; ?>, <?php echo $payment->amount; ?>, '<?php echo htmlspecialchars($payment->property_address ?? 'Property'); ?>')"
+                                        <button onclick="openPaymentModal(<?php echo $payment->id; ?>, <?php echo $payment->amount * 1.10; ?>, '<?php echo htmlspecialchars($payment->property_address ?? 'Property'); ?>')"
                                                 class="btn btn-primary btn-sm">
                                             <i class="fas fa-credit-card"></i> Pay
                                         </button>

@@ -229,7 +229,19 @@ class Bookings extends Controller
 
             $this->leaseModel->createLeaseAgreement($lease_data);
 
-            flash('booking_message', 'Booking approved successfully!', 'alert alert-success');
+            // Create scheduled monthly payments
+            $paymentModel = $this->model('M_Payments');
+            $payments_created = $paymentModel->createScheduledPayments(
+                $id,
+                $booking->tenant_id,
+                $booking->landlord_id,
+                $booking->property_id,
+                $booking->monthly_rent, // Store base rent (what landlord receives)
+                $booking->move_in_date,
+                $booking->move_out_date
+            );
+
+            flash('booking_message', 'Booking approved successfully! ' . $payments_created . ' payment(s) scheduled.', 'alert alert-success');
         } else {
             flash('booking_message', 'Failed to approve booking', 'alert alert-danger');
         }
