@@ -232,7 +232,7 @@ class M_Bookings
     {
         $this->db->query('SELECT b.*,
                          p.address, p.property_type,
-                         t.name as tenant_name, t.email as tenant_email, t.phone as tenant_phone,
+                         t.name as tenant_name, t.email as tenant_email,
                          l.name as landlord_name, l.email as landlord_email
                          FROM bookings b
                          LEFT JOIN properties p ON b.property_id = p.id
@@ -253,7 +253,7 @@ class M_Bookings
 
         $this->db->query("SELECT b.*,
                          p.address, p.property_type, p.bedrooms, p.bathrooms,
-                         t.name as tenant_name, t.email as tenant_email, t.phone as tenant_phone,
+                         t.name as tenant_name, t.email as tenant_email,
                          l.name as landlord_name, l.email as landlord_email
                          FROM bookings b
                          LEFT JOIN properties p ON b.property_id = p.id

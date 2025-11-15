@@ -53,7 +53,6 @@
                                         <td class="font-medium"><?php echo htmlspecialchars($booking->tenant_name ?? 'N/A'); ?></td>
                                         <td>
                                             <div><?php echo htmlspecialchars($booking->tenant_email ?? 'N/A'); ?></div>
-                                            <div class="text-muted small"><?php echo htmlspecialchars($booking->tenant_phone ?? 'N/A'); ?></div>
                                         </td>
                                         <td><?php echo htmlspecialchars($booking->address ?? 'N/A'); ?></td>
                                         <td>LKR <?php echo number_format($booking->monthly_rent * 1.10 ?? 0, 0); ?></td>
@@ -104,7 +103,6 @@
                                         <td class="font-medium"><?php echo htmlspecialchars($booking->tenant_name ?? 'N/A'); ?></td>
                                         <td>
                                             <div><?php echo htmlspecialchars($booking->tenant_email ?? 'N/A'); ?></div>
-                                            <div class="text-muted small"><?php echo htmlspecialchars($booking->tenant_phone ?? 'N/A'); ?></div>
                                         </td>
                                         <td><?php echo htmlspecialchars($booking->address ?? 'N/A'); ?></td>
                                         <td>LKR <?php echo number_format($booking->monthly_rent * 1.10 ?? 0, 0); ?></td>
@@ -155,7 +153,6 @@
                                         <td class="font-medium"><?php echo htmlspecialchars($booking->tenant_name ?? 'N/A'); ?></td>
                                         <td>
                                             <div><?php echo htmlspecialchars($booking->tenant_email ?? 'N/A'); ?></div>
-                                            <div class="text-muted small"><?php echo htmlspecialchars($booking->tenant_phone ?? 'N/A'); ?></div>
                                         </td>
                                         <td><?php echo htmlspecialchars($booking->address ?? 'N/A'); ?></td>
                                         <td>LKR <?php echo number_format($booking->monthly_rent * 1.10 ?? 0, 0); ?></td>
