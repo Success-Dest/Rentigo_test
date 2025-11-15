@@ -1,47 +1,47 @@
 <?php require APPROOT . '/views/inc/manager_header.php'; ?>
 
-<div class="content-wrapper">
-    <div class="page-header">
-        <div class="header-content">
-            <h2 class="page-title">
-                <i class="fas fa-file-contract"></i> Lease Agreements
-            </h2>
-            <p class="page-subtitle">Manage lease agreements for your assigned properties</p>
+<div class="page-header">
+    <div class="header-left">
+        <h1 class="page-title">Lease Agreements</h1>
+        <p class="page-subtitle">Manage lease agreements for your assigned properties</p>
+    </div>
+</div>
+
+<?php flash('lease_message'); ?>
+
+<!-- Lease Stats -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon">
+            <i class="fas fa-file-alt"></i>
+        </div>
+        <div class="stat-content">
+            <h3 class="stat-label">Draft</h3>
+            <div class="stat-value"><?php echo $data['draftCount'] ?? 0; ?></div>
+            <div class="stat-change">Pending creation</div>
         </div>
     </div>
-
-    <?php flash('lease_message'); ?>
-
-    <!-- Stats Cards -->
-    <div class="stats-container">
-        <div class="stat-card stat-warning">
-            <div class="stat-icon">
-                <i class="fas fa-file-alt"></i>
-            </div>
-            <div class="stat-details">
-                <span class="stat-number"><?php echo $data['draftCount'] ?? 0; ?></span>
-                <span class="stat-label">Draft Leases</span>
-            </div>
+    <div class="stat-card">
+        <div class="stat-icon">
+            <i class="fas fa-check-circle"></i>
         </div>
-        <div class="stat-card stat-success">
-            <div class="stat-icon">
-                <i class="fas fa-check-circle"></i>
-            </div>
-            <div class="stat-details">
-                <span class="stat-number"><?php echo $data['activeCount'] ?? 0; ?></span>
-                <span class="stat-label">Active Leases</span>
-            </div>
-        </div>
-        <div class="stat-card stat-info">
-            <div class="stat-icon">
-                <i class="fas fa-archive"></i>
-            </div>
-            <div class="stat-details">
-                <span class="stat-number"><?php echo $data['completedCount'] ?? 0; ?></span>
-                <span class="stat-label">Completed Leases</span>
-            </div>
+        <div class="stat-content">
+            <h3 class="stat-label">Active</h3>
+            <div class="stat-value"><?php echo $data['activeCount'] ?? 0; ?></div>
+            <div class="stat-change">Currently active</div>
         </div>
     </div>
+    <div class="stat-card">
+        <div class="stat-icon">
+            <i class="fas fa-archive"></i>
+        </div>
+        <div class="stat-content">
+            <h3 class="stat-label">Completed</h3>
+            <div class="stat-value"><?php echo $data['completedCount'] ?? 0; ?></div>
+            <div class="stat-change">Ended leases</div>
+        </div>
+    </div>
+</div>
 
     <!-- Tabs Container -->
     <div class="tabs-container">
@@ -257,70 +257,58 @@
             <?php endif; ?>
         </div>
     </div>
-</div>
 
 <style>
-    .stats-container {
+    .stats-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 1.5rem;
-        margin-bottom: 2rem;
+        gap: 20px;
+        margin-bottom: 30px;
     }
 
     .stat-card {
         background: white;
-        border-radius: 12px;
-        padding: 1.5rem;
+        border-radius: 8px;
+        padding: 20px;
         display: flex;
         align-items: center;
-        gap: 1rem;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-        border-left: 4px solid #3b82f6;
-    }
-
-    .stat-card.stat-warning {
-        border-left-color: #f59e0b;
-    }
-
-    .stat-card.stat-success {
-        border-left-color: #10b981;
-    }
-
-    .stat-card.stat-info {
-        border-left-color: #45a9ea;
+        gap: 15px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
     .stat-icon {
-        font-size: 2.5rem;
-        color: #6b7280;
-    }
-
-    .stat-warning .stat-icon {
-        color: #f59e0b;
-    }
-
-    .stat-success .stat-icon {
-        color: #10b981;
-    }
-
-    .stat-info .stat-icon {
-        color: #45a9ea;
-    }
-
-    .stat-details {
+        width: 50px;
+        height: 50px;
+        border-radius: 8px;
+        background: #45a9ea;
         display: flex;
-        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        color: white;
+        flex-shrink: 0;
     }
 
-    .stat-number {
-        font-size: 2rem;
-        font-weight: 700;
-        color: #1f2937;
+    .stat-content {
+        flex: 1;
     }
 
     .stat-label {
-        font-size: 0.875rem;
-        color: #6b7280;
+        font-size: 14px;
+        color: #666;
+        margin-bottom: 5px;
+    }
+
+    .stat-value {
+        font-size: 28px;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 2px;
+    }
+
+    .stat-change {
+        font-size: 12px;
+        color: #999;
     }
 
     .tabs-container {

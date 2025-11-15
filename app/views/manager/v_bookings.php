@@ -1,47 +1,47 @@
 <?php require APPROOT . '/views/inc/manager_header.php'; ?>
 
-<div class="content-wrapper">
-    <div class="page-header">
-        <div class="header-content">
-            <h2 class="page-title">
-                <i class="fas fa-calendar-check"></i> Booking Management
-            </h2>
-            <p class="page-subtitle">Manage booking requests for your assigned properties</p>
+<div class="page-header">
+    <div class="header-left">
+        <h1 class="page-title">Booking Management</h1>
+        <p class="page-subtitle">Manage booking requests for your assigned properties</p>
+    </div>
+</div>
+
+<?php flash('booking_message'); ?>
+
+<!-- Booking Stats -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon">
+            <i class="fas fa-clock"></i>
+        </div>
+        <div class="stat-content">
+            <h3 class="stat-label">Pending</h3>
+            <div class="stat-value"><?php echo $data['pendingCount'] ?? 0; ?></div>
+            <div class="stat-change">Awaiting response</div>
         </div>
     </div>
-
-    <?php flash('booking_message'); ?>
-
-    <!-- Stats Cards -->
-    <div class="stats-container">
-        <div class="stat-card stat-warning">
-            <div class="stat-icon">
-                <i class="fas fa-clock"></i>
-            </div>
-            <div class="stat-details">
-                <span class="stat-number"><?php echo $data['pendingCount'] ?? 0; ?></span>
-                <span class="stat-label">Pending Bookings</span>
-            </div>
+    <div class="stat-card">
+        <div class="stat-icon">
+            <i class="fas fa-check-circle"></i>
         </div>
-        <div class="stat-card stat-success">
-            <div class="stat-icon">
-                <i class="fas fa-check-circle"></i>
-            </div>
-            <div class="stat-details">
-                <span class="stat-number"><?php echo $data['approvedCount'] ?? 0; ?></span>
-                <span class="stat-label">Approved Bookings</span>
-            </div>
-        </div>
-        <div class="stat-card stat-danger">
-            <div class="stat-icon">
-                <i class="fas fa-times-circle"></i>
-            </div>
-            <div class="stat-details">
-                <span class="stat-number"><?php echo $data['rejectedCount'] ?? 0; ?></span>
-                <span class="stat-label">Rejected Bookings</span>
-            </div>
+        <div class="stat-content">
+            <h3 class="stat-label">Approved</h3>
+            <div class="stat-value"><?php echo $data['approvedCount'] ?? 0; ?></div>
+            <div class="stat-change">Accepted bookings</div>
         </div>
     </div>
+    <div class="stat-card">
+        <div class="stat-icon">
+            <i class="fas fa-times-circle"></i>
+        </div>
+        <div class="stat-content">
+            <h3 class="stat-label">Rejected</h3>
+            <div class="stat-value"><?php echo $data['rejectedCount'] ?? 0; ?></div>
+            <div class="stat-change">Declined requests</div>
+        </div>
+    </div>
+</div>
 
     <!-- Tabs Navigation -->
     <div class="tabs-container">
@@ -219,7 +219,6 @@
             <?php endif; ?>
         </div>
     </div>
-</div>
 
 <!-- Reject Booking Modal -->
 <div id="rejectModal" class="modal-overlay" style="display: none;">
@@ -249,67 +248,56 @@
 </div>
 
 <style>
-    .stats-container {
+    .stats-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 1.5rem;
-        margin-bottom: 2rem;
+        gap: 20px;
+        margin-bottom: 30px;
     }
 
     .stat-card {
         background: white;
-        border-radius: 12px;
-        padding: 1.5rem;
+        border-radius: 8px;
+        padding: 20px;
         display: flex;
         align-items: center;
-        gap: 1rem;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-        border-left: 4px solid #3b82f6;
-    }
-
-    .stat-card.stat-warning {
-        border-left-color: #f59e0b;
-    }
-
-    .stat-card.stat-success {
-        border-left-color: #10b981;
-    }
-
-    .stat-card.stat-danger {
-        border-left-color: #ef4444;
+        gap: 15px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
     .stat-icon {
-        font-size: 2.5rem;
-        color: #6b7280;
-    }
-
-    .stat-warning .stat-icon {
-        color: #f59e0b;
-    }
-
-    .stat-success .stat-icon {
-        color: #10b981;
-    }
-
-    .stat-danger .stat-icon {
-        color: #ef4444;
-    }
-
-    .stat-details {
+        width: 50px;
+        height: 50px;
+        border-radius: 8px;
+        background: #45a9ea;
         display: flex;
-        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        color: white;
+        flex-shrink: 0;
     }
 
-    .stat-number {
-        font-size: 2rem;
-        font-weight: 700;
-        color: #1f2937;
+    .stat-content {
+        flex: 1;
     }
 
     .stat-label {
-        font-size: 0.875rem;
-        color: #6b7280;
+        font-size: 14px;
+        color: #666;
+        margin-bottom: 5px;
+    }
+
+    .stat-value {
+        font-size: 28px;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 2px;
+    }
+
+    .stat-change {
+        font-size: 12px;
+        color: #999;
     }
 
     .tabs-container {
@@ -344,8 +332,8 @@
     }
 
     .tab-btn.active {
-        color: #3b82f6;
-        border-bottom-color: #3b82f6;
+        color: #45a9ea;
+        border-bottom-color: #45a9ea;
         background: white;
     }
 
@@ -508,8 +496,8 @@
 
     .form-control:focus {
         outline: none;
-        border-color: #3b82f6;
-        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        border-color: #45a9ea;
+        box-shadow: 0 0 0 3px rgba(69, 169, 234, 0.1);
     }
 </style>
 
