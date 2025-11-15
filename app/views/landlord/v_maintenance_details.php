@@ -185,7 +185,7 @@
     <?php endif; ?>
 
     <!-- Payment Status -->
-    <?php if (isset($data['payment'])): ?>
+    <?php if (isset($data['payment']) && $data['payment']): ?>
         <?php $payment = $data['payment']; ?>
         <div class="content-card">
             <div class="card-header">

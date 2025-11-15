@@ -79,15 +79,16 @@ class M_Maintenance
                   p.address as property_address,
                   r.name as requester_name,
                   sp.name as provider_name,
-                  mq.status as quotation_status,
-                  mq.amount as quotation_amount,
-                  mp.status as payment_status
+                  (SELECT mq2.status FROM maintenance_quotations mq2 WHERE mq2.request_id = m.id AND mq2.status != "rejected" ORDER BY mq2.created_at DESC LIMIT 1) as quotation_status,
+                  (SELECT mq2.amount FROM maintenance_quotations mq2 WHERE mq2.request_id = m.id AND mq2.status != "rejected" ORDER BY mq2.created_at DESC LIMIT 1) as quotation_amount,
+                  (SELECT mp2.status FROM maintenance_payments mp2
+                   INNER JOIN maintenance_quotations mq3 ON mp2.quotation_id = mq3.id
+                   WHERE mq3.request_id = m.id
+                   ORDER BY mp2.payment_date DESC LIMIT 1) as payment_status
                   FROM maintenance_requests m
                   LEFT JOIN properties p ON m.property_id = p.id
                   LEFT JOIN users r ON m.requester_id = r.id
                   LEFT JOIN service_providers sp ON m.provider_id = sp.id
-                  LEFT JOIN maintenance_quotations mq ON m.id = mq.request_id AND mq.status != "rejected"
-                  LEFT JOIN maintenance_payments mp ON mq.id = mp.quotation_id
                   WHERE m.landlord_id = :landlord_id';
 
         if ($status) {
@@ -114,16 +115,17 @@ class M_Maintenance
                   r.name as requester_name,
                   sp.name as provider_name,
                   l.name as landlord_name,
-                  mq.status as quotation_status,
-                  mq.amount as quotation_amount,
-                  mp.status as payment_status
+                  (SELECT mq2.status FROM maintenance_quotations mq2 WHERE mq2.request_id = m.id AND mq2.status != "rejected" ORDER BY mq2.created_at DESC LIMIT 1) as quotation_status,
+                  (SELECT mq2.amount FROM maintenance_quotations mq2 WHERE mq2.request_id = m.id AND mq2.status != "rejected" ORDER BY mq2.created_at DESC LIMIT 1) as quotation_amount,
+                  (SELECT mp2.status FROM maintenance_payments mp2
+                   INNER JOIN maintenance_quotations mq3 ON mp2.quotation_id = mq3.id
+                   WHERE mq3.request_id = m.id
+                   ORDER BY mp2.payment_date DESC LIMIT 1) as payment_status
                   FROM maintenance_requests m
-                  LEFT JOIN properties p ON m.property_id = p.id
+                  INNER JOIN properties p ON m.property_id = p.id
                   LEFT JOIN users r ON m.requester_id = r.id
                   LEFT JOIN service_providers sp ON m.provider_id = sp.id
                   LEFT JOIN users l ON m.landlord_id = l.id
-                  LEFT JOIN maintenance_quotations mq ON m.id = mq.request_id AND mq.status != "rejected"
-                  LEFT JOIN maintenance_payments mp ON mq.id = mp.quotation_id
                   WHERE p.manager_id = :manager_id';
 
         if ($status) {
