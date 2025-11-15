@@ -30,13 +30,14 @@ class Admin extends Controller
         // Calculate active tenants
         $activeBookings = array_filter($allBookings, fn($b) => $b->status === 'active');
 
-        // Calculate monthly revenue
+        // Calculate monthly revenue (10% platform service fee)
         $currentMonth = date('Y-m');
         $monthlyRevenue = 0;
         foreach ($allPayments as $payment) {
             if ($payment->status === 'completed' &&
                 date('Y-m', strtotime($payment->payment_date)) === $currentMonth) {
-                $monthlyRevenue += $payment->amount;
+                // Platform earns 10% service fee from each payment
+                $monthlyRevenue += ($payment->amount * 0.10);
             }
         }
 
@@ -95,7 +96,7 @@ class Admin extends Controller
         // Get all payments
         $allPayments = $paymentModel->getAllPayments();
 
-        // Calculate statistics
+        // Calculate statistics (10% platform service fee from all payments)
         $totalRevenue = 0;
         $collected = 0;
         $pending = 0;
@@ -104,14 +105,15 @@ class Admin extends Controller
         $overdueCount = 0;
 
         foreach ($allPayments as $payment) {
-            $totalRevenue += $payment->amount;
+            // Platform earns 10% service fee from each payment
+            $totalRevenue += ($payment->amount * 0.10);
             if ($payment->status === 'completed') {
-                $collected += $payment->amount;
+                $collected += ($payment->amount * 0.10);
             } elseif ($payment->status === 'pending') {
-                $pending += $payment->amount;
+                $pending += ($payment->amount * 0.10);
                 $pendingCount++;
             } elseif ($payment->status === 'overdue') {
-                $overdue += $payment->amount;
+                $overdue += ($payment->amount * 0.10);
                 $overdueCount++;
             }
         }

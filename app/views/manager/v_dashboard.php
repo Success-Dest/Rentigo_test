@@ -37,9 +37,9 @@
                 <i class="fas fa-dollar-sign"></i>
             </div>
             <div class="stat-info">
-                <div class="stat-label">Total Income</div>
+                <div class="stat-label">Platform Income</div>
                 <h3>LKR <?php echo number_format($data['totalIncome'] ?? 0, 0); ?></h3>
-                <div class="stat-change">From completed payments</div>
+                <div class="stat-change">10% service fees collected</div>
             </div>
         </div>
 
@@ -69,7 +69,8 @@
                         <tr>
                             <th>Tenant</th>
                             <th>Property</th>
-                            <th>Amount</th>
+                            <th>Total Payment</th>
+                            <th>Platform Fee</th>
                             <th>Date</th>
                             <th>Status</th>
                         </tr>
@@ -80,7 +81,8 @@
                                 <tr>
                                     <td class="font-medium"><?php echo htmlspecialchars($payment->tenant_name ?? 'N/A'); ?></td>
                                     <td><?php echo htmlspecialchars($payment->property_address ?? 'N/A'); ?></td>
-                                    <td>LKR <?php echo number_format($payment->amount, 0); ?></td>
+                                    <td>LKR <?php echo number_format($payment->amount * 1.10, 0); ?></td>
+                                    <td><strong>LKR <?php echo number_format($payment->amount * 0.10, 0); ?></strong></td>
                                     <td><?php echo date('M d, Y', strtotime($payment->payment_date ?? $payment->due_date)); ?></td>
                                     <td>
                                         <span class="status-badge <?php echo $payment->status === 'completed' ? 'approved' : ($payment->status === 'pending' ? 'pending' : 'rejected'); ?>">
@@ -91,7 +93,7 @@
                             <?php endforeach; ?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="5" class="text-center text-muted">No payment records</td>
+                                <td colspan="6" class="text-center text-muted">No payment records</td>
                             </tr>
                         <?php endif; ?>
                     </tbody>

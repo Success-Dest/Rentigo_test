@@ -38,6 +38,8 @@
                                 <th>Name</th>
                                 <th>Contact</th>
                                 <th>Property</th>
+                                <th>Monthly Rent</th>
+                                <th>Platform Fee</th>
                                 <th>Lease Start</th>
                                 <th>Lease End</th>
                                 <th>Status</th>
@@ -54,6 +56,8 @@
                                             <div class="text-muted small"><?php echo htmlspecialchars($booking->tenant_phone ?? 'N/A'); ?></div>
                                         </td>
                                         <td><?php echo htmlspecialchars($booking->address ?? 'N/A'); ?></td>
+                                        <td>LKR <?php echo number_format($booking->monthly_rent * 1.10 ?? 0, 0); ?></td>
+                                        <td><strong class="text-success">LKR <?php echo number_format($booking->monthly_rent * 0.10 ?? 0, 0); ?></strong></td>
                                         <td><?php echo date('Y-m-d', strtotime($booking->move_in_date)); ?></td>
                                         <td><?php echo $booking->move_out_date ? date('Y-m-d', strtotime($booking->move_out_date)) : 'N/A'; ?></td>
                                         <td><span class="status-badge approved">Active</span></td>
@@ -68,7 +72,7 @@
                                 <?php endforeach; ?>
                             <?php else: ?>
                                 <tr>
-                                    <td colspan="7" class="text-center text-muted">No active tenants</td>
+                                    <td colspan="9" class="text-center text-muted">No active tenants</td>
                                 </tr>
                             <?php endif; ?>
                         </tbody>
@@ -85,6 +89,8 @@
                                 <th>Name</th>
                                 <th>Contact</th>
                                 <th>Property</th>
+                                <th>Monthly Rent</th>
+                                <th>Platform Fee</th>
                                 <th>Lease Start</th>
                                 <th>Lease End</th>
                                 <th>Status</th>
@@ -101,6 +107,8 @@
                                             <div class="text-muted small"><?php echo htmlspecialchars($booking->tenant_phone ?? 'N/A'); ?></div>
                                         </td>
                                         <td><?php echo htmlspecialchars($booking->address ?? 'N/A'); ?></td>
+                                        <td>LKR <?php echo number_format($booking->monthly_rent * 1.10 ?? 0, 0); ?></td>
+                                        <td><strong class="text-success">LKR <?php echo number_format($booking->monthly_rent * 0.10 ?? 0, 0); ?></strong></td>
                                         <td><?php echo date('Y-m-d', strtotime($booking->move_in_date)); ?></td>
                                         <td><?php echo $booking->move_out_date ? date('Y-m-d', strtotime($booking->move_out_date)) : 'N/A'; ?></td>
                                         <td><span class="status-badge pending">Pending</span></td>
@@ -115,7 +123,7 @@
                                 <?php endforeach; ?>
                             <?php else: ?>
                                 <tr>
-                                    <td colspan="7" class="text-center text-muted">No pending tenants</td>
+                                    <td colspan="9" class="text-center text-muted">No pending tenants</td>
                                 </tr>
                             <?php endif; ?>
                         </tbody>
@@ -133,6 +141,8 @@
                                     <th>Name</th>
                                     <th>Contact</th>
                                     <th>Property</th>
+                                    <th>Monthly Rent</th>
+                                    <th>Platform Fee</th>
                                     <th>Lease Start</th>
                                     <th>Lease End</th>
                                     <th>Status</th>
@@ -148,6 +158,8 @@
                                             <div class="text-muted small"><?php echo htmlspecialchars($booking->tenant_phone ?? 'N/A'); ?></div>
                                         </td>
                                         <td><?php echo htmlspecialchars($booking->address ?? 'N/A'); ?></td>
+                                        <td>LKR <?php echo number_format($booking->monthly_rent * 1.10 ?? 0, 0); ?></td>
+                                        <td><strong class="text-muted">LKR <?php echo number_format($booking->monthly_rent * 0.10 ?? 0, 0); ?></strong></td>
                                         <td><?php echo date('Y-m-d', strtotime($booking->move_in_date)); ?></td>
                                         <td><?php echo $booking->move_out_date ? date('Y-m-d', strtotime($booking->move_out_date)) : 'N/A'; ?></td>
                                         <td><span class="status-badge rejected"><?php echo ucfirst($booking->status); ?></span></td>

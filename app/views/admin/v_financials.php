@@ -17,8 +17,8 @@
             </div>
             <div class="stat-info">
                 <h3 class="stat-number">LKR <?php echo number_format($data['totalRevenue'] ?? 0, 0); ?></h3>
-                <p class="stat-label">Total Revenue</p>
-                <span class="stat-change">All transactions</span>
+                <p class="stat-label">Platform Revenue</p>
+                <span class="stat-change">10% service fees from all payments</span>
             </div>
         </div>
 
@@ -28,8 +28,8 @@
             </div>
             <div class="stat-info">
                 <h3 class="stat-number">LKR <?php echo number_format($data['collected'] ?? 0, 0); ?></h3>
-                <p class="stat-label">Collected</p>
-                <span class="stat-change positive">Completed payments</span>
+                <p class="stat-label">Collected Fees</p>
+                <span class="stat-change positive">From completed payments</span>
             </div>
         </div>
 
@@ -39,7 +39,7 @@
             </div>
             <div class="stat-info">
                 <h3 class="stat-number">LKR <?php echo number_format($data['pending'] ?? 0, 0); ?></h3>
-                <p class="stat-label">Pending</p>
+                <p class="stat-label">Pending Fees</p>
                 <span class="stat-change"><?php echo $data['pendingCount'] ?? 0; ?> transactions</span>
             </div>
         </div>
@@ -50,7 +50,7 @@
             </div>
             <div class="stat-info">
                 <h3 class="stat-number">LKR <?php echo number_format($data['overdue'] ?? 0, 0); ?></h3>
-                <p class="stat-label">Overdue</p>
+                <p class="stat-label">Overdue Fees</p>
                 <span class="stat-change negative"><?php echo $data['overdueCount'] ?? 0; ?> transactions</span>
             </div>
         </div>
@@ -71,7 +71,8 @@
                         <th>Type</th>
                         <th>Description</th>
                         <th>Property</th>
-                        <th>Amount</th>
+                        <th>Total Payment</th>
+                        <th>Platform Fee (10%)</th>
                         <th>Date</th>
                         <th>Status</th>
                         <th>Actions</th>
@@ -104,8 +105,13 @@
                                     </div>
                                 </td>
                                 <td>
+                                    <div class="amount-display">
+                                        LKR <?php echo number_format($transaction->amount * 1.10, 0); ?>
+                                    </div>
+                                </td>
+                                <td>
                                     <div class="amount-display income">
-                                        LKR <?php echo number_format($transaction->amount, 0); ?>
+                                        <strong>LKR <?php echo number_format($transaction->amount * 0.10, 0); ?></strong>
                                     </div>
                                 </td>
                                 <td><?php echo date('m/d/Y', strtotime($transaction->payment_date ?? $transaction->due_date)); ?></td>
@@ -128,7 +134,7 @@
                         <?php endforeach; ?>
                     <?php else: ?>
                         <tr>
-                            <td colspan="7" class="text-center text-muted">No transactions found</td>
+                            <td colspan="8" class="text-center text-muted">No transactions found</td>
                         </tr>
                     <?php endif; ?>
                 </tbody>

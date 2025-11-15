@@ -54,12 +54,13 @@ class Manager extends Controller
             $occupiedUnits += $property->occupancy_occupied ?? 0;
         }
 
-        // Calculate total income from payments
+        // Calculate total income from payments (10% platform service fee)
         $totalIncome = 0;
         $totalExpenses = 0;
         foreach ($allPayments as $payment) {
             if ($payment->status === 'completed') {
-                $totalIncome += $payment->amount;
+                // Platform earns 10% service fee from each payment
+                $totalIncome += ($payment->amount * 0.10);
             }
         }
         foreach ($allMaintenance as $maintenance) {
