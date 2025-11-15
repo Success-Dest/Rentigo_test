@@ -228,12 +228,13 @@ class M_Properties
     // Get property statistics
     public function getPropertyStats($landlordId)
     {
-        $this->db->query('SELECT 
+        $this->db->query('SELECT
                          COUNT(*) as total_properties,
                          COUNT(CASE WHEN listing_type = "rent" THEN 1 END) as rental_properties,
                          COUNT(CASE WHEN listing_type = "maintenance" THEN 1 END) as maintenance_properties,
                          COUNT(CASE WHEN status = "occupied" THEN 1 END) as occupied,
                          COUNT(CASE WHEN status = "available" THEN 1 END) as available,
+                         COUNT(CASE WHEN status IN ("available", "occupied") THEN 1 END) as active_properties,
                          COUNT(CASE WHEN status = "maintenance" THEN 1 END) as maintenance,
                          COUNT(CASE WHEN status = "maintenance_only" THEN 1 END) as maintenance_only,
                          AVG(CASE WHEN listing_type = "rent" THEN rent ELSE NULL END) as average_rent,

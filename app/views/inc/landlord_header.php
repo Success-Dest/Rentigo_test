@@ -44,6 +44,15 @@
                             <span class="tooltip">Properties</span>
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a href="<?php echo URLROOT; ?>/landlord/bookings"
+                            class="nav-link <?php echo ($data['page'] ?? '') === 'bookings' ? 'active' : ''; ?>"
+                            data-tooltip="Bookings">
+                            <i class="fas fa-calendar-check"></i>
+                            <span class="nav-text">Bookings</span>
+                            <span class="tooltip">Bookings</span>
+                        </a>
+                    </li>
                     <!-- <li class="nav-item">
                         <a href="<?php echo URLROOT; ?>/landlord/add_property"
                             class="nav-link <?php echo ($data['page'] ?? '') === 'add_property' ? 'active' : ''; ?>"
