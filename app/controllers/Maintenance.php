@@ -90,7 +90,23 @@ class Maintenance extends Controller
             }
 
             // Create maintenance request
-            if ($this->maintenanceModel->createMaintenanceRequest($data)) {
+            $request_id = $this->maintenanceModel->createMaintenanceRequest($data);
+
+            if ($request_id) {
+                // Get property details to find the property manager
+                $property = $this->propertyModel->getPropertyById($data['property_id']);
+
+                // Send notification to property manager if assigned
+                if ($property && $property->manager_id) {
+                    $this->notificationModel->createNotification([
+                        'user_id' => $property->manager_id,
+                        'type' => 'maintenance_request',
+                        'title' => 'New Maintenance Request',
+                        'message' => 'New maintenance request: ' . $data['title'] . ' at ' . $property->address,
+                        'link' => '/maintenance/details/' . $request_id
+                    ]);
+                }
+
                 flash('maintenance_message', 'Maintenance request created successfully', 'alert alert-success');
                 redirect('maintenance/index');
             } else {
