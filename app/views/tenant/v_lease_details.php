@@ -107,16 +107,24 @@
                     <h4><i class="fas fa-dollar-sign"></i> Financial Details</h4>
                     <div class="info-grid">
                         <div class="info-item">
-                            <label>Monthly Rent:</label>
+                            <label>Base Monthly Rent:</label>
                             <span class="amount">LKR <?php echo number_format($lease->monthly_rent, 2); ?></span>
+                        </div>
+                        <div class="info-item">
+                            <label>Platform Service Fee (10%):</label>
+                            <span class="amount">LKR <?php echo number_format($lease->monthly_rent * 0.10, 2); ?></span>
+                        </div>
+                        <div class="info-item">
+                            <label>Total Monthly Payment:</label>
+                            <span class="amount total">LKR <?php echo number_format($lease->monthly_rent * 1.10, 2); ?></span>
                         </div>
                         <div class="info-item">
                             <label>Security Deposit:</label>
                             <span class="amount">LKR <?php echo number_format($lease->deposit_amount, 2); ?></span>
                         </div>
                         <div class="info-item">
-                            <label>Total Rent (Full Term):</label>
-                            <span class="amount total">LKR <?php echo number_format($lease->monthly_rent * ($lease->lease_duration_months ?? 1), 2); ?></span>
+                            <label>Total Payment (Full Term):</label>
+                            <span class="amount total">LKR <?php echo number_format(($lease->monthly_rent * 1.10) * ($lease->lease_duration_months ?? 1), 2); ?></span>
                         </div>
                         <div class="info-item">
                             <label>Payment Day:</label>
@@ -184,13 +192,14 @@
                 <div class="info-section">
                     <h4><i class="fas fa-calendar-check"></i> Payment Schedule</h4>
                     <p style="color: #6b7280; margin-bottom: 1rem;">
-                        Your monthly rent payments are due on day <?php echo $lease->payment_day ?? 1; ?> of each month.
+                        Your monthly rent payments (including 10% platform service fee) are due on day <?php echo $lease->payment_day ?? 1; ?> of each month.
                     </p>
                     <div class="payment-schedule">
                         <?php
                             $start = new DateTime($lease->start_date);
                             $end = new DateTime($lease->end_date);
                             $months = $lease->lease_duration_months ?? 1;
+                            $monthlyPayment = $lease->monthly_rent * 1.10; // Include 10% service fee
 
                             for ($i = 0; $i < $months; $i++) {
                                 $paymentDate = clone $start;
@@ -204,7 +213,7 @@
                                 echo '<div class="payment-item' . ($isCurrent ? ' current-month' : '') . '">';
                                 echo '<span class="payment-month">Month ' . ($i + 1) . '</span>';
                                 echo '<span class="payment-date">' . $paymentDate->format('F Y') . '</span>';
-                                echo '<span class="payment-amount">LKR ' . number_format($lease->monthly_rent, 2) . '</span>';
+                                echo '<span class="payment-amount">LKR ' . number_format($monthlyPayment, 2) . '</span>';
                                 echo '</div>';
                             }
                         ?>
