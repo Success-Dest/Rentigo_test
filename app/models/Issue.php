@@ -271,14 +271,14 @@ class Issue
         $this->db->query("
             SELECT
                 COUNT(*) as total_issues,
-                SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending_count,
-                SUM(CASE WHEN status = 'in_progress' THEN 1 ELSE 0 END) as in_progress_count,
-                SUM(CASE WHEN status = 'resolved' THEN 1 ELSE 0 END) as resolved_count,
-                SUM(CASE WHEN status = 'cancelled' THEN 1 ELSE 0 END) as cancelled_count,
-                SUM(CASE WHEN priority = 'emergency' THEN 1 ELSE 0 END) as emergency_count,
-                SUM(CASE WHEN priority = 'high' THEN 1 ELSE 0 END) as high_count,
-                SUM(CASE WHEN priority = 'medium' THEN 1 ELSE 0 END) as medium_count,
-                SUM(CASE WHEN priority = 'low' THEN 1 ELSE 0 END) as low_count
+                SUM(CASE WHEN i.status = 'pending' THEN 1 ELSE 0 END) as pending_count,
+                SUM(CASE WHEN i.status = 'in_progress' THEN 1 ELSE 0 END) as in_progress_count,
+                SUM(CASE WHEN i.status = 'resolved' THEN 1 ELSE 0 END) as resolved_count,
+                SUM(CASE WHEN i.status = 'cancelled' THEN 1 ELSE 0 END) as cancelled_count,
+                SUM(CASE WHEN i.priority = 'emergency' THEN 1 ELSE 0 END) as emergency_count,
+                SUM(CASE WHEN i.priority = 'high' THEN 1 ELSE 0 END) as high_count,
+                SUM(CASE WHEN i.priority = 'medium' THEN 1 ELSE 0 END) as medium_count,
+                SUM(CASE WHEN i.priority = 'low' THEN 1 ELSE 0 END) as low_count
             FROM issues i
             $whereClause
         ");
