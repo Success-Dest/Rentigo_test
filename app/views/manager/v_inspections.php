@@ -119,12 +119,10 @@ if (!empty($data['inspections']) && is_iterable($data['inspections'])) {
                     <table class="data-table">
                         <thead>
                             <tr>
-                                <th>INSPECTION ID</th>
                                 <th>PROPERTY</th>
                                 <th>TYPE</th>
                                 <th>SCHEDULED DATE</th>
                                 <th>STATUS</th>
-                                <th>ISSUES</th>
                                 <th>ACTIONS</th>
                             </tr>
                         </thead>
@@ -132,19 +130,14 @@ if (!empty($data['inspections']) && is_iterable($data['inspections'])) {
                             <?php if (!empty($filteredInspections)): ?>
                                 <?php foreach ($filteredInspections as $inspection): ?>
                                     <tr>
-                                        <td class="font-medium">INS-<?php echo $inspection->id; ?></td>
                                         <td><?php echo htmlspecialchars($inspection->property_address ?? 'N/A'); ?></td>
                                         <td><?php echo ucfirst($inspection->type); ?></td>
                                         <td><?php echo $inspection->scheduled_date; ?></td>
                                         <td><span
                                                 class="status-badge pending"><?php echo ucfirst($inspection->status); ?></span>
                                         </td>
-                                        <td><?php echo $inspection->issue_id ?? '-'; ?></td>
                                         <td>
                                             <div class="action-buttons">
-                                                <button class="btn btn-sm btn-secondary">
-                                                    <i class="fas fa-eye"></i> View Report
-                                                </button>
                                                 <a href="<?php echo URLROOT; ?>/inspections/edit/<?php echo $inspection->id; ?>"
                                                     class="btn btn-sm btn-primary">
                                                     <i class="fas fa-edit"></i> Edit
@@ -159,7 +152,7 @@ if (!empty($data['inspections']) && is_iterable($data['inspections'])) {
                                 <?php endforeach; ?>
                             <?php else: ?>
                                 <tr>
-                                    <td colspan="7" class="text-center">No inspections found</td>
+                                    <td colspan="5" class="text-center">No inspections found</td>
                                 </tr>
                             <?php endif; ?>
                         </tbody>
