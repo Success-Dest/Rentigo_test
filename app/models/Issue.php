@@ -49,7 +49,10 @@ class Issue
     public function getIssueById($id)
     {
         $this->db->query("
-            SELECT i.*, p.address AS property_address, u.name AS tenant_name
+            SELECT i.*,
+                   p.address AS property_address,
+                   u.name AS tenant_name,
+                   u.email AS tenant_email
             FROM issues i
             JOIN properties p ON i.property_id = p.id
             JOIN users u ON i.tenant_id = u.id
