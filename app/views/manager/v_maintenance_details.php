@@ -132,7 +132,7 @@
     <?php endif; ?>
 
     <!-- Upload Quotation -->
-    <?php if ($m->provider_id && !isset($data['payment'])): ?>
+    <?php if ($m->provider_id && (empty($data['payment']) || !is_object($data['payment']))): ?>
     <div class="content-card">
         <div class="card-header">
             <h2 class="card-title">Upload Quotation</h2>
@@ -214,7 +214,7 @@
     <?php endif; ?>
 
     <!-- Payment Status -->
-    <?php if (isset($data['payment'])): ?>
+    <?php if (!empty($data['payment']) && is_object($data['payment'])): ?>
         <?php $payment = $data['payment']; ?>
         <div class="content-card">
             <div class="card-header">

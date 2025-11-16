@@ -130,9 +130,10 @@ class Manager extends Controller
     {
         // Load maintenance model
         $maintenanceModel = $this->model('M_Maintenance');
+        $manager_id = $_SESSION['user_id'];
 
-        // Get all maintenance requests
-        $allRequests = $maintenanceModel->getAllMaintenanceRequests();
+        // Get maintenance requests for this manager's properties only
+        $allRequests = $maintenanceModel->getMaintenanceByManager($manager_id);
 
         // Filter by status
         $requestedRequests = array_filter($allRequests, fn($r) => $r->status === 'requested');
