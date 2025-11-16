@@ -149,7 +149,7 @@
                     <?php endif; ?>
 
                     <!-- Payment button for approved quotations -->
-                    <?php if ($quotation->status === 'approved' && !isset($data['payment'])): ?>
+                    <?php if ($quotation->status === 'approved' && (empty($data['payment']) || !is_object($data['payment']))): ?>
                         <div class="quotation-actions">
                             <button type="button" class="btn btn-primary btn-lg" onclick="showPaymentModal(<?php echo $quotation->id; ?>, <?php echo $quotation->amount; ?>)">
                                 <i class="fas fa-credit-card"></i> Make Payment (LKR <?php echo number_format($quotation->amount, 2); ?>)
@@ -185,7 +185,7 @@
     <?php endif; ?>
 
     <!-- Payment Status -->
-    <?php if (isset($data['payment']) && $data['payment']): ?>
+    <?php if (!empty($data['payment']) && is_object($data['payment'])): ?>
         <?php $payment = $data['payment']; ?>
         <div class="content-card">
             <div class="card-header">
@@ -268,7 +268,6 @@
                         <option value="">Select Payment Method</option>
                         <option value="bank_transfer">Bank Transfer</option>
                         <option value="card">Credit/Debit Card</option>
-                        <option value="cash">Cash</option>
                         <option value="mobile_payment">Mobile Payment</option>
                     </select>
                 </div>

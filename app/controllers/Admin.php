@@ -20,6 +20,7 @@ class Admin extends Controller
         $propertyModel = $this->model('M_Properties');
         $bookingModel = $this->model('M_Bookings');
         $paymentModel = $this->model('M_Payments');
+        $maintenanceQuotationModel = $this->model('M_MaintenanceQuotations');
 
         // Get statistics
         $allProperties = $propertyModel->getAllProperties();
@@ -30,14 +31,26 @@ class Admin extends Controller
         // Calculate active tenants (approved and active bookings)
         $activeBookings = array_filter($allBookings, fn($b) => $b->status === 'active' || $b->status === 'approved');
 
-        // Calculate monthly revenue (10% platform service fee)
+        // Calculate monthly revenue (10% platform service fee from rentals + 100% maintenance payments)
         $currentMonth = date('Y-m');
         $monthlyRevenue = 0;
+
+        // Rental payment income (10% service fee)
         foreach ($allPayments as $payment) {
             if ($payment->status === 'completed' &&
                 date('Y-m', strtotime($payment->payment_date)) === $currentMonth) {
-                // Platform earns 10% service fee from each payment
+                // Platform earns 10% service fee from each rental payment
                 $monthlyRevenue += ($payment->amount * 0.10);
+            }
+        }
+
+        // Maintenance payment income (100% - full payment amount)
+        $maintenancePayments = $maintenanceQuotationModel->getAllMaintenancePayments();
+        foreach ($maintenancePayments as $payment) {
+            if ($payment->status === 'completed' &&
+                date('Y-m', strtotime($payment->payment_date)) === $currentMonth) {
+                // Platform earns 100% from maintenance payments
+                $monthlyRevenue += $payment->amount;
             }
         }
 

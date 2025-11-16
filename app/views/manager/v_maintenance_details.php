@@ -1,19 +1,20 @@
 <?php require APPROOT . '/views/inc/manager_header.php'; ?>
 
-<div class="page-header">
-    <div class="header-left">
-        <a href="<?php echo URLROOT; ?>/maintenance/index" class="btn btn-secondary" style="margin-bottom: 1rem;">
-            <i class="fas fa-arrow-left"></i> Back to List
-        </a>
-        <h1 class="page-title">Maintenance Request Details</h1>
-        <p class="page-subtitle">Manage maintenance request and upload quotations</p>
+<div class="maintenance-details-container">
+    <div class="page-header">
+        <div class="header-left">
+            <a href="<?php echo URLROOT; ?>/manager/maintenance" class="btn btn-secondary" style="margin-bottom: 1rem;">
+                <i class="fas fa-arrow-left"></i> Back to List
+            </a>
+            <h1 class="page-title">Maintenance Request Details</h1>
+            <p class="page-subtitle">Manage maintenance request and upload quotations</p>
+        </div>
     </div>
-</div>
 
-<?php flash('maintenance_message'); ?>
+    <?php flash('maintenance_message'); ?>
 
-<?php if (isset($data['maintenance'])): ?>
-    <?php $m = $data['maintenance']; ?>
+    <?php if (isset($data['maintenance'])): ?>
+        <?php $m = $data['maintenance']; ?>
 
     <!-- Request Information -->
     <div class="content-card">
@@ -70,6 +71,7 @@
     </div>
 
     <!-- Service Provider Assignment -->
+    <!-- DEBUG: provider_id=<?php echo $m->provider_id ?? 'NULL'; ?>, status=<?php echo $m->status; ?>, providers count=<?php echo count($data['providers'] ?? []); ?> -->
     <?php if (!$m->provider_id && $m->status === 'pending'): ?>
     <div class="content-card">
         <div class="card-header">
@@ -132,7 +134,15 @@
     <?php endif; ?>
 
     <!-- Upload Quotation -->
-    <?php if ($m->provider_id && !isset($data['payment'])): ?>
+    <?php
+    // Show upload form if: provider assigned AND (no quotations OR latest quotation rejected) AND no payment
+    $canUploadQuotation = $m->provider_id &&
+                          (empty($data['quotations']) ||
+                           (isset($data['quotations'][0]) && $data['quotations'][0]->status === 'rejected')) &&
+                          (empty($data['payment']) || !is_object($data['payment']));
+    ?>
+    <!-- DEBUG: provider_id=<?php echo $m->provider_id ?? 'NULL'; ?>, quotations count=<?php echo count($data['quotations'] ?? []); ?>, payment=<?php echo isset($data['payment']) && is_object($data['payment']) ? 'EXISTS' : 'NONE'; ?>, canUpload=<?php echo $canUploadQuotation ? 'YES' : 'NO'; ?> -->
+    <?php if ($canUploadQuotation): ?>
     <div class="content-card">
         <div class="card-header">
             <h2 class="card-title">Upload Quotation</h2>
@@ -214,7 +224,7 @@
     <?php endif; ?>
 
     <!-- Payment Status -->
-    <?php if (isset($data['payment'])): ?>
+    <?php if (!empty($data['payment']) && is_object($data['payment'])): ?>
         <?php $payment = $data['payment']; ?>
         <div class="content-card">
             <div class="card-header">
@@ -256,11 +266,52 @@
         </div>
     </div>
 
-<?php else: ?>
-    <div class="alert alert-danger">Maintenance request not found.</div>
-<?php endif; ?>
+    <?php else: ?>
+        <div class="alert alert-danger">Maintenance request not found.</div>
+    <?php endif; ?>
+</div>
 
 <style>
+.maintenance-details-container {
+    padding: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.content-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    padding: 24px;
+    margin-bottom: 24px;
+    border: 1px solid #e5e7eb;
+}
+
+.content-card:last-child {
+    margin-bottom: 0;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid #f3f4f6;
+}
+
+.card-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #111827;
+    margin: 0;
+}
+
+.card-body {
+    color: #374151;
+}
+
+
 .info-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));

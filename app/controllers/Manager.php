@@ -32,6 +32,7 @@ class Manager extends Controller
         $propertyModel = $this->model('M_ManagerProperties');
         $maintenanceModel = $this->model('M_Maintenance');
         $paymentModel = $this->model('M_Payments');
+        $maintenanceQuotationModel = $this->model('M_MaintenanceQuotations');
 
         // Get manager's data
         $manager_id = $_SESSION['user_id'];
@@ -41,9 +42,20 @@ class Manager extends Controller
         $allMaintenance = $maintenanceModel->getAllMaintenanceRequests();
         $recentMaintenance = array_slice($allMaintenance, 0, 5);
 
-        // Get recent payments
+        // Get recent rental payments
         $allPayments = $paymentModel->getAllPayments();
-        $recentPayments = array_slice($allPayments, 0, 10);
+
+        // Get recent maintenance payments
+        $maintenancePayments = $maintenanceQuotationModel->getAllMaintenancePayments();
+
+        // Combine and sort all payments by date
+        $combinedPayments = array_merge($allPayments, $maintenancePayments);
+        usort($combinedPayments, function($a, $b) {
+            $dateA = $a->payment_date ?? $a->due_date ?? $a->created_at;
+            $dateB = $b->payment_date ?? $b->due_date ?? $b->created_at;
+            return strtotime($dateB) - strtotime($dateA);
+        });
+        $recentPayments = array_slice($combinedPayments, 0, 10);
 
         // Calculate statistics
         $totalProperties = count($properties);
@@ -54,15 +66,22 @@ class Manager extends Controller
             $occupiedUnits += $property->occupancy_occupied ?? 0;
         }
 
-        // Calculate total income from payments (10% platform service fee)
+        // Calculate total income from payments (10% platform service fee) + maintenance payments (100%)
         $totalIncome = 0;
         $totalExpenses = 0;
+
+        // Rental payment income (10% service fee)
         foreach ($allPayments as $payment) {
             if ($payment->status === 'completed') {
-                // Platform earns 10% service fee from each payment
+                // Platform earns 10% service fee from each rental payment
                 $totalIncome += ($payment->amount * 0.10);
             }
         }
+
+        // Maintenance payment income (100% - full payment amount)
+        $maintenanceIncome = $maintenanceQuotationModel->getTotalMaintenanceIncome();
+        $totalIncome += $maintenanceIncome;
+
         foreach ($allMaintenance as $maintenance) {
             $totalExpenses += $maintenance->actual_cost ?? $maintenance->estimated_cost ?? 0;
         }
@@ -130,9 +149,13 @@ class Manager extends Controller
     {
         // Load maintenance model
         $maintenanceModel = $this->model('M_Maintenance');
+        $manager_id = $_SESSION['user_id'];
 
-        // Get all maintenance requests
-        $allRequests = $maintenanceModel->getAllMaintenanceRequests();
+        // Get maintenance requests for this manager's properties only
+        $allRequests = $maintenanceModel->getMaintenanceByManager($manager_id);
+
+        // Get maintenance statistics
+        $maintenanceStats = $maintenanceModel->getMaintenanceStats(null, $manager_id);
 
         // Filter by status
         $requestedRequests = array_filter($allRequests, fn($r) => $r->status === 'requested');
@@ -147,6 +170,8 @@ class Manager extends Controller
             'title' => 'Maintenance Management',
             'page' => 'maintenance',
             'user_name' => $_SESSION['user_name'],
+            'maintenanceRequests' => $allRequests,  // View expects this
+            'maintenanceStats' => $maintenanceStats,  // View expects this
             'allRequests' => $allRequests,
             'requestedRequests' => $requestedRequests,
             'quotedRequests' => $quotedRequests,
@@ -384,5 +409,59 @@ class Manager extends Controller
         ];
 
         $this->view('manager/v_payments', $data);
+    }
+
+    // View all payments (rental + maintenance)
+    public function allPayments()
+    {
+        $paymentModel = $this->model('M_Payments');
+        $maintenanceQuotationModel = $this->model('M_MaintenanceQuotations');
+
+        // Get all rental payments
+        $allPayments = $paymentModel->getAllPayments();
+
+        // Get all maintenance payments
+        $maintenancePayments = $maintenanceQuotationModel->getAllMaintenancePayments();
+
+        // Combine and sort all payments by date
+        $combinedPayments = array_merge($allPayments, $maintenancePayments);
+        usort($combinedPayments, function($a, $b) {
+            $dateA = $a->payment_date ?? $a->due_date ?? $a->created_at;
+            $dateB = $b->payment_date ?? $b->due_date ?? $b->created_at;
+            return strtotime($dateB) - strtotime($dateA);
+        });
+
+        // Calculate statistics
+        $totalIncome = 0;
+        $completedCount = 0;
+        $pendingCount = 0;
+        $pendingAmount = 0;
+
+        foreach ($combinedPayments as $payment) {
+            $isMaintenance = isset($payment->payment_type) && $payment->payment_type === 'maintenance';
+            $platformFee = $isMaintenance ? $payment->amount : ($payment->amount * 0.10);
+
+            if ($payment->status === 'completed') {
+                $totalIncome += $platformFee;
+                $completedCount++;
+            } else if ($payment->status === 'pending') {
+                $pendingCount++;
+                $pendingAmount += $platformFee;
+            }
+        }
+
+        $data = [
+            'title' => 'All Payments',
+            'page' => 'payments',
+            'user_name' => $_SESSION['user_name'],
+            'allPayments' => $combinedPayments,
+            'totalIncome' => $totalIncome,
+            'completedCount' => $completedCount,
+            'pendingCount' => $pendingCount,
+            'pendingAmount' => $pendingAmount,
+            'unread_notifications' => $this->getUnreadNotificationCount()
+        ];
+
+        $this->view('manager/v_all_payments', $data);
     }
 }

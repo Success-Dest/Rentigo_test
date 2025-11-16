@@ -165,11 +165,12 @@
 
 <style>
 .maintenance-content {
-    padding: 2rem;
+    padding: 0;
 }
 
 .page-header {
     margin-bottom: 2rem;
+    padding: 0;
 }
 
 .page-title {
@@ -186,9 +187,10 @@
 
 .stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-template-columns: repeat(4, 1fr);
     gap: 1.5rem;
     margin-bottom: 2rem;
+    padding: 0;
 }
 
 .stat-card {
@@ -199,18 +201,7 @@
     display: flex;
     gap: 1rem;
     align-items: center;
-}
-
-.stat-card.warning {
-    border-left: 4px solid #f59e0b;
-}
-
-.stat-card.info {
-    border-left: 4px solid #3b82f6;
-}
-
-.stat-card.success {
-    border-left: 4px solid #10b981;
+    border: 1px solid #e5e7eb;
 }
 
 .stat-icon {
@@ -251,7 +242,7 @@
     border-radius: 0.75rem;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     padding: 1.5rem;
-    margin-bottom: 1.5rem;
+    margin: 0 0 1.5rem 0;
 }
 
 .header-actions {

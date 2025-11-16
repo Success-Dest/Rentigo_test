@@ -298,7 +298,8 @@ class M_Payments
         $this->db->query('SELECT p.*,
                          pr.address as property_address,
                          t.name as tenant_name, t.email as tenant_email,
-                         l.name as landlord_name, l.email as landlord_email
+                         l.name as landlord_name, l.email as landlord_email,
+                         "rental" as payment_type
                          FROM payments p
                          LEFT JOIN properties pr ON p.property_id = pr.id
                          LEFT JOIN users t ON p.tenant_id = t.id

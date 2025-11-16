@@ -25,12 +25,16 @@
                 <div class="provider-card">
                     <div class="provider-header">
                         <div class="provider-info">
-                            <h3 class="provider-name"><?php echo htmlspecialchars($provider->company_name ?? $provider->name ?? 'N/A'); ?></h3>
-                            <p class="provider-specialty"><?php echo htmlspecialchars($provider->service_type ?? $provider->specialty ?? 'General'); ?></p>
+                            <h3 class="provider-name"><?php echo htmlspecialchars($provider->name ?? 'N/A'); ?></h3>
+                            <p class="provider-company"><?php echo htmlspecialchars($provider->company ?? 'Independent'); ?></p>
+                            <p class="provider-specialty">
+                                <i class="fas fa-tools"></i>
+                                <?php echo htmlspecialchars(ucfirst($provider->specialty ?? 'General')); ?>
+                            </p>
                             <div class="provider-rating">
                                 <div class="stars">
                                     <?php
-                                        $rating = $provider->rating ?? 5;
+                                        $rating = $provider->rating ?? 0;
                                         for ($i = 1; $i <= 5; $i++) {
                                             if ($i <= $rating) {
                                                 echo '<i class="fas fa-star"></i>';
@@ -40,7 +44,7 @@
                                         }
                                     ?>
                                 </div>
-                                <span class="rating-text"><?php echo number_format($rating, 1); ?> (<?php echo $provider->review_count ?? 0; ?> reviews)</span>
+                                <span class="rating-text"><?php echo $rating > 0 ? number_format($rating, 1) . '/5.0' : 'Not rated'; ?></span>
                             </div>
                         </div>
                         <span class="status-badge <?php echo ($provider->status ?? 'active') === 'active' ? 'approved' : 'pending'; ?>">
@@ -63,56 +67,17 @@
                         </div>
                     </div>
 
-                    <div class="provider-stats">
-                        <span><strong>Completed Jobs:</strong> <?php echo $provider->completed_jobs ?? 0; ?></span>
-                        <span class="status-badge approved">Available</span>
-                    </div>
-
                     <div class="provider-actions">
-                        <button class="btn btn-secondary">View Profile</button>
-                        <button class="btn btn-primary">
-                            <i class="fas fa-user-check"></i>
-                            Assign
-                        </button>
+                        <a href="<?php echo URLROOT; ?>/manager/maintenance" class="btn btn-primary">
+                            <i class="fas fa-tasks"></i>
+                            View Maintenance Requests
+                        </a>
                     </div>
                 </div>
             <?php endforeach; ?>
         <?php else: ?>
             <p class="text-muted" style="text-align: center; padding: 2rem; width: 100%;">No service providers registered</p>
         <?php endif; ?>
-    </div>
-
-    <!-- Manual Status Update -->
-    <div class="dashboard-section">
-        <div class="section-header">
-            <h3>Manual Status Update</h3>
-        </div>
-        <form class="status-update-form">
-            <div class="form-grid">
-                <div class="form-group">
-                    <label for="requestId">Maintenance Request ID</label>
-                    <select id="requestId" name="requestId" required>
-                        <option value="">Select Request</option>
-                        <option value="MNT-001">MNT-001</option>
-                        <option value="MNT-002">MNT-002</option>
-                        <option value="MNT-003">MNT-003</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="newStatus">New Status</label>
-                    <select id="newStatus" name="newStatus" required>
-                        <option value="">Select Status</option>
-                        <option value="requested">Requested</option>
-                        <option value="quoted">Quoted</option>
-                        <option value="approved">Approved</option>
-                        <option value="completed">Completed</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <button type="submit" class="btn btn-primary full-width">Update Status</button>
-                </div>
-            </div>
-        </form>
     </div>
 </div>
 

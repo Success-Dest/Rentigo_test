@@ -61,13 +61,14 @@
         <div class="dashboard-section">
             <div class="section-header">
                 <h2>Recent Payments</h2>
-                <a href="#" class="btn btn-sm btn-secondary">View All</a>
+                <a href="<?php echo URLROOT; ?>/manager/allPayments" class="btn btn-sm btn-secondary">View All</a>
             </div>
             <div class="table-container">
                 <table class="data-table">
                     <thead>
                         <tr>
-                            <th>Tenant</th>
+                            <th>Type</th>
+                            <th>Customer</th>
                             <th>Property</th>
                             <th>Total Payment</th>
                             <th>Platform Fee</th>
@@ -78,12 +79,23 @@
                     <tbody>
                         <?php if (!empty($data['recentPayments'])): ?>
                             <?php foreach ($data['recentPayments'] as $payment): ?>
+                                <?php
+                                    $isMaintenance = isset($payment->payment_type) && $payment->payment_type === 'maintenance';
+                                    $customerName = $isMaintenance ? ($payment->landlord_name ?? 'N/A') : ($payment->tenant_name ?? 'N/A');
+                                    $totalPayment = $isMaintenance ? $payment->amount : ($payment->amount * 1.10);
+                                    $platformFee = $isMaintenance ? $payment->amount : ($payment->amount * 0.10);
+                                ?>
                                 <tr>
-                                    <td class="font-medium"><?php echo htmlspecialchars($payment->tenant_name ?? 'N/A'); ?></td>
+                                    <td>
+                                        <span class="badge <?php echo $isMaintenance ? 'badge-info' : 'badge-success'; ?>">
+                                            <?php echo $isMaintenance ? 'Maintenance' : 'Rental'; ?>
+                                        </span>
+                                    </td>
+                                    <td class="font-medium"><?php echo htmlspecialchars($customerName); ?></td>
                                     <td><?php echo htmlspecialchars($payment->property_address ?? 'N/A'); ?></td>
-                                    <td>LKR <?php echo number_format($payment->amount * 1.10, 0); ?></td>
-                                    <td><strong>LKR <?php echo number_format($payment->amount * 0.10, 0); ?></strong></td>
-                                    <td><?php echo date('M d, Y', strtotime($payment->payment_date ?? $payment->due_date)); ?></td>
+                                    <td>LKR <?php echo number_format($totalPayment, 0); ?></td>
+                                    <td><strong>LKR <?php echo number_format($platformFee, 0); ?></strong></td>
+                                    <td><?php echo date('M d, Y', strtotime($payment->payment_date ?? $payment->due_date ?? $payment->created_at)); ?></td>
                                     <td>
                                         <span class="status-badge <?php echo $payment->status === 'completed' ? 'approved' : ($payment->status === 'pending' ? 'pending' : 'rejected'); ?>">
                                             <?php echo ucfirst($payment->status); ?>
@@ -93,7 +105,7 @@
                             <?php endforeach; ?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="6" class="text-center text-muted">No payment records</td>
+                                <td colspan="7" class="text-center text-muted">No payment records</td>
                             </tr>
                         <?php endif; ?>
                     </tbody>
