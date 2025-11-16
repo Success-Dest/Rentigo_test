@@ -2,8 +2,8 @@
 
 <div class="page-header">
     <div class="header-left">
-        <h1 class="page-title">Tenant Issues</h1>
-        <p class="page-subtitle">View and track issues reported by your tenants</p>
+        <h1 class="page-title">Tenant Inquiries</h1>
+        <p class="page-subtitle">View and track inquiries reported by your tenants</p>
     </div>
 </div>
 
@@ -17,7 +17,7 @@
             <i class="fas fa-exclamation-circle"></i>
         </div>
         <div class="stat-content">
-            <h3 class="stat-label">Total Issues</h3>
+            <h3 class="stat-label">Total Inquiries</h3>
             <div class="stat-value"><?php echo $data['issueStats']->total_issues ?? 0; ?></div>
             <div class="stat-change">All time</div>
         </div>

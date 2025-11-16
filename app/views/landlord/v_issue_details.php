@@ -3,11 +3,11 @@
 <div class="issue-details-content">
     <div class="page-header">
         <div class="header-left">
-            <a href="<?php echo URLROOT; ?>/landlord/issues" class="back-link">
-                <i class="fas fa-arrow-left"></i> Back to Issues
+            <a href="<?php echo URLROOT; ?>/landlord/inquiries" class="back-link">
+                <i class="fas fa-arrow-left"></i> Back to Inquiries
             </a>
-            <h1 class="page-title">Issue Details</h1>
-            <p class="page-subtitle">ISS-<?php echo $data['issue']->id; ?></p>
+            <h1 class="page-title">Inquiry Details</h1>
+            <p class="page-subtitle">INQ-<?php echo $data['issue']->id; ?></p>
         </div>
         <div class="header-right">
             <span class="priority-badge-large <?php echo $data['issue']->priority; ?>">
