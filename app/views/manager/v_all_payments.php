@@ -42,16 +42,22 @@
     <!-- Filter -->
     <div class="dashboard-section">
         <div class="header-actions">
-            <select class="form-control" id="typeFilter">
-                <option value="">All Types</option>
-                <option value="rental">Rental Payments</option>
-                <option value="maintenance">Maintenance Payments</option>
-            </select>
-            <select class="form-control" id="statusFilter">
-                <option value="">All Status</option>
-                <option value="completed">Completed</option>
-                <option value="pending">Pending</option>
-            </select>
+            <div class="filter-group">
+                <label for="typeFilter">Payment Type:</label>
+                <select class="form-control" id="typeFilter">
+                    <option value="">All Types</option>
+                    <option value="rental">Rental</option>
+                    <option value="maintenance">Maintenance</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="statusFilter">Status:</label>
+                <select class="form-control" id="statusFilter">
+                    <option value="">All Status</option>
+                    <option value="completed">Completed</option>
+                    <option value="pending">Pending</option>
+                </select>
+            </div>
         </div>
     </div>
 
@@ -218,15 +224,38 @@
 
 .header-actions {
     display: flex;
-    gap: 1rem;
+    gap: 1.5rem;
     align-items: center;
+    flex-wrap: wrap;
+}
+
+.filter-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.filter-group label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #374151;
+    white-space: nowrap;
 }
 
 .form-control {
+    min-width: 180px;
     padding: 0.5rem 0.75rem;
     border: 1px solid #d1d5db;
     border-radius: 0.5rem;
     font-size: 0.875rem;
+    background-color: white;
+    cursor: pointer;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #45a9ea;
+    box-shadow: 0 0 0 3px rgba(69, 169, 234, 0.1);
 }
 
 .table-container {
@@ -338,25 +367,36 @@
 document.addEventListener('DOMContentLoaded', function() {
     const typeFilter = document.getElementById('typeFilter');
     const statusFilter = document.getElementById('statusFilter');
+    const table = document.querySelector('.data-table tbody');
+
+    if (!typeFilter || !statusFilter || !table) {
+        console.error('Filter elements not found');
+        return;
+    }
 
     function filterTable() {
-        const selectedType = typeFilter.value.toLowerCase();
-        const selectedStatus = statusFilter.value.toLowerCase();
-        const rows = document.querySelectorAll('.data-table tbody tr[data-type]');
+        const selectedType = typeFilter.value;
+        const selectedStatus = statusFilter.value;
+        const rows = table.querySelectorAll('tr[data-type]');
+
+        let visibleCount = 0;
 
         rows.forEach(row => {
             const rowType = row.getAttribute('data-type');
             const rowStatus = row.getAttribute('data-status');
 
-            const typeMatch = selectedType === '' || rowType === selectedType;
-            const statusMatch = selectedStatus === '' || rowStatus === selectedStatus;
+            const typeMatch = !selectedType || rowType === selectedType;
+            const statusMatch = !selectedStatus || rowStatus === selectedStatus;
 
             if (typeMatch && statusMatch) {
                 row.style.display = '';
+                visibleCount++;
             } else {
                 row.style.display = 'none';
             }
         });
+
+        console.log(`Filtered: ${visibleCount} of ${rows.length} rows visible`);
     }
 
     typeFilter.addEventListener('change', filterTable);
