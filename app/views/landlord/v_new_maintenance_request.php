@@ -73,8 +73,8 @@
                             <option value="hvac" <?php echo ($data['category'] == 'hvac') ? 'selected' : ''; ?>>HVAC (Heating/Cooling)</option>
                             <option value="appliance" <?php echo ($data['category'] == 'appliance') ? 'selected' : ''; ?>>Appliance</option>
                             <option value="structural" <?php echo ($data['category'] == 'structural') ? 'selected' : ''; ?>>Structural</option>
-                            <option value="general" <?php echo ($data['category'] == 'general') ? 'selected' : ''; ?>>General Maintenance</option>
-                            <option value="emergency" <?php echo ($data['category'] == 'emergency') ? 'selected' : ''; ?>>Emergency</option>
+                            <option value="pest" <?php echo ($data['category'] == 'pest') ? 'selected' : ''; ?>>Pest Control</option>
+                            <option value="other" <?php echo ($data['category'] == 'other') ? 'selected' : ''; ?>>Other</option>
                         </select>
                         <span class="invalid-feedback"><?php echo $data['category_err']; ?></span>
                     </div>
