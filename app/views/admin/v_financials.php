@@ -187,19 +187,19 @@
         // Get the row element from the clicked button
         const row = event.target.closest('tr')
 
-        // Extract data from the row
-        const type = row.querySelector('.type-label').textContent
-        const description = row.querySelector('.description-title').textContent
-        const property = row.querySelector('.property-name').textContent
-
         // Get all td elements
         const cells = row.querySelectorAll('td')
-        const totalAmount = cells[3].querySelector('.amount-display').textContent.trim()
-        const platformFee = cells[4].querySelector('.amount-display').textContent.trim()
-        const date = cells[5].textContent.trim()
 
-        const status = row.querySelector('.status-badge').textContent.trim()
-        const statusClass = row.querySelector('.status-badge').className.split(' ')[1] || 'pending'
+        // Extract data with safe fallbacks
+        const type = cells[0].querySelector('.type-label')?.textContent || 'N/A'
+        const description = cells[1].querySelector('.description-title')?.textContent || 'N/A'
+        const property = cells[2].querySelector('.property-name')?.textContent || 'N/A'
+        const totalAmount = cells[3]?.textContent?.trim() || 'N/A'
+        const platformFee = cells[4]?.textContent?.trim() || 'N/A'
+        const date = cells[5]?.textContent?.trim() || 'N/A'
+        const statusElement = cells[6].querySelector('.status-badge')
+        const status = statusElement?.textContent?.trim() || 'N/A'
+        const statusClass = statusElement?.className.split(' ')[1] || 'pending'
 
         // Build modal content with real data
         modalContent.innerHTML = `
