@@ -268,7 +268,6 @@
                         <option value="">Select Payment Method</option>
                         <option value="bank_transfer">Bank Transfer</option>
                         <option value="card">Credit/Debit Card</option>
-                        <option value="cash">Cash</option>
                         <option value="mobile_payment">Mobile Payment</option>
                     </select>
                 </div>

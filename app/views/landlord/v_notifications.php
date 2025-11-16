@@ -155,7 +155,7 @@
                                 </button>
                             <?php endif; ?>
                             <?php if ($notification->link): ?>
-                                <a href="<?php echo $notification->link; ?>"
+                                <a href="<?php echo URLROOT . '/' . ltrim($notification->link, '/'); ?>"
                                    class="btn btn-primary btn-sm">
                                     <i class="fas fa-arrow-right"></i> View Details
                                 </a>

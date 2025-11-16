@@ -32,6 +32,7 @@ class Manager extends Controller
         $propertyModel = $this->model('M_ManagerProperties');
         $maintenanceModel = $this->model('M_Maintenance');
         $paymentModel = $this->model('M_Payments');
+        $maintenanceQuotationModel = $this->model('M_MaintenanceQuotations');
 
         // Get manager's data
         $manager_id = $_SESSION['user_id'];
@@ -54,15 +55,22 @@ class Manager extends Controller
             $occupiedUnits += $property->occupancy_occupied ?? 0;
         }
 
-        // Calculate total income from payments (10% platform service fee)
+        // Calculate total income from payments (10% platform service fee) + maintenance payments (100%)
         $totalIncome = 0;
         $totalExpenses = 0;
+
+        // Rental payment income (10% service fee)
         foreach ($allPayments as $payment) {
             if ($payment->status === 'completed') {
-                // Platform earns 10% service fee from each payment
+                // Platform earns 10% service fee from each rental payment
                 $totalIncome += ($payment->amount * 0.10);
             }
         }
+
+        // Maintenance payment income (100% - full payment amount)
+        $maintenanceIncome = $maintenanceQuotationModel->getTotalMaintenanceIncome();
+        $totalIncome += $maintenanceIncome;
+
         foreach ($allMaintenance as $maintenance) {
             $totalExpenses += $maintenance->actual_cost ?? $maintenance->estimated_cost ?? 0;
         }
