@@ -312,3 +312,19 @@
   color: var(--text-secondary);
   line-height: 1.5;
 }
+
+/* Issue Details Page - Remove default content wrapper padding */
+.issue-details-content {
+  margin: -2rem;
+  padding: 0;
+}
+
+.issue-details-content .page-header {
+  padding: 1.5rem 2rem;
+  background: var(--bg-primary);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.issue-details-content .details-grid {
+  padding: 2rem;
+}
