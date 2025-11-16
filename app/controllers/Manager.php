@@ -135,6 +135,9 @@ class Manager extends Controller
         // Get maintenance requests for this manager's properties only
         $allRequests = $maintenanceModel->getMaintenanceByManager($manager_id);
 
+        // Get maintenance statistics
+        $maintenanceStats = $maintenanceModel->getMaintenanceStats(null, $manager_id);
+
         // Filter by status
         $requestedRequests = array_filter($allRequests, fn($r) => $r->status === 'requested');
         $quotedRequests = array_filter($allRequests, fn($r) => $r->status === 'quoted');
@@ -148,6 +151,8 @@ class Manager extends Controller
             'title' => 'Maintenance Management',
             'page' => 'maintenance',
             'user_name' => $_SESSION['user_name'],
+            'maintenanceRequests' => $allRequests,  // View expects this
+            'maintenanceStats' => $maintenanceStats,  // View expects this
             'allRequests' => $allRequests,
             'requestedRequests' => $requestedRequests,
             'quotedRequests' => $quotedRequests,
