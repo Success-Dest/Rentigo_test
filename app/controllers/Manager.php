@@ -301,13 +301,12 @@ class Manager extends Controller
             $notificationModel = $this->model('M_Notifications');
             $statusText = ucfirst(str_replace('_', ' ', $status));
 
-            $notificationModel->create([
+            $notificationModel->createNotification([
                 'user_id' => $issue->tenant_id,
                 'type' => 'issue_update',
                 'title' => 'Issue Status Updated',
                 'message' => 'Your issue "' . $issue->title . '" has been updated to: ' . $statusText,
-                'link' => 'issues/track',
-                'is_read' => 0
+                'link' => 'issues/track'
             ]);
 
             echo json_encode(['success' => true, 'message' => 'Issue status updated successfully']);
@@ -356,13 +355,12 @@ class Manager extends Controller
 
         $notificationMessage = $message ?: 'Your property manager has flagged a tenant issue that may require a maintenance request: "' . $issue->title . '". Please review and take appropriate action.';
 
-        $notificationModel->create([
+        $notificationModel->createNotification([
             'user_id' => $issue->landlord_id,
             'type' => 'issue_landlord_action',
             'title' => 'Tenant Issue Requires Your Attention',
             'message' => $notificationMessage,
-            'link' => 'landlord/issueDetails/' . $issue_id,
-            'is_read' => 0
+            'link' => 'landlord/issueDetails/' . $issue_id
         ]);
 
         // Mark landlord as notified

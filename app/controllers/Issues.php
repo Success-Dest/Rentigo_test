@@ -93,13 +93,12 @@ class Issues extends Controller
 
                     if ($manager) {
                         $notificationModel = $this->model('M_Notifications');
-                        $notificationModel->create([
+                        $notificationModel->createNotification([
                             'user_id' => $manager->manager_id,
                             'type' => 'issue_reported',
                             'title' => 'New Issue Reported',
                             'message' => 'A tenant has reported a new ' . $data['priority'] . ' priority issue: ' . $data['issue_title'],
-                            'link' => 'manager/issueDetails/' . $issue_id,
-                            'is_read' => 0
+                            'link' => 'manager/issueDetails/' . $issue_id
                         ]);
                     }
 
