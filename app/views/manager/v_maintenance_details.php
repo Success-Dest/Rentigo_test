@@ -132,7 +132,14 @@
     <?php endif; ?>
 
     <!-- Upload Quotation -->
-    <?php if ($m->provider_id && (empty($data['payment']) || !is_object($data['payment']))): ?>
+    <?php
+    // Show upload form if: provider assigned AND (no quotations OR latest quotation rejected) AND no payment
+    $canUploadQuotation = $m->provider_id &&
+                          (empty($data['quotations']) ||
+                           (isset($data['quotations'][0]) && $data['quotations'][0]->status === 'rejected')) &&
+                          (empty($data['payment']) || !is_object($data['payment']));
+    ?>
+    <?php if ($canUploadQuotation): ?>
     <div class="content-card">
         <div class="card-header">
             <h2 class="card-title">Upload Quotation</h2>
