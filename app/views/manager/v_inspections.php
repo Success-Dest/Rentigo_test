@@ -133,13 +133,13 @@ if (!empty($data['inspections']) && is_iterable($data['inspections'])) {
                                 <?php foreach ($filteredInspections as $inspection): ?>
                                     <tr>
                                         <td class="font-medium">INS-<?php echo $inspection->id; ?></td>
-                                        <td><?php echo htmlspecialchars($inspection->property); ?></td>
+                                        <td><?php echo htmlspecialchars($inspection->property_address ?? 'N/A'); ?></td>
                                         <td><?php echo ucfirst($inspection->type); ?></td>
                                         <td><?php echo $inspection->scheduled_date; ?></td>
                                         <td><span
                                                 class="status-badge pending"><?php echo ucfirst($inspection->status); ?></span>
                                         </td>
-                                        <td><?php echo $inspection->issues ?? '-'; ?></td>
+                                        <td><?php echo $inspection->issue_id ?? '-'; ?></td>
                                         <td>
                                             <div class="action-buttons">
                                                 <button class="btn btn-sm btn-secondary">
