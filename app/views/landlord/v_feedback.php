@@ -99,7 +99,11 @@
                             </div>
                         </div>
                         <div class="feedback-content">
-                            <p>"<?php echo htmlspecialchars($review->comment); ?>"</p>
+                            <?php if (!empty($review->review_text)): ?>
+                                <p>"<?php echo nl2br(htmlspecialchars($review->review_text)); ?>"</p>
+                            <?php else: ?>
+                                <p class="text-muted"><em>No written review</em></p>
+                            <?php endif; ?>
                         </div>
                     </div>
                 <?php endforeach; ?>
@@ -157,7 +161,11 @@
                             </div>
                         </div>
                         <div class="feedback-content">
-                            <p>"<?php echo htmlspecialchars($review->comment); ?>"</p>
+                            <?php if (!empty($review->review_text)): ?>
+                                <p>"<?php echo nl2br(htmlspecialchars($review->review_text)); ?>"</p>
+                            <?php else: ?>
+                                <p class="text-muted"><em>No written review</em></p>
+                            <?php endif; ?>
                         </div>
                         <div class="feedback-actions">
                             <a href="<?php echo URLROOT; ?>/reviews/update/<?php echo $review->id; ?>"

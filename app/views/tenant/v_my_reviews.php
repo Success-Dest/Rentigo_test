@@ -128,7 +128,11 @@
                                 <span class="rating-text"><?php echo $review->rating; ?>/5 stars</span>
                             </div>
                             <div class="review-text">
-                                <p>"<?php echo htmlspecialchars($review->comment); ?>"</p>
+                                <?php if (!empty($review->review_text)): ?>
+                                    <p>"<?php echo nl2br(htmlspecialchars($review->review_text)); ?>"</p>
+                                <?php else: ?>
+                                    <p class="text-muted"><em>No written review</em></p>
+                                <?php endif; ?>
                             </div>
                             <div class="review-actions">
                                 <a href="<?php echo URLROOT; ?>/reviews/update/<?php echo $review->id; ?>"
