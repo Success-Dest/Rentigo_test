@@ -36,4 +36,19 @@ class M_ManagerProperties
         $this->db->bind(':manager_id', $manager_id);
         return $this->db->single();
     }
+
+    // Get the manager assigned to a property
+    public function getManagerByProperty($property_id)
+    {
+        $this->db->query(
+            "SELECT u.id as manager_id, u.name, u.email
+             FROM properties p
+             JOIN users u ON p.manager_id = u.id
+             WHERE p.id = :property_id
+               AND p.manager_id IS NOT NULL
+             LIMIT 1"
+        );
+        $this->db->bind(':property_id', $property_id);
+        return $this->db->single();
+    }
 }
