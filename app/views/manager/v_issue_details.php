@@ -103,29 +103,6 @@
             </div>
 
             <div class="info-card">
-                <h3>Linked Items</h3>
-                <?php if ($data['issue']->maintenance_request_id): ?>
-                    <p>
-                        <i class="fas fa-wrench"></i>
-                        <a href="<?php echo URLROOT; ?>/manager/maintenanceDetails/<?php echo $data['issue']->maintenance_request_id; ?>">
-                            Maintenance Request #<?php echo $data['issue']->maintenance_request_id; ?>
-                        </a>
-                    </p>
-                <?php endif; ?>
-                <?php if ($data['issue']->inspection_id): ?>
-                    <p>
-                        <i class="fas fa-clipboard-check"></i>
-                        <a href="<?php echo URLROOT; ?>/inspections/view/<?php echo $data['issue']->inspection_id; ?>">
-                            Inspection #<?php echo $data['issue']->inspection_id; ?>
-                        </a>
-                    </p>
-                <?php endif; ?>
-                <?php if (!$data['issue']->maintenance_request_id && !$data['issue']->inspection_id): ?>
-                    <p class="text-muted">No linked items</p>
-                <?php endif; ?>
-            </div>
-
-            <div class="info-card">
                 <h3>Timeline</h3>
                 <div class="timeline">
                     <div class="timeline-item">

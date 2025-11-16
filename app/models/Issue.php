@@ -52,10 +52,12 @@ class Issue
             SELECT i.*,
                    p.address AS property_address,
                    u.name AS tenant_name,
-                   u.email AS tenant_email
+                   u.email AS tenant_email,
+                   l.name AS landlord_name
             FROM issues i
             JOIN properties p ON i.property_id = p.id
             JOIN users u ON i.tenant_id = u.id
+            LEFT JOIN users l ON i.landlord_id = l.id
             WHERE i.id = :id
         ");
 
