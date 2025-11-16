@@ -49,6 +49,10 @@ class Landlord extends Controller
         $unreadMessages = $this->messageModel->getUnreadCount($_SESSION['user_id']);
         $unreadNotifications = $this->notificationModel->getUnreadCount($_SESSION['user_id']);
 
+        // Get issue statistics
+        $issueModel = $this->model('Issue');
+        $issueStats = $issueModel->getIssueStats($_SESSION['user_id'], 'landlord');
+
         // Limit recent bookings to 5
         if (count($recentBookings) > 5) {
             $recentBookings = array_slice($recentBookings, 0, 5);
@@ -67,7 +71,8 @@ class Landlord extends Controller
             'recentBookings' => $recentBookings,
             'recentPayments' => $recentPayments,
             'unreadMessages' => $unreadMessages,
-            'unreadNotifications' => $unreadNotifications
+            'unreadNotifications' => $unreadNotifications,
+            'issueStats' => $issueStats
         ];
         $this->view('landlord/v_dashboard', $data);
     }
@@ -100,18 +105,32 @@ class Landlord extends Controller
 
     public function inquiries()
     {
-        // Get all messages for the landlord
-        $messages = $this->messageModel->getMessagesByUser($_SESSION['user_id'], 'received');
-        $unreadCount = $this->messageModel->getUnreadCount($_SESSION['user_id']);
+        $issueModel = $this->model('Issue');
+        $landlord_id = $_SESSION['user_id'];
+
+        // Get all issues for this landlord's properties
+        $allIssues = $issueModel->getIssuesByLandlord($landlord_id);
+
+        // Filter by status
+        $pendingIssues = array_filter($allIssues, fn($issue) => $issue->status === 'pending');
+        $inProgressIssues = array_filter($allIssues, fn($issue) => $issue->status === 'in_progress');
+        $resolvedIssues = array_filter($allIssues, fn($issue) => $issue->status === 'resolved');
+
+        // Get issue statistics
+        $stats = $issueModel->getIssueStats($landlord_id, 'landlord');
 
         $data = [
             'title' => 'Tenant Inquiries',
             'page' => 'inquiries',
             'user_name' => $_SESSION['user_name'],
-            'messages' => $messages,
-            'unreadCount' => $unreadCount
+            'allIssues' => $allIssues,
+            'pendingIssues' => $pendingIssues,
+            'inProgressIssues' => $inProgressIssues,
+            'resolvedIssues' => $resolvedIssues,
+            'issueStats' => $stats
         ];
-        $this->view('landlord/v_inquiries', $data);
+
+        $this->view('landlord/v_issues', $data);
     }
 
     public function payment_history()
@@ -240,5 +259,37 @@ class Landlord extends Controller
         }
 
         redirect('landlord/notifications');
+    }
+
+    // View inquiry/issue details
+    public function issueDetails($id = null)
+    {
+        if (!$id) {
+            flash('issue_error', 'Issue not found', 'alert alert-danger');
+            redirect('landlord/inquiries');
+        }
+
+        $issueModel = $this->model('Issue');
+        $issue = $issueModel->getIssueById($id);
+
+        if (!$issue) {
+            flash('issue_error', 'Issue not found', 'alert alert-danger');
+            redirect('landlord/inquiries');
+        }
+
+        // Verify this landlord owns the property
+        if ($issue->landlord_id != $_SESSION['user_id']) {
+            flash('issue_error', 'Unauthorized access', 'alert alert-danger');
+            redirect('landlord/inquiries');
+        }
+
+        $data = [
+            'title' => 'Inquiry Details',
+            'page' => 'inquiries',
+            'user_name' => $_SESSION['user_name'],
+            'issue' => $issue
+        ];
+
+        $this->view('landlord/v_issue_details', $data);
     }
 }

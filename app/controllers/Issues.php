@@ -71,6 +71,10 @@ class Issues extends Controller
             }
 
             if (!$validator->hasErrors()) {
+                // Get property details to find landlord
+                $propertyModel = $this->model('M_Properties');
+                $property = $propertyModel->getPropertyById($data['property_id']);
+
                 $dbData = [
                     'tenant_id' => $data['tenant_id'],
                     'property_id' => $data['property_id'],
@@ -78,11 +82,27 @@ class Issues extends Controller
                     'description' => $data['description'],
                     'category' => $data['category'],
                     'priority' => $data['priority'],
-                    'status' => $data['status']
+                    'status' => $data['status'],
+                    'landlord_id' => $property->landlord_id ?? null
                 ];
 
-                if ($this->issueModel->addIssue($dbData)) {
-                    flash('issue_message', 'Issue reported successfully', 'alert alert-success');
+                if ($issue_id = $this->issueModel->addIssue($dbData)) {
+                    // Send notification to PM
+                    $managerModel = $this->model('M_ManagerProperties');
+                    $manager = $managerModel->getManagerByProperty($data['property_id']);
+
+                    if ($manager) {
+                        $notificationModel = $this->model('M_Notifications');
+                        $notificationModel->createNotification([
+                            'user_id' => $manager->manager_id,
+                            'type' => 'issue_reported',
+                            'title' => 'New Issue Reported',
+                            'message' => 'A tenant has reported a new ' . $data['priority'] . ' priority issue: ' . $data['issue_title'],
+                            'link' => 'manager/issueDetails/' . $issue_id
+                        ]);
+                    }
+
+                    flash('issue_message', 'Issue reported successfully. Property manager has been notified.', 'alert alert-success');
                     redirect('issues/track');
                 } else {
                     die('Something went wrong when saving issue');
@@ -172,6 +192,29 @@ class Issues extends Controller
             redirect('issues/track');
         }
 
+        // Get the issue first to check time restriction
+        $issue = $this->issueModel->getIssueById($id);
+
+        if (!$issue) {
+            flash('issue_message', 'Issue not found', 'alert alert-danger');
+            redirect('issues/track');
+        }
+
+        if ($issue->tenant_id != $_SESSION['user_id']) {
+            flash('issue_message', 'Unauthorized access', 'alert alert-danger');
+            redirect('issues/track');
+        }
+
+        // Check if issue can be edited (within 1 minute of creation)
+        $createdTime = new DateTime($issue->created_at);
+        $currentTime = new DateTime();
+        $timeDiff = $currentTime->getTimestamp() - $createdTime->getTimestamp();
+
+        if ($timeDiff > 60) {
+            flash('issue_message', 'Issues can only be edited within 1 minute of creation', 'alert alert-warning');
+            redirect('issues/track');
+        }
+
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_SPECIAL_CHARS);
 
@@ -252,7 +295,6 @@ class Issues extends Controller
                 $data['category_err'] = $errors['category'] ?? '';
                 $data['priority_err'] = $errors['priority'] ?? '';
 
-                $issue = $this->issueModel->getIssueById($id);
                 $data['issue'] = $issue;
                 $data['properties'] = $this->issueModel->getProperties();
                 $data['page_title'] = 'Edit Issue - TenantHub';
@@ -262,18 +304,6 @@ class Issues extends Controller
                 $this->view('tenant/v_edit_issue', $data);
             }
         } else {
-            $issue = $this->issueModel->getIssueById($id);
-
-            if (!$issue) {
-                flash('issue_message', 'Issue not found', 'alert alert-danger');
-                redirect('issues/track');
-            }
-
-            if ($issue->tenant_id != $_SESSION['user_id']) {
-                flash('issue_message', 'Unauthorized access', 'alert alert-danger');
-                redirect('issues/track');
-            }
-
             $properties = $this->issueModel->getProperties();
 
             $data = [

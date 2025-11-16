@@ -48,7 +48,7 @@
                 <div class="issues-cards">
                     <?php if (!empty($data['allIssues'])): ?>
                         <?php foreach ($data['allIssues'] as $issue): ?>
-                            <div class="issue-card" onclick="selectIssue('ISS-<?php echo $issue->id; ?>')">
+                            <div class="issue-card" onclick="window.location.href='<?php echo URLROOT; ?>/manager/issueDetails/<?php echo $issue->id; ?>'" style="cursor: pointer;">
                                 <div class="issue-header">
                                     <div class="issue-title-priority">
                                         <h3 class="font-medium"><?php echo htmlspecialchars($issue->title); ?></h3>
@@ -85,7 +85,7 @@
                 <div class="issues-cards">
                     <?php if (!empty($data['openIssues'])): ?>
                         <?php foreach ($data['openIssues'] as $issue): ?>
-                            <div class="issue-card" onclick="selectIssue('ISS-<?php echo $issue->id; ?>')">
+                            <div class="issue-card" onclick="window.location.href='<?php echo URLROOT; ?>/manager/issueDetails/<?php echo $issue->id; ?>'" style="cursor: pointer;">
                                 <div class="issue-header">
                                     <div class="issue-title-priority">
                                         <h3 class="font-medium"><?php echo htmlspecialchars($issue->title); ?></h3>
@@ -122,7 +122,7 @@
                 <div class="issues-cards">
                     <?php if (!empty($data['assignedIssues'])): ?>
                         <?php foreach ($data['assignedIssues'] as $issue): ?>
-                            <div class="issue-card" onclick="selectIssue('ISS-<?php echo $issue->id; ?>')">
+                            <div class="issue-card" onclick="window.location.href='<?php echo URLROOT; ?>/manager/issueDetails/<?php echo $issue->id; ?>'" style="cursor: pointer;">
                                 <div class="issue-header">
                                     <div class="issue-title-priority">
                                         <h3 class="font-medium"><?php echo htmlspecialchars($issue->title); ?></h3>
@@ -159,7 +159,7 @@
                 <div class="issues-cards">
                     <?php if (!empty($data['inProgressIssues'])): ?>
                         <?php foreach ($data['inProgressIssues'] as $issue): ?>
-                            <div class="issue-card" onclick="selectIssue('ISS-<?php echo $issue->id; ?>')">
+                            <div class="issue-card" onclick="window.location.href='<?php echo URLROOT; ?>/manager/issueDetails/<?php echo $issue->id; ?>'" style="cursor: pointer;">
                                 <div class="issue-header">
                                     <div class="issue-title-priority">
                                         <h3 class="font-medium"><?php echo htmlspecialchars($issue->title); ?></h3>
@@ -196,7 +196,7 @@
                 <div class="issues-cards">
                     <?php if (!empty($data['resolvedIssues'])): ?>
                         <?php foreach ($data['resolvedIssues'] as $issue): ?>
-                            <div class="issue-card" onclick="selectIssue('ISS-<?php echo $issue->id; ?>')">
+                            <div class="issue-card" onclick="window.location.href='<?php echo URLROOT; ?>/manager/issueDetails/<?php echo $issue->id; ?>'" style="cursor: pointer;">
                                 <div class="issue-header">
                                     <div class="issue-title-priority">
                                         <h3 class="font-medium"><?php echo htmlspecialchars($issue->title); ?></h3>

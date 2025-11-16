@@ -18,7 +18,7 @@
             <div class="stat-info">
                 <h3 class="stat-number">LKR <?php echo number_format($data['totalRevenue'] ?? 0, 0); ?></h3>
                 <p class="stat-label">Platform Revenue</p>
-                <span class="stat-change">10% service fees from all payments</span>
+                <span class="stat-change">10% from rental + full maintenance payments</span>
             </div>
         </div>
 
@@ -81,19 +81,29 @@
                 <tbody>
                     <?php if (!empty($data['recentTransactions'])): ?>
                         <?php foreach ($data['recentTransactions'] as $transaction): ?>
-                            <tr data-type="income" data-status="<?php echo htmlspecialchars($transaction->status); ?>" data-date="<?php echo date('Y-m-d', strtotime($transaction->payment_date ?? $transaction->due_date)); ?>">
+                            <?php
+                                $isMaintenance = isset($transaction->payment_type) && $transaction->payment_type === 'maintenance';
+                                $displayDate = $transaction->payment_date ?? $transaction->due_date ?? $transaction->created_at;
+                            ?>
+                            <tr data-type="income" data-status="<?php echo htmlspecialchars($transaction->status); ?>" data-date="<?php echo date('Y-m-d', strtotime($displayDate)); ?>">
                                 <td>
                                     <div class="transaction-type">
                                         <div class="type-icon income">
-                                            <i class="fas fa-arrow-down"></i>
+                                            <i class="fas <?php echo $isMaintenance ? 'fa-tools' : 'fa-home'; ?>"></i>
                                         </div>
-                                        <span class="type-label">Payment</span>
+                                        <span class="type-label"><?php echo $isMaintenance ? 'Maintenance' : 'Rental'; ?></span>
                                     </div>
                                 </td>
                                 <td>
                                     <div class="transaction-description">
                                         <div class="description-title">
-                                            <?php echo htmlspecialchars($transaction->payment_method ?? 'Rental payment'); ?>
+                                            <?php
+                                                if ($isMaintenance) {
+                                                    echo htmlspecialchars($transaction->maintenance_title ?? 'Maintenance payment');
+                                                } else {
+                                                    echo htmlspecialchars($transaction->payment_method ?? 'Rental payment');
+                                                }
+                                            ?>
                                         </div>
                                     </div>
                                 </td>
@@ -106,15 +116,23 @@
                                 </td>
                                 <td>
                                     <div class="amount-display">
-                                        LKR <?php echo number_format($transaction->amount * 1.10, 0); ?>
+                                        <?php if ($isMaintenance): ?>
+                                            LKR <?php echo number_format($transaction->amount, 0); ?>
+                                        <?php else: ?>
+                                            LKR <?php echo number_format($transaction->amount * 1.10, 0); ?>
+                                        <?php endif; ?>
                                     </div>
                                 </td>
                                 <td>
                                     <div class="amount-display income">
-                                        <strong>LKR <?php echo number_format($transaction->amount * 0.10, 0); ?></strong>
+                                        <?php if ($isMaintenance): ?>
+                                            <span>-</span>
+                                        <?php else: ?>
+                                            <strong>LKR <?php echo number_format($transaction->amount * 0.10, 0); ?></strong>
+                                        <?php endif; ?>
                                     </div>
                                 </td>
-                                <td><?php echo date('m/d/Y', strtotime($transaction->payment_date ?? $transaction->due_date)); ?></td>
+                                <td><?php echo date('m/d/Y', strtotime($displayDate)); ?></td>
                                 <td>
                                     <span class="status-badge <?php
                                         echo $transaction->status === 'completed' ? 'approved' :
@@ -125,7 +143,7 @@
                                 </td>
                                 <td>
                                     <div class="transaction-actions">
-                                        <button class="action-btn view-btn" onclick="viewTransaction('TXN<?php echo $transaction->id; ?>')" title="View">
+                                        <button class="action-btn view-btn" onclick="viewTransaction('<?php echo $isMaintenance ? 'MAIN' : 'TXN'; ?><?php echo $transaction->id; ?>', event)" title="View">
                                             <i class="fas fa-eye"></i>
                                         </button>
                                     </div>
@@ -162,12 +180,28 @@
 
 <script>
     // Transaction management functions - Global scope for onclick handlers
-    function viewTransaction(transactionId) {
-        console.log('Viewing transaction:', transactionId)
+    function viewTransaction(transactionId, event) {
         const modal = document.getElementById('transactionModal')
         const modalContent = document.getElementById('transactionModalContent')
 
-        // Simulate transaction details
+        // Get the row element from the clicked button
+        const row = event.target.closest('tr')
+
+        // Get all td elements
+        const cells = row.querySelectorAll('td')
+
+        // Extract data with safe fallbacks
+        const type = cells[0].querySelector('.type-label')?.textContent || 'N/A'
+        const description = cells[1].querySelector('.description-title')?.textContent || 'N/A'
+        const property = cells[2].querySelector('.property-name')?.textContent || 'N/A'
+        const totalAmount = cells[3]?.textContent?.trim() || 'N/A'
+        const platformFee = cells[4]?.textContent?.trim() || 'N/A'
+        const date = cells[5]?.textContent?.trim() || 'N/A'
+        const statusElement = cells[6].querySelector('.status-badge')
+        const status = statusElement?.textContent?.trim() || 'N/A'
+        const statusClass = statusElement?.className.split(' ')[1] || 'pending'
+
+        // Build modal content with real data
         modalContent.innerHTML = `
             <div class="transaction-details">
                 <div class="detail-grid">
@@ -177,36 +211,32 @@
                     </div>
                     <div class="detail-item">
                         <label>Type</label>
-                        <span>Monthly Rent Payment</span>
+                        <span>${type}</span>
                     </div>
                     <div class="detail-item">
-                        <label>Amount</label>
-                        <span class="amount-large">$2,500.00</span>
-                    </div>
-                    <div class="detail-item">
-                        <label>Status</label>
-                        <span class="status-badge approved">Approved</span>
+                        <label>Description</label>
+                        <span>${description}</span>
                     </div>
                     <div class="detail-item">
                         <label>Property</label>
-                        <span>Luxury Apartment Downtown</span>
+                        <span>${property}</span>
                     </div>
                     <div class="detail-item">
-                        <label>Tenant</label>
-                        <span>John Doe</span>
+                        <label>Total Payment</label>
+                        <span class="amount-large">${totalAmount}</span>
+                    </div>
+                    <div class="detail-item">
+                        <label>Platform Fee (10%)</label>
+                        <span>${platformFee}</span>
                     </div>
                     <div class="detail-item">
                         <label>Date</label>
-                        <span>January 7, 2024</span>
+                        <span>${date}</span>
                     </div>
                     <div class="detail-item">
-                        <label>Payment Method</label>
-                        <span>Credit Card</span>
+                        <label>Status</label>
+                        <span class="status-badge ${statusClass}">${status}</span>
                     </div>
-                </div>
-                <div class="detail-notes">
-                    <label>Notes</label>
-                    <p>Regular monthly rent payment processed successfully.</p>
                 </div>
                 <div class="modal-actions">
                     <button class="btn btn-primary" onclick="closeTransactionModal()">Close</button>
@@ -236,7 +266,7 @@
 
             // Update actions - remove approve/reject, keep view only
             actionsCell.innerHTML = `
-                <button class="action-btn view-btn" onclick="viewTransaction('${transactionId}')" title="View">
+                <button class="action-btn view-btn" onclick="viewTransaction('${transactionId}', event)" title="View">
                     <i class="fas fa-eye"></i>
                 </button>
             `

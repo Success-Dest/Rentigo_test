@@ -243,6 +243,86 @@
                 <?php endif; ?>
             </div>
         </div>
+
+        <!-- Reviews Section -->
+        <div class="property-details-card" style="margin-top: 2rem;">
+            <h3>Property Reviews & Ratings</h3>
+
+            <?php if (isset($data['reviewCount']) && $data['reviewCount'] > 0): ?>
+                <!-- Average Rating Summary -->
+                <div style="background: #f9fafb; padding: 1.5rem; border-radius: 10px; margin: 1.5rem 0;">
+                    <div style="display: flex; align-items: center; gap: 2rem; flex-wrap: wrap;">
+                        <div style="text-align: center;">
+                            <div style="font-size: 3rem; font-weight: 700; color: #f59e0b;">
+                                <?php echo number_format($data['averageRating'], 1); ?>
+                            </div>
+                            <div class="stars" style="color: #f59e0b; font-size: 1.5rem;">
+                                <?php
+                                    $avgRating = $data['averageRating'];
+                                    for ($i = 1; $i <= 5; $i++) {
+                                        if ($i <= floor($avgRating)) {
+                                            echo '<i class="fas fa-star"></i>';
+                                        } elseif ($i - 0.5 <= $avgRating) {
+                                            echo '<i class="fas fa-star-half-alt"></i>';
+                                        } else {
+                                            echo '<i class="far fa-star"></i>';
+                                        }
+                                    }
+                                ?>
+                            </div>
+                            <div style="color: #6b7280; margin-top: 0.5rem;">
+                                <?php echo $data['reviewCount']; ?> review<?php echo $data['reviewCount'] != 1 ? 's' : ''; ?>
+                            </div>
+                        </div>
+                        <div style="flex: 1; min-width: 200px;">
+                            <p style="color: #374151; font-weight: 500;">
+                                Based on <?php echo $data['reviewCount']; ?> tenant review<?php echo $data['reviewCount'] != 1 ? 's' : ''; ?>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Individual Reviews -->
+                <h4 style="margin-top: 2rem;">Tenant Reviews</h4>
+                <div style="margin-top: 1.5rem;">
+                    <?php if (!empty($data['reviews'])): ?>
+                        <?php foreach ($data['reviews'] as $review): ?>
+                            <div style="background: #ffffff; border: 1px solid #e5e7eb; border-radius: 10px; padding: 1.5rem; margin-bottom: 1rem;">
+                                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.75rem;">
+                                    <div>
+                                        <div style="font-weight: 600; color: #1f2937; margin-bottom: 0.25rem;">
+                                            <?php echo htmlspecialchars($review->reviewer_name ?? 'Anonymous'); ?>
+                                        </div>
+                                        <div class="stars" style="color: #f59e0b; font-size: 1rem;">
+                                            <?php
+                                                for ($i = 1; $i <= 5; $i++) {
+                                                    echo $i <= $review->rating ? '<i class="fas fa-star"></i>' : '<i class="far fa-star"></i>';
+                                                }
+                                            ?>
+                                        </div>
+                                    </div>
+                                    <div style="color: #6b7280; font-size: 0.875rem;">
+                                        <?php echo date('M d, Y', strtotime($review->created_at)); ?>
+                                    </div>
+                                </div>
+                                <?php if (!empty($review->review_text)): ?>
+                                    <p style="color: #4b5563; line-height: 1.6; margin-top: 0.75rem;">
+                                        <?php echo nl2br(htmlspecialchars($review->review_text)); ?>
+                                    </p>
+                                <?php endif; ?>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </div>
+            <?php else: ?>
+                <div style="background: #f9fafb; padding: 2rem; border-radius: 10px; text-align: center; color: #6b7280;">
+                    <i class="far fa-comment" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.3;"></i>
+                    <p style="font-weight: 500;">No reviews yet</p>
+                    <p style="font-size: 0.875rem;">Be the first to review this property after your stay!</p>
+                </div>
+            <?php endif; ?>
+        </div>
+
     <?php else: ?>
         <div class="property-details-card" style="max-width:700px; margin:2rem auto 3rem auto;">
             <div class="alert alert-danger">Property details not found or no longer available.</div>

@@ -217,7 +217,7 @@
                         <p><?php echo htmlspecialchars(substr($issue->description, 0, 100)); ?>...</p>
                         <span class="issue-date">
                             <i class="fas fa-calendar"></i>
-                            <?php echo date('M d, Y', strtotime($issue->reported_date)); ?>
+                            <?php echo date('M d, Y', strtotime($issue->created_at)); ?>
                         </span>
                     </div>
                     <span class="status-badge <?php echo $statusClass; ?>">

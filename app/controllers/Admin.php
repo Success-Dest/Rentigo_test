@@ -102,12 +102,15 @@ class Admin extends Controller
     // Financial management page
     public function financials()
     {
-        // Load payment model
+        // Load payment models
         $paymentModel = $this->model('M_Payments');
-        $maintenanceModel = $this->model('M_Maintenance');
+        $maintenanceQuotationsModel = $this->model('M_MaintenanceQuotations');
 
-        // Get all payments
+        // Get all rental payments
         $allPayments = $paymentModel->getAllPayments();
+
+        // Get all maintenance payments
+        $maintenancePayments = $maintenanceQuotationsModel->getAllMaintenancePayments();
 
         // Calculate statistics (10% platform service fee from all payments)
         $totalRevenue = 0;
@@ -117,8 +120,9 @@ class Admin extends Controller
         $pendingCount = 0;
         $overdueCount = 0;
 
+        // Calculate rental payment fees (10% service fee)
         foreach ($allPayments as $payment) {
-            // Platform earns 10% service fee from each payment
+            // Platform earns 10% service fee from each rental payment
             $totalRevenue += ($payment->amount * 0.10);
             if ($payment->status === 'completed') {
                 $collected += ($payment->amount * 0.10);
@@ -131,9 +135,34 @@ class Admin extends Controller
             }
         }
 
-        // Get recent transactions (payments and maintenance)
-        $recentTransactions = array_slice($allPayments, -20);
-        $recentTransactions = array_reverse($recentTransactions);
+        // Calculate maintenance payment income (100% goes to platform)
+        foreach ($maintenancePayments as $payment) {
+            // Platform receives full maintenance payment amount as income
+            $totalRevenue += $payment->amount;
+            if ($payment->status === 'completed') {
+                $collected += $payment->amount;
+            } elseif ($payment->status === 'pending') {
+                $pending += $payment->amount;
+                $pendingCount++;
+            } elseif ($payment->status === 'failed') {
+                // Treat failed as overdue for maintenance
+                $overdue += $payment->amount;
+                $overdueCount++;
+            }
+        }
+
+        // Merge and sort all transactions by date
+        $allTransactions = array_merge($allPayments, $maintenancePayments);
+
+        // Sort by payment_date (descending)
+        usort($allTransactions, function($a, $b) {
+            $dateA = strtotime($a->payment_date ?? $a->due_date ?? $a->created_at);
+            $dateB = strtotime($b->payment_date ?? $b->due_date ?? $b->created_at);
+            return $dateB - $dateA;
+        });
+
+        // Get recent transactions (last 20)
+        $recentTransactions = array_slice($allTransactions, 0, 20);
 
         $data = [
             'title' => 'Financials - Rentigo Admin',
@@ -334,5 +363,21 @@ class Admin extends Controller
         } else {
             redirect('admin/managers');
         }
+    }
+
+    // View all inspections from all PMs
+    public function inspections()
+    {
+        $inspectionModel = $this->model('M_Inspection');
+        $inspections = $inspectionModel->getAllInspections();
+
+        $data = [
+            'title' => 'All Inspections',
+            'page' => 'inspections',
+            'user_name' => $_SESSION['user_name'],
+            'inspections' => $inspections
+        ];
+
+        $this->view('admin/v_inspections', $data);
     }
 }

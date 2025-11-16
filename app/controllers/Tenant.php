@@ -158,10 +158,14 @@ class Tenant extends Controller
 
     public function feedback()
     {
+        // Get reviews about the tenant (from landlords)
+        $reviewsAboutMe = $this->reviewModel->getReviewsAboutUser($_SESSION['user_id'], 'tenant');
+
         $data = [
-            'title' => 'Feedback - TenantHub',
+            'title' => 'Landlord Reviews - TenantHub',
             'page' => 'feedback',
-            'user_name' => $_SESSION['user_name']
+            'user_name' => $_SESSION['user_name'],
+            'reviewsAboutMe' => $reviewsAboutMe
         ];
 
         $this->view('tenant/v_feedback', $data);

@@ -13,10 +13,10 @@ class Inspections extends Controller
         $this->M_Inspection = $this->model('M_Inspection');
     }
 
-    // Show all inspections
+    // Show all inspections for this manager
     public function index()
     {
-        $inspections = $this->M_Inspection->getInspections();
+        $inspections = $this->M_Inspection->getInspectionsByManager($_SESSION['user_id']);
 
         $data = [
             'title' => 'Property Inspections',
@@ -63,11 +63,15 @@ class Inspections extends Controller
                 'type' => trim($_POST['type'] ?? ''),
                 'issue_id' => !empty($_POST['issue_id']) ? (int)$_POST['issue_id'] : 0,
                 'date' => trim($_POST['date'] ?? ''),
+                'time' => trim($_POST['time'] ?? ''),
+                'notes' => trim($_POST['notes'] ?? ''),
                 'property_address' => '',
                 'property_id_err' => '',
                 'type_err' => '',
                 'issue_id_err' => '',
-                'date_err' => ''
+                'date_err' => '',
+                'time_err' => '',
+                'notes_err' => ''
             ];
 
             // Validate property_id
@@ -156,17 +160,56 @@ class Inspections extends Controller
                 return;
             }
 
+            // Get property details for landlord and tenant info
+            $property = $this->M_Inspection->getPropertyById($data['property_id']);
+
             // Prepare data for insertion
             $insertData = [
-                'property' => $data['property_address'],
+                'property_id' => $data['property_id'],
+                'issue_id' => $data['issue_id'],
                 'type' => $data['type'],
-                'issues' => $data['issue_id'],
-                'date' => $data['date']
+                'date' => $data['date'],
+                'time' => $data['time'],
+                'notes' => $data['notes'],
+                'manager_id' => $_SESSION['user_id'],
+                'landlord_id' => $property->landlord_id ?? null,
+                'tenant_id' => $property->tenant_id ?? null
             ];
 
             // Attempt to add inspection
-            if ($this->M_Inspection->addInspection($insertData)) {
-                flash('inspection_message', 'Inspection scheduled successfully', 'alert alert-success');
+            if ($inspection_id = $this->M_Inspection->addInspection($insertData)) {
+                // Send notifications
+                $notificationModel = $this->model('M_Notifications');
+
+                $inspectionType = ucfirst(str_replace('_', ' ', $data['type']));
+                $scheduleInfo = date('M d, Y', strtotime($data['date']));
+                if ($data['time']) {
+                    $scheduleInfo .= ' at ' . date('g:i A', strtotime($data['time']));
+                }
+
+                // Notify landlord
+                if ($property->landlord_id) {
+                    $notificationModel->createNotification([
+                        'user_id' => $property->landlord_id,
+                        'type' => 'inspection_scheduled',
+                        'title' => 'Inspection Scheduled',
+                        'message' => "A {$inspectionType} inspection has been scheduled for your property at {$property->address} on {$scheduleInfo}.",
+                        'link' => 'landlord/inspections'
+                    ]);
+                }
+
+                // Notify tenant
+                if ($property->tenant_id) {
+                    $notificationModel->createNotification([
+                        'user_id' => $property->tenant_id,
+                        'type' => 'inspection_scheduled',
+                        'title' => 'Inspection Scheduled',
+                        'message' => "A {$inspectionType} inspection has been scheduled for your property at {$property->address} on {$scheduleInfo}.",
+                        'link' => 'tenant/inspections'
+                    ]);
+                }
+
+                flash('inspection_message', 'Inspection scheduled successfully. Landlord and tenant have been notified.', 'alert alert-success');
                 redirect('inspections/index');
             } else {
                 flash('inspection_message', 'Failed to schedule inspection. Please try again.', 'alert alert-danger');
@@ -174,7 +217,7 @@ class Inspections extends Controller
             }
         } else {
             // GET request → show form
-            $properties = $this->M_Inspection->getPropertiesWithIssues();
+            $properties = $this->M_Inspection->getAllPropertiesByManager($_SESSION['user_id']);
 
             $data = [
                 'title' => 'Schedule Inspection',
@@ -185,10 +228,14 @@ class Inspections extends Controller
                 'type' => '',
                 'issue_id' => '',
                 'date' => '',
+                'time' => '',
+                'notes' => '',
                 'property_id_err' => '',
                 'type_err' => '',
                 'issue_id_err' => '',
-                'date_err' => ''
+                'date_err' => '',
+                'time_err' => '',
+                'notes_err' => ''
             ];
 
             $this->view('manager/v_add_inspection', $data);
@@ -212,12 +259,18 @@ class Inspections extends Controller
                 'type' => trim($_POST['type'] ?? ''),
                 'issue_id' => !empty($_POST['issue_id']) ? (int)$_POST['issue_id'] : 0,
                 'date' => trim($_POST['date'] ?? ''),
+                'time' => trim($_POST['time'] ?? ''),
+                'notes' => trim($_POST['notes'] ?? ''),
+                'inspection_notes' => trim($_POST['inspection_notes'] ?? ''),
                 'status' => trim($_POST['status'] ?? ''),
                 'property_address' => '',
                 'property_id_err' => '',
                 'type_err' => '',
                 'issue_id_err' => '',
                 'date_err' => '',
+                'time_err' => '',
+                'notes_err' => '',
+                'inspection_notes_err' => '',
                 'status_err' => ''
             ];
 
@@ -314,10 +367,13 @@ class Inspections extends Controller
 
             // Prepare data for update
             $updateData = [
-                'property' => $data['property_address'],
+                'property_id' => $data['property_id'],
                 'type' => $data['type'],
-                'issues' => $data['issue_id'],
+                'issue_id' => $data['issue_id'],
                 'date' => $data['date'],
+                'time' => $data['time'],
+                'notes' => $data['notes'],
+                'inspection_notes' => $data['inspection_notes'],
                 'status' => $data['status']
             ];
 

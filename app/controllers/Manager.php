@@ -86,6 +86,10 @@ class Manager extends Controller
             $totalExpenses += $maintenance->actual_cost ?? $maintenance->estimated_cost ?? 0;
         }
 
+        // Get issue statistics
+        $issueModel = $this->model('Issue');
+        $issueStats = $issueModel->getIssueStats($manager_id, 'manager');
+
         $data = [
             'title' => 'Property Manager Dashboard',
             'page' => 'dashboard',
@@ -97,6 +101,7 @@ class Manager extends Controller
             'totalExpenses' => $totalExpenses,
             'recentPayments' => $recentPayments,
             'recentMaintenance' => $recentMaintenance,
+            'issueStats' => $issueStats,
             'unread_notifications' => $this->getUnreadNotificationCount()
         ];
         $this->view('manager/v_dashboard', $data);
@@ -191,12 +196,18 @@ class Manager extends Controller
     public function issues()
     {
         $issueModel = $this->model('Issue');
-        $allIssues = $issueModel->getAllIssues();
+        $manager_id = $_SESSION['user_id'];
+
+        // Get issues for properties assigned to this PM
+        $allIssues = $issueModel->getIssuesByManager($manager_id);
 
         $openIssues = array_filter($allIssues, fn($issue) => $issue->status === 'pending');
         $assignedIssues = array_filter($allIssues, fn($issue) => $issue->status === 'assigned');
         $inProgressIssues = array_filter($allIssues, fn($issue) => $issue->status === 'in_progress');
         $resolvedIssues = array_filter($allIssues, fn($issue) => $issue->status === 'resolved');
+
+        // Get issue statistics
+        $stats = $issueModel->getIssueStats($manager_id, 'manager');
 
         $data = [
             'title' => 'Issue Tracking',
@@ -207,10 +218,156 @@ class Manager extends Controller
             'assignedIssues' => $assignedIssues,
             'inProgressIssues' => $inProgressIssues,
             'resolvedIssues' => $resolvedIssues,
+            'issueStats' => $stats,
             'unread_notifications' => $this->getUnreadNotificationCount()
         ];
 
         $this->view('manager/v_issues', $data);
+    }
+
+    // Issue details and management page
+    public function issueDetails($id = null)
+    {
+        if (!$id) {
+            flash('issue_error', 'Issue not found', 'alert alert-danger');
+            redirect('manager/issues');
+        }
+
+        $issueModel = $this->model('Issue');
+        $issue = $issueModel->getIssueById($id);
+
+        if (!$issue) {
+            flash('issue_error', 'Issue not found', 'alert alert-danger');
+            redirect('manager/issues');
+        }
+
+        // Verify this PM manages this property
+        $propertyModel = $this->model('M_ManagerProperties');
+        $manager = $propertyModel->getManagerByProperty($issue->property_id);
+
+        if (!$manager || $manager->manager_id != $_SESSION['user_id']) {
+            flash('issue_error', 'Unauthorized access', 'alert alert-danger');
+            redirect('manager/issues');
+        }
+
+        $data = [
+            'title' => 'Issue Details',
+            'page' => 'issues',
+            'user_name' => $_SESSION['user_name'],
+            'issue' => $issue,
+            'unread_notifications' => $this->getUnreadNotificationCount()
+        ];
+
+        $this->view('manager/v_issue_details', $data);
+    }
+
+    // Update issue status
+    public function updateIssueStatus()
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            redirect('manager/issues');
+        }
+
+        header('Content-Type: application/json');
+
+        $issue_id = $_POST['issue_id'] ?? null;
+        $status = $_POST['status'] ?? null;
+        $resolution_notes = $_POST['resolution_notes'] ?? null;
+
+        if (!$issue_id || !$status) {
+            echo json_encode(['success' => false, 'message' => 'Missing required fields']);
+            exit();
+        }
+
+        $issueModel = $this->model('Issue');
+        $issue = $issueModel->getIssueById($issue_id);
+
+        if (!$issue) {
+            echo json_encode(['success' => false, 'message' => 'Issue not found']);
+            exit();
+        }
+
+        // Verify this PM manages this property
+        $propertyModel = $this->model('M_ManagerProperties');
+        $manager = $propertyModel->getManagerByProperty($issue->property_id);
+
+        if (!$manager || $manager->manager_id != $_SESSION['user_id']) {
+            echo json_encode(['success' => false, 'message' => 'Unauthorized access']);
+            exit();
+        }
+
+        if ($issueModel->updateStatus($issue_id, $status, $resolution_notes)) {
+            // Send notification to tenant
+            $notificationModel = $this->model('M_Notifications');
+            $statusText = ucfirst(str_replace('_', ' ', $status));
+
+            $notificationModel->createNotification([
+                'user_id' => $issue->tenant_id,
+                'type' => 'issue_update',
+                'title' => 'Issue Status Updated',
+                'message' => 'Your issue "' . $issue->title . '" has been updated to: ' . $statusText,
+                'link' => 'issues/track'
+            ]);
+
+            echo json_encode(['success' => true, 'message' => 'Issue status updated successfully']);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Failed to update issue status']);
+        }
+        exit();
+    }
+
+    // Notify landlord about issue
+    public function notifyLandlordAboutIssue()
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            redirect('manager/issues');
+        }
+
+        header('Content-Type: application/json');
+
+        $issue_id = $_POST['issue_id'] ?? null;
+        $message = $_POST['message'] ?? '';
+
+        if (!$issue_id) {
+            echo json_encode(['success' => false, 'message' => 'Issue ID is required']);
+            exit();
+        }
+
+        $issueModel = $this->model('Issue');
+        $issue = $issueModel->getIssueById($issue_id);
+
+        if (!$issue) {
+            echo json_encode(['success' => false, 'message' => 'Issue not found']);
+            exit();
+        }
+
+        // Verify this PM manages this property
+        $propertyModel = $this->model('M_ManagerProperties');
+        $manager = $propertyModel->getManagerByProperty($issue->property_id);
+
+        if (!$manager || $manager->manager_id != $_SESSION['user_id']) {
+            echo json_encode(['success' => false, 'message' => 'Unauthorized access']);
+            exit();
+        }
+
+        // Send notification to landlord
+        $notificationModel = $this->model('M_Notifications');
+
+        $notificationMessage = $message ?: 'Your property manager has flagged a tenant issue that may require a maintenance request: "' . $issue->title . '". Please review and take appropriate action.';
+
+        $notificationModel->createNotification([
+            'user_id' => $issue->landlord_id,
+            'type' => 'issue_landlord_action',
+            'title' => 'Tenant Issue Requires Your Attention',
+            'message' => $notificationMessage,
+            'link' => 'landlord/issueDetails/' . $issue_id
+        ]);
+
+        // Mark landlord as notified
+        $issueModel->markLandlordNotified($issue_id);
+
+        echo json_encode(['success' => true, 'message' => 'Landlord has been notified']);
+        exit();
     }
 
     public function leases()

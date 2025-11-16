@@ -167,10 +167,11 @@ $averageDaysToResolve = calculateAverageDaysToResolve($data['issues']);
                         }
                         ?>
                         <?php
-                        // Check if issue can be deleted (within 1 minute of creation)
+                        // Check if issue can be edited/deleted (within 1 minute of creation)
                         $createdTime = new DateTime($issue->created_at);
                         $currentTime = new DateTime();
                         $timeDiff = $currentTime->getTimestamp() - $createdTime->getTimestamp();
+                        $canEdit = ($timeDiff <= 60); // 60 seconds = 1 minute
                         $canDelete = ($timeDiff <= 60); // 60 seconds = 1 minute
                         ?>
                         <tr>
@@ -185,10 +186,16 @@ $averageDaysToResolve = calculateAverageDaysToResolve($data['issues']);
                             </td>
                             <td><?= date("F d, Y", strtotime($issue->created_at)); ?></td>
                             <td>
-                                <a href="<?= URLROOT; ?>/issues/edit/<?= $issue->id; ?>"
-                                    class="btn btn-secondary btn-sm">
-                                    <i class="fas fa-edit"></i> Edit
-                                </a>
+                                <?php if ($canEdit): ?>
+                                    <a href="<?= URLROOT; ?>/issues/edit/<?= $issue->id; ?>"
+                                        class="btn btn-secondary btn-sm">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </a>
+                                <?php else: ?>
+                                    <button class="btn btn-secondary btn-sm" disabled title="Can only edit within 1 minute of creation">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </button>
+                                <?php endif; ?>
                                 <?php if ($canDelete): ?>
                                     <a href="<?= URLROOT; ?>/issues/delete/<?= $issue->id; ?>"
                                         class="btn btn-danger btn-sm"

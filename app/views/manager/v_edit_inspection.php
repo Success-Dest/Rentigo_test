@@ -19,11 +19,11 @@
                     name="property_id"
                     class="form-control <?php echo !empty($data['property_id_err']) ? 'is-invalid' : ''; ?>"
                     required>
-                    <option value="">-- Select Property with Issues --</option>
+                    <option value="">-- Select Property --</option>
                     <?php
-                    // Fetch properties with issues for edit form
+                    // Fetch all properties for edit form
                     $M_Inspection = new M_Inspection();
-                    $properties = $M_Inspection->getPropertiesWithIssues();
+                    $properties = $M_Inspection->getAllPropertiesByManager($_SESSION['user_id']);
 
                     if (!empty($properties)):
                         foreach ($properties as $property):
@@ -31,14 +31,13 @@
                             $isSelected = false;
                             if (isset($data['property_id']) && $data['property_id'] == $property->id) {
                                 $isSelected = true;
-                            } elseif (!isset($data['property_id']) && trim($property->address) === trim($data['inspection']->property)) {
+                            } elseif (!isset($data['property_id']) && $property->id == $data['inspection']->property_id) {
                                 $isSelected = true;
                             }
                             $selected = $isSelected ? 'selected' : '';
                     ?>
                             <option value="<?php echo $property->id; ?>" <?php echo $selected; ?>>
                                 <?php echo htmlspecialchars($property->address); ?>
-                                (<?php echo $property->issue_count; ?> issue<?php echo $property->issue_count > 1 ? 's' : ''; ?>)
                             </option>
                     <?php
                         endforeach;
@@ -50,7 +49,7 @@
                         <?php echo $data['property_id_err']; ?>
                     </div>
                 <?php endif; ?>
-                <small class="form-text text-muted">Current: <?php echo htmlspecialchars($data['inspection']->property); ?></small>
+                <small class="form-text text-muted">Current: <?php echo htmlspecialchars($data['inspection']->property_address ?? 'N/A'); ?></small>
             </div>
 
             <!-- Issue Field -->
@@ -61,8 +60,8 @@
                     name="issue_id"
                     class="form-control <?php echo !empty($data['issue_id_err']) ? 'is-invalid' : ''; ?>"
                     required>
-                    <option value="<?php echo $data['inspection']->issues; ?>" selected>
-                        Current Issue ID: <?php echo $data['inspection']->issues; ?>
+                    <option value="<?php echo $data['inspection']->issue_id ?? ''; ?>" selected>
+                        <?php echo $data['inspection']->issue_id ? 'Current Issue ID: ' . $data['inspection']->issue_id : 'No Issue Linked'; ?>
                     </option>
                 </select>
                 <?php if (!empty($data['issue_id_err'])): ?>

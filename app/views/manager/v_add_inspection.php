@@ -18,18 +18,17 @@
                     id="property_id"
                     name="property_id"
                     class="form-control <?php echo !empty($data['property_id_err']) ? 'is-invalid' : ''; ?>">
-                    <option value="">-- Select Property with Issues --</option>
+                    <option value="">-- Select Property --</option>
                     <?php if (!empty($data['properties'])): ?>
                         <?php foreach ($data['properties'] as $property): ?>
                             <option
                                 value="<?php echo $property->id; ?>"
                                 <?php echo (isset($data['property_id']) && $data['property_id'] == $property->id) ? 'selected' : ''; ?>>
                                 <?php echo htmlspecialchars($property->address); ?>
-                                (<?php echo $property->issue_count; ?> issue<?php echo $property->issue_count > 1 ? 's' : ''; ?>)
                             </option>
                         <?php endforeach; ?>
                     <?php else: ?>
-                        <option value="" disabled>No properties with issues found</option>
+                        <option value="" disabled>No properties found</option>
                     <?php endif; ?>
                 </select>
                 <?php if (!empty($data['property_id_err'])): ?>
@@ -37,7 +36,7 @@
                         <?php echo $data['property_id_err']; ?>
                     </div>
                 <?php endif; ?>
-                <small class="form-text text-muted">Select a property that has maintenance issues</small>
+                <small class="form-text text-muted">Select a property for inspection</small>
             </div>
 
             <!-- Issue Field -->

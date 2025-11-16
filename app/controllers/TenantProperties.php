@@ -51,8 +51,24 @@ class TenantProperties extends Controller
         $property->images = $this->getPropertyImages($property->id);
         $property->documents = $this->getPropertyDocuments($property->id);
 
+        // Load reviews and ratings
+        $reviewModel = $this->model('M_Reviews');
+        $reviews = $reviewModel->getReviewsByProperty($id, 'approved');
+        $ratingData = $reviewModel->getPropertyAverageRating($id);
+
+        // Safely extract rating data
+        $averageRating = 0;
+        $reviewCount = 0;
+        if ($ratingData) {
+            $averageRating = $ratingData->avg_rating ?? 0;
+            $reviewCount = $ratingData->review_count ?? 0;
+        }
+
         $data = [
-            'property' => $property
+            'property' => $property,
+            'reviews' => $reviews ?? [],
+            'averageRating' => $averageRating,
+            'reviewCount' => $reviewCount
         ];
         $this->view('tenant/v_property_details', $data);
     }

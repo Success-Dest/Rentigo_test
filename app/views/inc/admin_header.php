@@ -75,6 +75,14 @@
                         </a>
                     </li>
                     <li class="nav-item">
+                        <a href="<?php echo URLROOT; ?>/admin/inspections"
+                            class="nav-link <?php echo ($data['page'] ?? '') === 'inspections' ? 'active' : ''; ?>"
+                            data-tooltip="Inspections">
+                            <i class="fas fa-clipboard-check"></i>
+                            <span class="nav-text">Inspections</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a href="<?php echo URLROOT; ?>/admin/policies"
                             class="nav-link <?php echo ($data['page'] ?? '') === 'policies' ? 'active' : ''; ?>"
                             data-tooltip="Policies">
