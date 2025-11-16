@@ -261,7 +261,7 @@ class Issue
         $whereClause = '';
 
         if ($user_type === 'manager') {
-            $whereClause = 'JOIN manager_properties mp ON i.property_id = mp.property_id WHERE mp.manager_id = :user_id';
+            $whereClause = 'LEFT JOIN properties p ON i.property_id = p.id WHERE p.manager_id = :user_id';
         } elseif ($user_type === 'landlord') {
             $whereClause = 'WHERE i.landlord_id = :user_id';
         } elseif ($user_type === 'tenant') {
