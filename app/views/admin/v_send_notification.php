@@ -77,22 +77,6 @@
                     ><?php echo htmlspecialchars($data['notification_message'] ?? ''); ?></textarea>
                     <small class="form-help">Maximum 500 characters</small>
                 </div>
-
-                <!-- Optional Link -->
-                <div class="form-group full-width">
-                    <label for="link" class="form-label">
-                        <i class="fas fa-link"></i> Link (Optional)
-                    </label>
-                    <input
-                        type="text"
-                        name="link"
-                        id="link"
-                        class="form-input"
-                        placeholder="e.g., tenant/dashboard, landlord/properties"
-                        value="<?php echo htmlspecialchars($data['notification_link'] ?? ''); ?>"
-                    >
-                    <small class="form-help">Relative URL where users will be directed when clicking the notification</small>
-                </div>
             </div>
 
             <!-- Form Actions -->
@@ -158,8 +142,8 @@
     .form-select:focus,
     .form-textarea:focus {
         outline: none;
-        border-color: #3b82f6;
-        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        border-color: #45a9ea;
+        box-shadow: 0 0 0 3px rgba(69, 169, 234, 0.1);
     }
 
     .form-textarea {
@@ -197,12 +181,12 @@
     }
 
     .btn-primary {
-        background: #3b82f6;
+        background: #45a9ea;
         color: white;
     }
 
     .btn-primary:hover {
-        background: #2563eb;
+        background: #3b8fd1;
     }
 
     .btn-secondary {

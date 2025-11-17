@@ -265,8 +265,8 @@
 }
 
 .tab-button.active {
-    color: #3b82f6;
-    border-bottom-color: #3b82f6;
+    color: #45a9ea;
+    border-bottom-color: #45a9ea;
     background: white;
 }
 
@@ -320,8 +320,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #e0e7ff;
-    color: #3b82f6;
+    background: #e0f2fe;
+    color: #45a9ea;
     border-radius: 50%;
     font-size: 0.875rem;
 }

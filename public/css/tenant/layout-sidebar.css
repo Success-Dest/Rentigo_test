@@ -206,7 +206,7 @@
   position: absolute;
   top: 8px;
   right: 12px;
-  background: var(--danger-color);
+  background: #45a9ea;
   color: white;
   font-size: 0.75rem;
   font-weight: 600;

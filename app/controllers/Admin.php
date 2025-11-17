@@ -223,7 +223,6 @@ class Admin extends Controller
             $recipient_type = $_POST['recipient_type'] ?? '';
             $title = trim($_POST['title'] ?? '');
             $message = trim($_POST['message'] ?? '');
-            $link = trim($_POST['link'] ?? '');
 
             if (empty($recipient_type)) {
                 $errors[] = 'Please select recipient type';
@@ -267,7 +266,7 @@ class Admin extends Controller
                         'type' => 'system',
                         'title' => $title,
                         'message' => $message,
-                        'link' => $link
+                        'link' => ''
                     ]);
                     $sent_count++;
                 }
@@ -281,8 +280,7 @@ class Admin extends Controller
                     'errors' => $errors,
                     'recipient_type' => $recipient_type,
                     'notification_title' => $title,
-                    'notification_message' => $message,
-                    'notification_link' => $link
+                    'notification_message' => $message
                 ];
                 $this->view('admin/v_send_notification', $data);
             }
@@ -293,8 +291,7 @@ class Admin extends Controller
                 'errors' => [],
                 'recipient_type' => '',
                 'notification_title' => '',
-                'notification_message' => '',
-                'notification_link' => ''
+                'notification_message' => ''
             ];
             $this->view('admin/v_send_notification', $data);
         }
