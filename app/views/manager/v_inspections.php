@@ -53,16 +53,11 @@ if (!empty($data['inspections']) && is_iterable($data['inspections'])) {
     </div>
 
     <div class="tabs-container">
-        <div class="tabs-nav">
-            <button class="tab-button active" onclick="showInspectionTab('all-inspections')">All Inspections</button>
-        </div>
-
         <!-- All Inspections Tab -->
         <div id="all-inspections-tab" class="tab-content active">
             <!-- Search and Filters -->
-            <!-- Search and Filters -->
             <div class="dashboard-section"
-                style="padding: 1rem; background: #fff; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.1);">
+                style="padding: 1rem 1rem 0 1rem; background: #fff; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.1); margin-bottom: 1.5rem;">
                 <!-- Replace static div with a GET form -->
                 <form method="get" action="<?php echo htmlspecialchars(strtok($_SERVER['REQUEST_URI'], '?')); ?>"
                     class="filters-grid"
@@ -180,29 +175,6 @@ if (!empty($data['inspections']) && is_iterable($data['inspections'])) {
 
             // Submit form via POST
             form.submit();
-        }
-    }
-
-    function showInspectionTab(tabName) {
-        // Hide all tabs
-        document.querySelectorAll('.tab-content').forEach(tab => {
-            tab.classList.remove('active');
-        });
-
-        // Remove active class from all buttons
-        document.querySelectorAll('.tab-button').forEach(btn => {
-            btn.classList.remove('active');
-        });
-
-        // Show selected tab
-        const selectedTab = document.getElementById(tabName + '-tab');
-        if (selectedTab) {
-            selectedTab.classList.add('active');
-        }
-
-        // Add active class to clicked button
-        if (event && event.target) {
-            event.target.classList.add('active');
         }
     }
 </script>
