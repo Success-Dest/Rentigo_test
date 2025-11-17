@@ -368,6 +368,11 @@
   margin-bottom: 0.25rem;
 }
 
+.stat-value.stat-value-small,
+.stat-value-small {
+  font-size: 1.25rem;
+}
+
 .stat-content .stat-change {
   font-size: 0.688rem;
   font-weight: 500;

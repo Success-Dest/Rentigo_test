@@ -48,7 +48,7 @@
             </div>
             <div class="stat-content">
                 <h3 class="stat-label">Total Income</h3>
-                <div class="stat-value">LKR <?php echo number_format($data['maintenanceStats']->total_cost ?? 0, 2); ?></div>
+                <div class="stat-value stat-value-small">LKR <?php echo number_format($data['maintenanceStats']->total_cost ?? 0, 2); ?></div>
                 <div class="stat-change">Maintenance income</div>
             </div>
         </div>
