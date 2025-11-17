@@ -67,7 +67,6 @@
                     <table class="data-table">
                         <thead>
                             <tr>
-                                <th>ID</th>
                                 <th>Property</th>
                                 <th>Tenant</th>
                                 <th>Start Date</th>
@@ -80,7 +79,6 @@
                         <tbody>
                             <?php foreach ($data['allLeases'] as $lease): ?>
                                 <tr>
-                                    <td>#<?php echo $lease->id; ?></td>
                                     <td>
                                         <strong><?php echo htmlspecialchars($lease->address ?? 'N/A'); ?></strong><br>
                                         <small><?php echo ucfirst($lease->property_type ?? ''); ?></small>
@@ -122,7 +120,6 @@
                     <table class="data-table">
                         <thead>
                             <tr>
-                                <th>ID</th>
                                 <th>Property</th>
                                 <th>Tenant</th>
                                 <th>Start Date</th>
@@ -134,7 +131,6 @@
                         <tbody>
                             <?php foreach ($data['draftLeases'] as $lease): ?>
                                 <tr>
-                                    <td>#<?php echo $lease->id; ?></td>
                                     <td>
                                         <strong><?php echo htmlspecialchars($lease->address ?? 'N/A'); ?></strong><br>
                                         <small><?php echo ucfirst($lease->property_type ?? ''); ?></small>
@@ -168,7 +164,6 @@
                     <table class="data-table">
                         <thead>
                             <tr>
-                                <th>ID</th>
                                 <th>Property</th>
                                 <th>Tenant</th>
                                 <th>Start Date</th>
@@ -180,7 +175,6 @@
                         <tbody>
                             <?php foreach ($data['activeLeases'] as $lease): ?>
                                 <tr class="active-row">
-                                    <td>#<?php echo $lease->id; ?></td>
                                     <td>
                                         <strong><?php echo htmlspecialchars($lease->address ?? 'N/A'); ?></strong><br>
                                         <small><?php echo ucfirst($lease->property_type ?? ''); ?></small>
@@ -217,7 +211,6 @@
                     <table class="data-table">
                         <thead>
                             <tr>
-                                <th>ID</th>
                                 <th>Property</th>
                                 <th>Tenant</th>
                                 <th>Period</th>
@@ -228,7 +221,6 @@
                         <tbody>
                             <?php foreach ($data['completedLeases'] as $lease): ?>
                                 <tr>
-                                    <td>#<?php echo $lease->id; ?></td>
                                     <td>
                                         <strong><?php echo htmlspecialchars($lease->address ?? 'N/A'); ?></strong><br>
                                         <small><?php echo ucfirst($lease->property_type ?? ''); ?></small>
