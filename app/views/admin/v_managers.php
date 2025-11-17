@@ -72,116 +72,113 @@
         </div>
     </div>
 
-    <!-- Manager Applications -->
-    <div class="tab-content active" id="applications-tab">
-        <!-- Search and Filter -->
-        <div class="search-filter-row">
-            <div class="search-container">
-                <input type="text" class="search-input" placeholder="Search managers..." id="searchManagers">
-            </div>
-            <div class="filter-container">
-                <select class="filter-select" id="filterManagers" onchange="filterManagersByStatus()">
-                    <option value="">All Managers</option>
-                    <option value="pending">Pending</option>
-                    <option value="approved">Approved</option>
-                    <option value="rejected">Rejected</option>
-                </select>
-            </div>
+
+    <!-- Search and Filter -->
+    <div class="search-filter-row">
+        <div class="search-container">
+            <input type="text" class="search-input" placeholder="Search managers..." id="searchManagers">
         </div>
-
-        <!-- Manager Applications Table -->
-        <div class="table-section">
-            <h3 class="table-title">All Property Manager Applications (<?php echo $totalManagers; ?>)</h3>
-            <div class="table-container">
-                <table class="managers-table">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Employee ID</th>
-                            <th>Join Date</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="managers-tbody">
-                        <?php if (!empty($data['allManagers'])): ?>
-                            <?php foreach ($data['allManagers'] as $manager): ?>
-                                <tr id="manager-row-<?php echo $manager->id; ?>" data-status="<?php echo $manager->approval_status; ?>">
-                                    <td><?php echo htmlspecialchars($manager->name); ?></td>
-                                    <td><?php echo htmlspecialchars($manager->email); ?></td>
-                                    <td>
-                                        <a href="<?php echo URLROOT; ?>/users/viewEmployeeId/<?php echo $manager->id; ?>" target="_blank">
-                                            <?php echo htmlspecialchars($manager->employee_id_filename); ?>
-                                        </a>
-                                    </td>
-                                    <td><?php echo date('d/m/Y', strtotime($manager->created_at)); ?></td>
-                                    <td>
-                                        <?php
-                                        $statusClass = '';
-                                        $statusText = ucfirst($manager->approval_status);
-
-                                        switch ($manager->approval_status) {
-                                            case 'pending':
-                                                $statusClass = 'status-pending';
-                                                break;
-                                            case 'approved':
-                                                $statusClass = 'status-approved';
-                                                break;
-                                            case 'rejected':
-                                                $statusClass = 'status-rejected';
-                                                break;
-                                            default:
-                                                $statusClass = 'status-unknown';
-                                        }
-                                        ?>
-                                        <span class="status-badge <?php echo $statusClass; ?>">
-                                            <?php echo $statusText; ?>
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <?php if ($manager->approval_status === 'pending'): ?>
-                                            <!-- Pending: Show Approve and Reject buttons -->
-                                            <div class="action-buttons-group">
-                                                <button class="action-btn approve-btn"
-                                                    id="approve-btn-<?php echo $manager->id; ?>"
-                                                    onclick="approveManagerCustom(<?php echo $manager->id; ?>)" title="Approve Manager">
-                                                    <i class="fas fa-check"></i>
-                                                </button>
-                                                <button class="action-btn reject-btn"
-                                                    id="reject-btn-<?php echo $manager->id; ?>"
-                                                    onclick="rejectManagerCustom(<?php echo $manager->id; ?>)" title="Reject Manager">
-                                                    <i class=" fas fa-times"></i>
-                                                </button>
-                                            </div>
-                                        <?php elseif ($manager->approval_status === 'approved'): ?>
-                                            <!-- Approved: Show Remove button only -->
-                                            <button class="action-btn reject-btn"
-                                                id="remove-btn-<?php echo $manager->id; ?>"
-                                                onclick="removeManagerCustom(<?php echo $manager->id; ?>)" title="Remove Manager">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        <?php elseif ($manager->approval_status === 'rejected'): ?>
-                                            <!-- Rejected: Show Remove button only -->
-                                            <button class="action-btn reject-btn"
-                                                id="remove-btn-<?php echo $manager->id; ?>"
-                                                onclick="removeManagerCustom(<?php echo $manager->id; ?>)" title="Remove Manager">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        <?php endif; ?>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <tr>
-                                <td colspan="6" style="text-align: center;">No property managers found</td>
-                            </tr>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
-            </div>
+        <div class="filter-container">
+            <select class="filter-select" id="filterManagers" onchange="filterManagersByStatus()">
+                <option value="">All Managers</option>
+                <option value="pending">Pending</option>
+                <option value="approved">Approved</option>
+                <option value="rejected">Rejected</option>
+            </select>
         </div>
     </div>
+
+    <!-- Manager Applications Table -->
+    <h3 class="table-title">All Property Manager Applications (<?php echo $totalManagers; ?>)</h3>
+    <div class="table-container">
+        <table class="managers-table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Employee ID</th>
+                    <th>Join Date</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="managers-tbody">
+                <?php if (!empty($data['allManagers'])): ?>
+                    <?php foreach ($data['allManagers'] as $manager): ?>
+                        <tr id="manager-row-<?php echo $manager->id; ?>" data-status="<?php echo $manager->approval_status; ?>">
+                            <td><?php echo htmlspecialchars($manager->name); ?></td>
+                            <td><?php echo htmlspecialchars($manager->email); ?></td>
+                            <td>
+                                <a href="<?php echo URLROOT; ?>/users/viewEmployeeId/<?php echo $manager->id; ?>" target="_blank">
+                                    <?php echo htmlspecialchars($manager->employee_id_filename); ?>
+                                </a>
+                            </td>
+                            <td><?php echo date('d/m/Y', strtotime($manager->created_at)); ?></td>
+                            <td>
+                                <?php
+                                $statusClass = '';
+                                $statusText = ucfirst($manager->approval_status);
+
+                                switch ($manager->approval_status) {
+                                    case 'pending':
+                                        $statusClass = 'status-pending';
+                                        break;
+                                    case 'approved':
+                                        $statusClass = 'status-approved';
+                                        break;
+                                    case 'rejected':
+                                        $statusClass = 'status-rejected';
+                                        break;
+                                    default:
+                                        $statusClass = 'status-unknown';
+                                }
+                                ?>
+                                <span class="status-badge <?php echo $statusClass; ?>">
+                                    <?php echo $statusText; ?>
+                                </span>
+                            </td>
+                            <td>
+                                <?php if ($manager->approval_status === 'pending'): ?>
+                                    <!-- Pending: Show Approve and Reject buttons -->
+                                    <div class="action-buttons-group">
+                                        <button class="action-btn approve-btn"
+                                            id="approve-btn-<?php echo $manager->id; ?>"
+                                            onclick="approveManagerCustom(<?php echo $manager->id; ?>)" title="Approve Manager">
+                                            <i class="fas fa-check"></i>
+                                        </button>
+                                        <button class="action-btn reject-btn"
+                                            id="reject-btn-<?php echo $manager->id; ?>"
+                                            onclick="rejectManagerCustom(<?php echo $manager->id; ?>)" title="Reject Manager">
+                                            <i class=" fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                <?php elseif ($manager->approval_status === 'approved'): ?>
+                                    <!-- Approved: Show Remove button only -->
+                                    <button class="action-btn reject-btn"
+                                        id="remove-btn-<?php echo $manager->id; ?>"
+                                        onclick="removeManagerCustom(<?php echo $manager->id; ?>)" title="Remove Manager">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                <?php elseif ($manager->approval_status === 'rejected'): ?>
+                                    <!-- Rejected: Show Remove button only -->
+                                    <button class="action-btn reject-btn"
+                                        id="remove-btn-<?php echo $manager->id; ?>"
+                                        onclick="removeManagerCustom(<?php echo $manager->id; ?>)" title="Remove Manager">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                <?php endif; ?>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <tr>
+                        <td colspan="6" style="text-align: center;">No property managers found</td>
+                    </tr>
+                <?php endif; ?>
+            </tbody>
+        </table>
+    </div>
+</div>
 </div>
 </div>
 

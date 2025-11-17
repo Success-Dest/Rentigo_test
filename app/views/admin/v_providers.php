@@ -89,47 +89,45 @@
     </div>
 
     <!-- Search and Filter Section -->
-    <div class="search-filter-section">
-        <form method="GET" action="<?php echo URLROOT; ?>/providers/index">
-            <div class="search-filter-content">
-                <div class="search-input-wrapper">
-                    <input type="text"
-                        class="form-input"
-                        name="search"
-                        placeholder="Search providers..."
-                        value="<?php echo htmlspecialchars($data['search'] ?? ''); ?>">
-                </div>
-                <div class="filter-dropdown-wrapper">
-                    <select class="form-select" name="specialty">
-                        <option value="">All Specialties</option>
-                        <option value="plumbing" <?php echo ($data['specialty_filter'] ?? '') === 'plumbing' ? 'selected' : ''; ?>>Plumbing</option>
-                        <option value="electrical" <?php echo ($data['specialty_filter'] ?? '') === 'electrical' ? 'selected' : ''; ?>>Electrical</option>
-                        <option value="hvac" <?php echo ($data['specialty_filter'] ?? '') === 'hvac' ? 'selected' : ''; ?>>HVAC</option>
-                        <option value="carpentry" <?php echo ($data['specialty_filter'] ?? '') === 'carpentry' ? 'selected' : ''; ?>>Carpentry</option>
-                        <option value="painting" <?php echo ($data['specialty_filter'] ?? '') === 'painting' ? 'selected' : ''; ?>>Painting</option>
-                        <option value="landscaping" <?php echo ($data['specialty_filter'] ?? '') === 'landscaping' ? 'selected' : ''; ?>>Landscaping</option>
-                        <option value="cleaning" <?php echo ($data['specialty_filter'] ?? '') === 'cleaning' ? 'selected' : ''; ?>>Cleaning</option>
-                        <option value="pest_control" <?php echo ($data['specialty_filter'] ?? '') === 'pest_control' ? 'selected' : ''; ?>>Pest Control</option>
-                        <option value="general" <?php echo ($data['specialty_filter'] ?? '') === 'general' ? 'selected' : ''; ?>>General Maintenance</option>
-                    </select>
-                </div>
-                <div class="filter-dropdown-wrapper">
-                    <select class="form-select" name="status">
-                        <option value="">All Status</option>
-                        <option value="active" <?php echo ($data['status_filter'] ?? '') === 'active' ? 'selected' : ''; ?>>Active</option>
-                        <option value="inactive" <?php echo ($data['status_filter'] ?? '') === 'inactive' ? 'selected' : ''; ?>>Inactive</option>
-                        <option value="suspended" <?php echo ($data['status_filter'] ?? '') === 'suspended' ? 'selected' : ''; ?>>Suspended</option>
-                    </select>
-                </div>
-                <button type="submit" class="btn btn-secondary">
-                    <i class="fas fa-search"></i> Search
-                </button>
-                <a href="<?php echo URLROOT; ?>/providers/index" class="btn btn-outline">
-                    <i class="fas fa-refresh"></i> Clear
-                </a>
+    <form method="GET" action="<?php echo URLROOT; ?>/providers/index">
+        <div class="search-filter-content">
+            <div class="search-input-wrapper">
+                <input type="text"
+                    class="form-input"
+                    name="search"
+                    placeholder="Search providers..."
+                    value="<?php echo htmlspecialchars($data['search'] ?? ''); ?>">
             </div>
-        </form>
-    </div>
+            <div class="filter-dropdown-wrapper">
+                <select class="form-select" name="specialty">
+                    <option value="">All Specialties</option>
+                    <option value="plumbing" <?php echo ($data['specialty_filter'] ?? '') === 'plumbing' ? 'selected' : ''; ?>>Plumbing</option>
+                    <option value="electrical" <?php echo ($data['specialty_filter'] ?? '') === 'electrical' ? 'selected' : ''; ?>>Electrical</option>
+                    <option value="hvac" <?php echo ($data['specialty_filter'] ?? '') === 'hvac' ? 'selected' : ''; ?>>HVAC</option>
+                    <option value="carpentry" <?php echo ($data['specialty_filter'] ?? '') === 'carpentry' ? 'selected' : ''; ?>>Carpentry</option>
+                    <option value="painting" <?php echo ($data['specialty_filter'] ?? '') === 'painting' ? 'selected' : ''; ?>>Painting</option>
+                    <option value="landscaping" <?php echo ($data['specialty_filter'] ?? '') === 'landscaping' ? 'selected' : ''; ?>>Landscaping</option>
+                    <option value="cleaning" <?php echo ($data['specialty_filter'] ?? '') === 'cleaning' ? 'selected' : ''; ?>>Cleaning</option>
+                    <option value="pest_control" <?php echo ($data['specialty_filter'] ?? '') === 'pest_control' ? 'selected' : ''; ?>>Pest Control</option>
+                    <option value="general" <?php echo ($data['specialty_filter'] ?? '') === 'general' ? 'selected' : ''; ?>>General Maintenance</option>
+                </select>
+            </div>
+            <div class="filter-dropdown-wrapper">
+                <select class="form-select" name="status">
+                    <option value="">All Status</option>
+                    <option value="active" <?php echo ($data['status_filter'] ?? '') === 'active' ? 'selected' : ''; ?>>Active</option>
+                    <option value="inactive" <?php echo ($data['status_filter'] ?? '') === 'inactive' ? 'selected' : ''; ?>>Inactive</option>
+                    <option value="suspended" <?php echo ($data['status_filter'] ?? '') === 'suspended' ? 'selected' : ''; ?>>Suspended</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-secondary">
+                <i class="fas fa-search"></i> Search
+            </button>
+            <a href="<?php echo URLROOT; ?>/providers/index" class="btn btn-outline">
+                <i class="fas fa-refresh"></i> Clear
+            </a>
+        </div>
+    </form>
 
     <!-- Service Providers Table -->
     <div class="dashboard-section">

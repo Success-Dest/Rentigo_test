@@ -7,19 +7,17 @@
             <p>Manage, approve, and oversee all property listings</p>
         </div>
     </div>
-    <div class="search-filter-section">
-        <div class="search-filter-content">
-            <div class="search-input-wrapper">
-                <input type="text" class="form-input" placeholder="Search properties..." id="searchProperties">
-            </div>
-            <div class="filter-dropdown-wrapper">
-                <select class="form-select" id="filterProperties" onchange="window.location.href='?filter=' + this.value;">
-                    <option value="" <?php echo (($data['current_filter'] ?? 'all') === 'all' || ($data['current_filter'] ?? '') === '') ? 'selected' : ''; ?>>All Properties</option>
-                    <option value="pending" <?php echo (($data['current_filter'] ?? '') === 'pending') ? 'selected' : ''; ?>>Pending</option>
-                    <option value="approved" <?php echo (($data['current_filter'] ?? '') === 'approved') ? 'selected' : ''; ?>>Approved</option>
-                    <option value="rejected" <?php echo (($data['current_filter'] ?? '') === 'rejected') ? 'selected' : ''; ?>>Rejected</option>
-                </select>
-            </div>
+    <div class="search-filter-content">
+        <div class="search-input-wrapper">
+            <input type="text" class="form-input" placeholder="Search properties..." id="searchProperties">
+        </div>
+        <div class="filter-dropdown-wrapper">
+            <select class="form-select" id="filterProperties" onchange="window.location.href='?filter=' + this.value;">
+                <option value="" <?php echo (($data['current_filter'] ?? 'all') === 'all' || ($data['current_filter'] ?? '') === '') ? 'selected' : ''; ?>>All Properties</option>
+                <option value="pending" <?php echo (($data['current_filter'] ?? '') === 'pending') ? 'selected' : ''; ?>>Pending</option>
+                <option value="approved" <?php echo (($data['current_filter'] ?? '') === 'approved') ? 'selected' : ''; ?>>Approved</option>
+                <option value="rejected" <?php echo (($data['current_filter'] ?? '') === 'rejected') ? 'selected' : ''; ?>>Rejected</option>
+            </select>
         </div>
     </div>
     <div class="dashboard-section">

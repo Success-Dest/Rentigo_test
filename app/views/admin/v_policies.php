@@ -73,41 +73,39 @@
     </div>
 
     <!-- Search and Filter Section -->
-    <div class="search-filter-section">
-        <form method="GET" action="<?php echo URLROOT; ?>/policies" id="filterForm">
-            <div class="search-filter-content">
-                <div class="search-input-wrapper">
-                    <input type="text"
-                        class="form-input"
-                        name="search"
-                        placeholder="Search policies..."
-                        value="<?php echo isset($data['filters']['search']) ? htmlspecialchars($data['filters']['search']) : ''; ?>">
-                </div>
-                <div class="filter-dropdown-wrapper">
-                    <select class="form-select" name="status">
-                        <option value="">All Statuses</option>
-                        <option value="active" <?php echo (isset($data['filters']['status']) && $data['filters']['status'] == 'active') ? 'selected' : ''; ?>>Active</option>
-                        <option value="draft" <?php echo (isset($data['filters']['status']) && $data['filters']['status'] == 'draft') ? 'selected' : ''; ?>>Draft</option>
-                        <option value="inactive" <?php echo (isset($data['filters']['status']) && $data['filters']['status'] == 'inactive') ? 'selected' : ''; ?>>Inactive</option>
-                        <option value="archived" <?php echo (isset($data['filters']['status']) && $data['filters']['status'] == 'archived') ? 'selected' : ''; ?>>Archived</option>
-                        <option value="under_review" <?php echo (isset($data['filters']['status']) && $data['filters']['status'] == 'under_review') ? 'selected' : ''; ?>>Under Review</option>
-                    </select>
-                </div>
-                <div class="filter-dropdown-wrapper">
-                    <select class="form-select" name="category">
-                        <option value="">All Categories</option>
-                        <?php foreach ($data['categories'] as $key => $value): ?>
-                            <option value="<?php echo $key; ?>" <?php echo (isset($data['filters']['category']) && $data['filters']['category'] == $key) ? 'selected' : ''; ?>>
-                                <?php echo $value; ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-                <button type="submit" class="btn btn-secondary">Filter</button>
-                <a href="<?php echo URLROOT; ?>/policies" class="btn btn-outline">Clear</a>
+    <form method="GET" action="<?php echo URLROOT; ?>/policies" id="filterForm">
+        <div class="search-filter-content">
+            <div class="search-input-wrapper">
+                <input type="text"
+                    class="form-input"
+                    name="search"
+                    placeholder="Search policies..."
+                    value="<?php echo isset($data['filters']['search']) ? htmlspecialchars($data['filters']['search']) : ''; ?>">
             </div>
-        </form>
-    </div>
+            <div class="filter-dropdown-wrapper">
+                <select class="form-select" name="status">
+                    <option value="">All Statuses</option>
+                    <option value="active" <?php echo (isset($data['filters']['status']) && $data['filters']['status'] == 'active') ? 'selected' : ''; ?>>Active</option>
+                    <option value="draft" <?php echo (isset($data['filters']['status']) && $data['filters']['status'] == 'draft') ? 'selected' : ''; ?>>Draft</option>
+                    <option value="inactive" <?php echo (isset($data['filters']['status']) && $data['filters']['status'] == 'inactive') ? 'selected' : ''; ?>>Inactive</option>
+                    <option value="archived" <?php echo (isset($data['filters']['status']) && $data['filters']['status'] == 'archived') ? 'selected' : ''; ?>>Archived</option>
+                    <option value="under_review" <?php echo (isset($data['filters']['status']) && $data['filters']['status'] == 'under_review') ? 'selected' : ''; ?>>Under Review</option>
+                </select>
+            </div>
+            <div class="filter-dropdown-wrapper">
+                <select class="form-select" name="category">
+                    <option value="">All Categories</option>
+                    <?php foreach ($data['categories'] as $key => $value): ?>
+                        <option value="<?php echo $key; ?>" <?php echo (isset($data['filters']['category']) && $data['filters']['category'] == $key) ? 'selected' : ''; ?>>
+                            <?php echo $value; ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-secondary">Filter</button>
+            <a href="<?php echo URLROOT; ?>/policies" class="btn btn-outline">Clear</a>
+        </div>
+    </form>
 
     <!-- Policy Documents -->
     <div class="dashboard-section">
