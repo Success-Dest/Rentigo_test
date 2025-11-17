@@ -32,7 +32,7 @@
             <div class="stat-info">
                 <h3 class="stat-number">LKR <?php echo number_format($data['monthlyRevenue'] ?? 0, 0); ?></h3>
                 <p class="stat-label">Platform Income</p>
-                <span class="stat-change">10% service fees this month</span>
+                <span class="stat-change">10% from rental + full maintenance payments</span>
             </div>
         </div>
 
