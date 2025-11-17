@@ -24,6 +24,12 @@ class Tenant extends Controller
         $this->issueModel = $this->model('Issue');
     }
 
+    // Helper method to get unread notification count
+    private function getUnreadNotificationCount()
+    {
+        return $this->notificationModel->getUnreadCount($_SESSION['user_id']);
+    }
+
     // Main dashboard page
     public function index()
     {
@@ -44,7 +50,8 @@ class Tenant extends Controller
             'pendingPayments' => $pendingPayments,
             'recentIssues' => $recentIssues,
             'bookingStats' => $bookingStats,
-            'unreadNotifications' => $unreadNotifications
+            'unreadNotifications' => $unreadNotifications,
+            'unread_notifications' => $this->getUnreadNotificationCount()
         ];
 
         $this->view('tenant/v_dashboard', $data);
@@ -66,7 +73,8 @@ class Tenant extends Controller
             'page' => 'bookings',
             'user_name' => $_SESSION['user_name'],
             'bookings' => $bookings,
-            'bookingStats' => $bookingStats
+            'bookingStats' => $bookingStats,
+            'unread_notifications' => $this->getUnreadNotificationCount()
         ];
 
         $this->view('tenant/v_bookings', $data);
@@ -87,7 +95,8 @@ class Tenant extends Controller
             'pendingPayments' => $pendingPayments,
             'paymentHistory' => $paymentHistory,
             'totalPayments' => $totalPayments,
-            'overduePayments' => $overduePayments
+            'overduePayments' => $overduePayments,
+            'unread_notifications' => $this->getUnreadNotificationCount()
         ];
 
         $this->view('tenant/v_pay_rent', $data);
@@ -106,7 +115,8 @@ class Tenant extends Controller
             'user_name' => $_SESSION['user_name'],
             'leases' => $leases,
             'activeLease' => $activeLease,
-            'leaseStats' => $leaseStats
+            'leaseStats' => $leaseStats,
+            'unread_notifications' => $this->getUnreadNotificationCount()
         ];
 
         $this->view('tenant/v_agreements', $data);
@@ -133,7 +143,8 @@ class Tenant extends Controller
             'page' => 'my_reviews',
             'user_name' => $_SESSION['user_name'],
             'myReviews' => $myReviews,
-            'reviewableBookings' => $reviewableBookings
+            'reviewableBookings' => $reviewableBookings,
+            'unread_notifications' => $this->getUnreadNotificationCount()
         ];
 
         $this->view('tenant/v_my_reviews', $data);
@@ -150,7 +161,8 @@ class Tenant extends Controller
             'page' => 'notifications',
             'user_name' => $_SESSION['user_name'],
             'notifications' => $notifications,
-            'unreadCount' => $unreadCount
+            'unreadCount' => $unreadCount,
+            'unread_notifications' => $this->getUnreadNotificationCount()
         ];
 
         $this->view('tenant/v_notifications', $data);
@@ -165,7 +177,8 @@ class Tenant extends Controller
             'title' => 'Landlord Reviews - TenantHub',
             'page' => 'feedback',
             'user_name' => $_SESSION['user_name'],
-            'reviewsAboutMe' => $reviewsAboutMe
+            'reviewsAboutMe' => $reviewsAboutMe,
+            'unread_notifications' => $this->getUnreadNotificationCount()
         ];
 
         $this->view('tenant/v_feedback', $data);
@@ -181,7 +194,8 @@ class Tenant extends Controller
             'title' => 'Settings - TenantHub',
             'page' => 'settings',
             'user_name' => $_SESSION['user_name'],
-            'user' => $user
+            'user' => $user,
+            'unread_notifications' => $this->getUnreadNotificationCount()
         ];
 
         $this->view('tenant/v_settings', $data);

@@ -222,10 +222,19 @@ class M_Users
         return $this->db->resultSet();
     }
 
+    // Get all users by type (for admin notifications)
+    public function getAllUsersByType($user_type)
+    {
+        $this->db->query('SELECT id, name, email FROM users WHERE user_type = :user_type AND account_status = :status');
+        $this->db->bind(':user_type', $user_type);
+        $this->db->bind(':status', 'active');
+        return $this->db->resultSet();
+    }
+
     // Get manager counts
     public function getManagerCounts()
     {
-        $this->db->query('SELECT 
+        $this->db->query('SELECT
                               COUNT(*) as total,
                               SUM(CASE WHEN pm.approval_status = "pending" THEN 1 ELSE 0 END) as pending,
                               SUM(CASE WHEN pm.approval_status = "approved" THEN 1 ELSE 0 END) as approved,

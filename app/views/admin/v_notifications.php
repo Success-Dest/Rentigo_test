@@ -8,9 +8,9 @@
             <p>Manage and send notifications to users</p>
         </div>
         <div class="header-actions">
-            <button class="btn btn-primary" onclick="sendNotification()">
+            <a href="<?php echo URLROOT; ?>/admin/sendNotification" class="btn btn-primary">
                 <i class="fas fa-paper-plane"></i> Send Notification
-            </button>
+            </a>
         </div>
     </div>
 
@@ -80,7 +80,7 @@
     <!-- Notification History -->
     <div class="dashboard-section">
         <div class="section-header">
-            <h3>Notification History (3)</h3>
+            <h3>Notification History (<?php echo count($data['notifications'] ?? []); ?>)</h3>
         </div>
 
         <div class="table-container">
@@ -97,101 +97,67 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr data-status="sent">
-                        <td>
-                            <div class="notification-info">
-                                <div class="notification-icon system">
-                                    <i class="fas fa-exclamation-triangle"></i>
-                                </div>
-                                <div class="notification-details">
-                                    <div class="notification-title">System Maintenance Notice</div>
-                                    <div class="notification-preview">The property management system will unde...</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            <span class="type-badge system">System</span>
-                        </td>
-                        <td>All</td>
-                        <td>245</td>
-                        <td>01/07/2024</td>
-                        <td><span class="status-badge sent">Sent</span></td>
-                        <td>
-                            <div class="notification-actions">
-                                <button class="action-btn view-btn" onclick="viewNotification('NOT001')" title="View">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                                <button class="action-btn danger-btn" onclick="deleteNotification('NOT001')" title="Delete">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
+                    <?php if (!empty($data['notifications'])): ?>
+                        <?php foreach ($data['notifications'] as $notification): ?>
+                            <?php
+                            // Determine icon based on type
+                            $iconClass = match ($notification->type) {
+                                'payment' => 'fas fa-credit-card',
+                                'booking' => 'fas fa-calendar-check',
+                                'lease' => 'fas fa-file-contract',
+                                'property' => 'fas fa-home',
+                                'issue', 'issue_reported', 'issue_update' => 'fas fa-exclamation-triangle',
+                                'inspection', 'inspection_scheduled' => 'fas fa-clipboard-check',
+                                'maintenance', 'maintenance_request' => 'fas fa-tools',
+                                'review' => 'fas fa-star',
+                                default => 'fas fa-info-circle'
+                            };
 
-                    <tr data-status="sent">
-                        <td>
-                            <div class="notification-info">
-                                <div class="notification-icon payment">
-                                    <i class="fas fa-credit-card"></i>
-                                </div>
-                                <div class="notification-details">
-                                    <div class="notification-title">New Payment Policy</div>
-                                    <div class="notification-preview">Starting next month, all rent payments must...</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            <span class="type-badge payment">Payment</span>
-                        </td>
-                        <td>Tenants</td>
-                        <td>156</td>
-                        <td>28/06/2024</td>
-                        <td><span class="status-badge sent">Sent</span></td>
-                        <td>
-                            <div class="notification-actions">
-                                <button class="action-btn view-btn" onclick="viewNotification('NOT002')" title="View">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                                <button class="action-btn danger-btn" onclick="deleteNotification('NOT002')" title="Delete">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-
-                    <tr data-status="draft">
-                        <td>
-                            <div class="notification-info">
-                                <div class="notification-icon general">
-                                    <i class="fas fa-info-circle"></i>
-                                </div>
-                                <div class="notification-details">
-                                    <div class="notification-title">Holiday Schedule Update</div>
-                                    <div class="notification-preview">Please note the updated office hours during...</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            <span class="type-badge general">General</span>
-                        </td>
-                        <td>All</td>
-                        <td>-</td>
-                        <td>-</td>
-                        <td><span class="status-badge draft">Draft</span></td>
-                        <td>
-                            <div class="notification-actions">
-                                <button class="action-btn view-btn" onclick="editNotification('NOT003')" title="Edit">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button class="action-btn send-btn" onclick="sendDraftNotification('NOT003')" title="Send">
-                                    <i class="fas fa-paper-plane"></i>
-                                </button>
-                                <button class="action-btn danger-btn" onclick="deleteNotification('NOT003')" title="Delete">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
+                            $messagePreview = substr($notification->message ?? '', 0, 50) . (strlen($notification->message ?? '') > 50 ? '...' : '');
+                            $formattedDate = date('d/m/Y', strtotime($notification->created_at));
+                            ?>
+                            <tr data-status="<?php echo htmlspecialchars($notification->status ?? 'sent'); ?>">
+                                <td>
+                                    <div class="notification-info">
+                                        <div class="notification-icon <?php echo htmlspecialchars($notification->type); ?>">
+                                            <i class="<?php echo $iconClass; ?>"></i>
+                                        </div>
+                                        <div class="notification-details">
+                                            <div class="notification-title"><?php echo htmlspecialchars($notification->title ?? 'Notification'); ?></div>
+                                            <div class="notification-preview"><?php echo htmlspecialchars($messagePreview); ?></div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="type-badge <?php echo htmlspecialchars($notification->type); ?>">
+                                        <?php echo ucfirst(str_replace('_', ' ', $notification->type)); ?>
+                                    </span>
+                                </td>
+                                <td>Various</td>
+                                <td><?php echo htmlspecialchars($notification->recipient_count ?? 1); ?></td>
+                                <td><?php echo $formattedDate; ?></td>
+                                <td><span class="status-badge <?php echo htmlspecialchars($notification->status ?? 'sent'); ?>">
+                                    <?php echo ucfirst($notification->status ?? 'Sent'); ?>
+                                </span></td>
+                                <td>
+                                    <div class="notification-actions">
+                                        <button class="action-btn view-btn" onclick="viewNotification('<?php echo $notification->id ?? ''; ?>')" title="View">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="action-btn danger-btn" onclick="deleteNotification('<?php echo $notification->id ?? ''; ?>')" title="Delete">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="7" style="text-align: center; padding: 2rem; color: #6b7280;">
+                                No notifications found. Click "Send Notification" to send a notification to users.
+                            </td>
+                        </tr>
+                    <?php endif; ?>
                 </tbody>
             </table>
         </div>

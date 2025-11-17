@@ -101,12 +101,38 @@ class LeaseAgreements extends Controller
         }
 
         if ($this->leaseModel->signLeaseByTenant($id)) {
+            // Notify landlord that tenant has signed
+            $this->notificationModel->createNotification([
+                'user_id' => $lease->landlord_id,
+                'type' => 'lease',
+                'title' => 'Lease Agreement Signed by Tenant',
+                'message' => 'The tenant has signed the lease agreement for property at "' . substr($lease->property_address, 0, 50) . '..."',
+                'link' => 'leaseagreements/details/' . $id
+            ]);
+
             // Check if both parties have signed
             $lease = $this->leaseModel->getLeaseById($id);
             if ($lease->signed_by_landlord) {
                 // Activate the lease and booking
                 $this->leaseModel->updateLeaseStatus($id, 'active');
                 $this->bookingModel->activateBooking($lease->booking_id);
+
+                // Notify both parties that lease is now active
+                $this->notificationModel->createNotification([
+                    'user_id' => $lease->tenant_id,
+                    'type' => 'lease',
+                    'title' => 'Lease Agreement Active',
+                    'message' => 'Your lease agreement for property at "' . substr($lease->property_address, 0, 50) . '..." is now active!',
+                    'link' => 'tenant/agreements'
+                ]);
+
+                $this->notificationModel->createNotification([
+                    'user_id' => $lease->landlord_id,
+                    'type' => 'lease',
+                    'title' => 'Lease Agreement Active',
+                    'message' => 'Lease agreement for property at "' . substr($lease->property_address, 0, 50) . '..." is now active!',
+                    'link' => 'landlord/bookings'
+                ]);
             } else {
                 $this->leaseModel->updateLeaseStatus($id, 'pending_signatures');
             }
@@ -140,12 +166,38 @@ class LeaseAgreements extends Controller
         }
 
         if ($this->leaseModel->signLeaseByLandlord($id)) {
+            // Notify tenant that landlord has signed
+            $this->notificationModel->createNotification([
+                'user_id' => $lease->tenant_id,
+                'type' => 'lease',
+                'title' => 'Lease Agreement Signed by Landlord',
+                'message' => 'The landlord has signed the lease agreement for property at "' . substr($lease->property_address, 0, 50) . '..."',
+                'link' => 'leaseagreements/details/' . $id
+            ]);
+
             // Check if both parties have signed
             $lease = $this->leaseModel->getLeaseById($id);
             if ($lease->signed_by_tenant) {
                 // Activate the lease and booking
                 $this->leaseModel->updateLeaseStatus($id, 'active');
                 $this->bookingModel->activateBooking($lease->booking_id);
+
+                // Notify both parties that lease is now active
+                $this->notificationModel->createNotification([
+                    'user_id' => $lease->tenant_id,
+                    'type' => 'lease',
+                    'title' => 'Lease Agreement Active',
+                    'message' => 'Your lease agreement for property at "' . substr($lease->property_address, 0, 50) . '..." is now active!',
+                    'link' => 'tenant/agreements'
+                ]);
+
+                $this->notificationModel->createNotification([
+                    'user_id' => $lease->landlord_id,
+                    'type' => 'lease',
+                    'title' => 'Lease Agreement Active',
+                    'message' => 'Lease agreement for property at "' . substr($lease->property_address, 0, 50) . '..." is now active!',
+                    'link' => 'landlord/bookings'
+                ]);
             } else {
                 $this->leaseModel->updateLeaseStatus($id, 'pending_signatures');
             }
@@ -181,6 +233,19 @@ class LeaseAgreements extends Controller
             if ($this->leaseModel->terminateLease($id, $termination_reason, $termination_date)) {
                 // Complete the booking
                 $this->bookingModel->completeBooking($lease->booking_id);
+
+                // Notify the other party about lease termination
+                $initiator = $_SESSION['user_id'];
+                $other_party_id = ($lease->tenant_id == $initiator) ? $lease->landlord_id : $lease->tenant_id;
+                $initiator_role = ($lease->tenant_id == $initiator) ? 'tenant' : 'landlord';
+
+                $this->notificationModel->createNotification([
+                    'user_id' => $other_party_id,
+                    'type' => 'lease',
+                    'title' => 'Lease Agreement Terminated',
+                    'message' => 'The lease agreement for property at "' . substr($lease->property_address, 0, 50) . '..." has been terminated by the ' . $initiator_role . '.',
+                    'link' => 'leaseagreements/details/' . $id
+                ]);
 
                 flash('lease_message', 'Lease agreement terminated successfully', 'alert alert-success');
             } else {

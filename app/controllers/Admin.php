@@ -221,6 +221,94 @@ class Admin extends Controller
         $this->view('admin/v_notifications', $data);
     }
 
+    // Send notification form page
+    public function sendNotification()
+    {
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_SPECIAL_CHARS);
+
+            // Validate inputs
+            $errors = [];
+            $recipient_type = $_POST['recipient_type'] ?? '';
+            $title = trim($_POST['title'] ?? '');
+            $message = trim($_POST['message'] ?? '');
+            $link = trim($_POST['link'] ?? '');
+
+            if (empty($recipient_type)) {
+                $errors[] = 'Please select recipient type';
+            }
+            if (empty($title)) {
+                $errors[] = 'Please enter notification title';
+            }
+            if (empty($message)) {
+                $errors[] = 'Please enter notification message';
+            }
+
+            if (empty($errors)) {
+                $notificationModel = $this->model('M_Notifications');
+
+                // Get user IDs based on recipient type
+                $recipients = [];
+                switch ($recipient_type) {
+                    case 'all':
+                        $recipients = array_merge(
+                            $this->userModel->getAllUsersByType('tenant'),
+                            $this->userModel->getAllUsersByType('landlord'),
+                            $this->userModel->getAllUsersByType('property_manager')
+                        );
+                        break;
+                    case 'tenants':
+                        $recipients = $this->userModel->getAllUsersByType('tenant');
+                        break;
+                    case 'landlords':
+                        $recipients = $this->userModel->getAllUsersByType('landlord');
+                        break;
+                    case 'managers':
+                        $recipients = $this->userModel->getAllUsersByType('property_manager');
+                        break;
+                }
+
+                // Send notification to each recipient
+                $sent_count = 0;
+                foreach ($recipients as $user) {
+                    $notificationModel->createNotification([
+                        'user_id' => $user->id,
+                        'type' => 'system',
+                        'title' => $title,
+                        'message' => $message,
+                        'link' => $link
+                    ]);
+                    $sent_count++;
+                }
+
+                flash('notification_message', "Successfully sent notification to $sent_count user(s)", 'alert alert-success');
+                redirect('admin/notifications');
+            } else {
+                $data = [
+                    'title' => 'Send Notification - Rentigo Admin',
+                    'page' => 'notifications',
+                    'errors' => $errors,
+                    'recipient_type' => $recipient_type,
+                    'notification_title' => $title,
+                    'notification_message' => $message,
+                    'notification_link' => $link
+                ];
+                $this->view('admin/v_send_notification', $data);
+            }
+        } else {
+            $data = [
+                'title' => 'Send Notification - Rentigo Admin',
+                'page' => 'notifications',
+                'errors' => [],
+                'recipient_type' => '',
+                'notification_title' => '',
+                'notification_message' => '',
+                'notification_link' => ''
+            ];
+            $this->view('admin/v_send_notification', $data);
+        }
+    }
+
     // Property Manager approvals page
     public function pm_approvals()
     {

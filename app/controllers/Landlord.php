@@ -30,6 +30,12 @@ class Landlord extends Controller
         $this->reviewModel = $this->model('M_Reviews');
     }
 
+    // Helper method to get unread notification count
+    private function getUnreadNotificationCount()
+    {
+        return $this->notificationModel->getUnreadCount($_SESSION['user_id']);
+    }
+
     public function index()
     {
         $this->dashboard();
@@ -72,7 +78,8 @@ class Landlord extends Controller
             'recentPayments' => $recentPayments,
             'unreadMessages' => $unreadMessages,
             'unreadNotifications' => $unreadNotifications,
-            'issueStats' => $issueStats
+            'issueStats' => $issueStats,
+            'unread_notifications' => $this->getUnreadNotificationCount()
         ];
         $this->view('landlord/v_dashboard', $data);
     }
@@ -98,7 +105,8 @@ class Landlord extends Controller
             'page' => 'bookings',
             'user_name' => $_SESSION['user_name'],
             'bookings' => $bookings,
-            'bookingStats' => $bookingStats
+            'bookingStats' => $bookingStats,
+            'unread_notifications' => $this->getUnreadNotificationCount()
         ];
         $this->view('landlord/v_bookings', $data);
     }
@@ -127,7 +135,8 @@ class Landlord extends Controller
             'pendingIssues' => $pendingIssues,
             'inProgressIssues' => $inProgressIssues,
             'resolvedIssues' => $resolvedIssues,
-            'issueStats' => $stats
+            'issueStats' => $stats,
+            'unread_notifications' => $this->getUnreadNotificationCount()
         ];
 
         $this->view('landlord/v_issues', $data);
@@ -146,7 +155,8 @@ class Landlord extends Controller
             'user_name' => $_SESSION['user_name'],
             'payments' => $payments,
             'totalIncome' => $totalIncome,
-            'paymentStats' => $paymentStats
+            'paymentStats' => $paymentStats,
+            'unread_notifications' => $this->getUnreadNotificationCount()
         ];
         $this->view('landlord/v_payment_history', $data);
     }
@@ -162,7 +172,8 @@ class Landlord extends Controller
             'page' => 'feedback',
             'user_name' => $_SESSION['user_name'],
             'myReviews' => $myReviews,
-            'reviewsAboutMe' => $reviewsAboutMe
+            'reviewsAboutMe' => $reviewsAboutMe,
+            'unread_notifications' => $this->getUnreadNotificationCount()
         ];
         $this->view('landlord/v_feedback', $data);
     }
@@ -178,7 +189,8 @@ class Landlord extends Controller
             'page' => 'notifications',
             'user_name' => $_SESSION['user_name'],
             'notifications' => $notifications,
-            'unreadCount' => $unreadCount
+            'unreadCount' => $unreadCount,
+            'unread_notifications' => $this->getUnreadNotificationCount()
         ];
         $this->view('landlord/v_notifications', $data);
     }
@@ -192,7 +204,8 @@ class Landlord extends Controller
             'title' => 'Settings',
             'page' => 'settings',
             'user_name' => $_SESSION['user_name'],
-            'user' => $user
+            'user' => $user,
+            'unread_notifications' => $this->getUnreadNotificationCount()
         ];
         $this->view('landlord/v_settings', $data);
     }
@@ -222,7 +235,8 @@ class Landlord extends Controller
             'paymentStats' => $paymentStats,
             'payments' => $payments,
             'maintenanceStats' => $maintenanceStats,
-            'monthlyIncome' => $monthlyIncome
+            'monthlyIncome' => $monthlyIncome,
+            'unread_notifications' => $this->getUnreadNotificationCount()
         ];
         $this->view('landlord/v_income', $data);
     }

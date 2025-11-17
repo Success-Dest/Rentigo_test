@@ -104,6 +104,13 @@
                             data-tooltip="Notifications">
                             <i class="fas fa-bell"></i>
                             <span class="nav-text">Notifications</span>
+                            <?php
+                            // Show notification badge if there are unread notifications
+                            $unreadCount = $data['unread_notifications'] ?? 0;
+                            if ($unreadCount > 0) {
+                                echo '<span class="notification-badge">' . min($unreadCount, 99) . '</span>';
+                            }
+                            ?>
                             <span class="tooltip">Notifications</span>
                         </a>
                     </li>
