@@ -57,6 +57,13 @@
   border-bottom: none !important;
 }
 
+/* Remove borders from actions column cells */
+.data-table td.actions {
+  border: none !important;
+  border-top: none !important;
+  border-bottom: none !important;
+}
+
 /* Property Thumbnail */
 .property-thumb {
   width: 50px;
