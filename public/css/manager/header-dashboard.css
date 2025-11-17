@@ -349,6 +349,31 @@
   color: var(--danger-color);
 }
 
+/* Alternative stat card structure (used in Bookings, Maintenance, Leases) */
+.stat-content {
+  flex: 1;
+}
+
+.stat-content .stat-label {
+  font-size: 0.813rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  margin-bottom: 0.25rem;
+}
+
+.stat-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-color);
+  margin-bottom: 0.25rem;
+}
+
+.stat-content .stat-change {
+  font-size: 0.688rem;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
 /* Dashboard Grid */
 .dashboard-grid {
   display: grid;
