@@ -96,6 +96,14 @@
   font-size: 0.875rem;
 }
 
+.type-icon.rental {
+  background-color: var(--success-color);
+}
+
+.type-icon.maintenance {
+  background-color: var(--warning-color);
+}
+
 .type-icon.income {
   background-color: var(--income-color);
 }

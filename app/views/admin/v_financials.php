@@ -88,7 +88,7 @@
                             <tr data-type="income" data-status="<?php echo htmlspecialchars($transaction->status); ?>" data-date="<?php echo date('Y-m-d', strtotime($displayDate)); ?>">
                                 <td>
                                     <div class="transaction-type">
-                                        <div class="type-icon income">
+                                        <div class="type-icon <?php echo $isMaintenance ? 'maintenance' : 'rental'; ?>">
                                             <i class="fas <?php echo $isMaintenance ? 'fa-tools' : 'fa-home'; ?>"></i>
                                         </div>
                                         <span class="type-label"><?php echo $isMaintenance ? 'Maintenance' : 'Rental'; ?></span>
