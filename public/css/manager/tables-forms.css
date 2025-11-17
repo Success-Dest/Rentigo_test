@@ -50,6 +50,13 @@
   border-bottom: none;
 }
 
+/* Remove borders from buttons in table cells */
+.data-table td .btn {
+  border: none !important;
+  border-top: none !important;
+  border-bottom: none !important;
+}
+
 /* Property Thumbnail */
 .property-thumb {
   width: 50px;
