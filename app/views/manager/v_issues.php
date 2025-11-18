@@ -29,17 +29,17 @@
                 <button class="tab-button active" onclick="showIssueTab('all')">
                     All (<?php echo isset($data['allIssues']) ? count($data['allIssues']) : 0; ?>)
                 </button>
-                <button class="tab-button" onclick="showIssueTab('open')">
-                    Open (<?php echo isset($data['openIssues']) ? count($data['openIssues']) : 0; ?>)
-                </button>
-                <button class="tab-button" onclick="showIssueTab('assigned')">
-                    Assigned (<?php echo isset($data['assignedIssues']) ? count($data['assignedIssues']) : 0; ?>)
+                <button class="tab-button" onclick="showIssueTab('pending')">
+                    Pending (<?php echo isset($data['pendingIssues']) ? count($data['pendingIssues']) : 0; ?>)
                 </button>
                 <button class="tab-button" onclick="showIssueTab('in-progress')">
                     In Progress (<?php echo isset($data['inProgressIssues']) ? count($data['inProgressIssues']) : 0; ?>)
                 </button>
                 <button class="tab-button" onclick="showIssueTab('resolved')">
                     Resolved (<?php echo isset($data['resolvedIssues']) ? count($data['resolvedIssues']) : 0; ?>)
+                </button>
+                <button class="tab-button" onclick="showIssueTab('cancelled')">
+                    Cancelled (<?php echo isset($data['cancelledIssues']) ? count($data['cancelledIssues']) : 0; ?>)
                 </button>
             </div>
 
@@ -80,11 +80,11 @@
                 </div>
             </div>
 
-            <!-- Open Issues Tab -->
-            <div id="open-issues-tab" class="tab-content">
+            <!-- Pending Issues Tab -->
+            <div id="pending-issues-tab" class="tab-content">
                 <div class="issues-cards">
-                    <?php if (!empty($data['openIssues'])): ?>
-                        <?php foreach ($data['openIssues'] as $issue): ?>
+                    <?php if (!empty($data['pendingIssues'])): ?>
+                        <?php foreach ($data['pendingIssues'] as $issue): ?>
                             <div class="issue-card" onclick="window.location.href='<?php echo URLROOT; ?>/manager/issueDetails/<?php echo $issue->id; ?>'" style="cursor: pointer;">
                                 <div class="issue-header">
                                     <div class="issue-title-priority">
@@ -112,44 +112,7 @@
                             </div>
                         <?php endforeach; ?>
                     <?php else: ?>
-                        <p style="text-align: center; padding: 2rem; color: #6b7280;">No open issues.</p>
-                    <?php endif; ?>
-                </div>
-            </div>
-
-            <!-- Assigned Issues Tab -->
-            <div id="assigned-issues-tab" class="tab-content">
-                <div class="issues-cards">
-                    <?php if (!empty($data['assignedIssues'])): ?>
-                        <?php foreach ($data['assignedIssues'] as $issue): ?>
-                            <div class="issue-card" onclick="window.location.href='<?php echo URLROOT; ?>/manager/issueDetails/<?php echo $issue->id; ?>'" style="cursor: pointer;">
-                                <div class="issue-header">
-                                    <div class="issue-title-priority">
-                                        <h3 class="font-medium"><?php echo htmlspecialchars($issue->title); ?></h3>
-                                        <span class="priority-badge <?php echo htmlspecialchars($issue->priority); ?>">
-                                            <?php echo strtoupper(htmlspecialchars($issue->priority)); ?>
-                                        </span>
-                                    </div>
-                                    <span class="status-badge <?php echo htmlspecialchars($issue->status); ?>">
-                                        <?php echo ucfirst(str_replace('_', ' ', htmlspecialchars($issue->status))); ?>
-                                    </span>
-                                </div>
-                                <p class="issue-property"><?php echo htmlspecialchars($issue->property_address); ?></p>
-                                <p class="issue-description">
-                                    <?php
-                                    $desc = $issue->description ?? '';
-                                    echo htmlspecialchars(substr($desc, 0, 100)) . (strlen($desc) > 100 ? '...' : '');
-                                    ?>
-                                </p>
-                                <div class="issue-footer">
-                                    <span>By <?php echo htmlspecialchars($issue->tenant_name ?? ''); ?></span>
-                                    <span><?php echo date('Y-m-d', strtotime($issue->created_at)); ?></span>
-                                    <span><?php echo htmlspecialchars($issue->category); ?></span>
-                                </div>
-                            </div>
-                        <?php endforeach; ?>
-                    <?php else: ?>
-                        <p style="text-align: center; padding: 2rem; color: #6b7280;">No assigned issues.</p>
+                        <p style="text-align: center; padding: 2rem; color: #6b7280;">No pending issues.</p>
                     <?php endif; ?>
                 </div>
             </div>
@@ -224,6 +187,43 @@
                         <?php endforeach; ?>
                     <?php else: ?>
                         <p style="text-align: center; padding: 2rem; color: #6b7280;">No resolved issues.</p>
+                    <?php endif; ?>
+                </div>
+            </div>
+
+            <!-- Cancelled Issues Tab -->
+            <div id="cancelled-issues-tab" class="tab-content">
+                <div class="issues-cards">
+                    <?php if (!empty($data['cancelledIssues'])): ?>
+                        <?php foreach ($data['cancelledIssues'] as $issue): ?>
+                            <div class="issue-card" onclick="window.location.href='<?php echo URLROOT; ?>/manager/issueDetails/<?php echo $issue->id; ?>'" style="cursor: pointer;">
+                                <div class="issue-header">
+                                    <div class="issue-title-priority">
+                                        <h3 class="font-medium"><?php echo htmlspecialchars($issue->title); ?></h3>
+                                        <span class="priority-badge <?php echo htmlspecialchars($issue->priority); ?>">
+                                            <?php echo strtoupper(htmlspecialchars($issue->priority)); ?>
+                                        </span>
+                                    </div>
+                                    <span class="status-badge <?php echo htmlspecialchars($issue->status); ?>">
+                                        <?php echo ucfirst(str_replace('_', ' ', htmlspecialchars($issue->status))); ?>
+                                    </span>
+                                </div>
+                                <p class="issue-property"><?php echo htmlspecialchars($issue->property_address); ?></p>
+                                <p class="issue-description">
+                                    <?php
+                                    $desc = $issue->description ?? '';
+                                    echo htmlspecialchars(substr($desc, 0, 100)) . (strlen($desc) > 100 ? '...' : '');
+                                    ?>
+                                </p>
+                                <div class="issue-footer">
+                                    <span>By <?php echo htmlspecialchars($issue->tenant_name ?? ''); ?></span>
+                                    <span><?php echo date('Y-m-d', strtotime($issue->created_at)); ?></span>
+                                    <span><?php echo htmlspecialchars($issue->category); ?></span>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <p style="text-align: center; padding: 2rem; color: #6b7280;">No cancelled issues.</p>
                     <?php endif; ?>
                 </div>
             </div>

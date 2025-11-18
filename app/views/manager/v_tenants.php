@@ -50,7 +50,6 @@
                                     <th>Lease Start</th>
                                     <th>Lease End</th>
                                     <th>Status</th>
-                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -67,18 +66,11 @@
                                             <td><?php echo date('Y-m-d', strtotime($booking->move_in_date)); ?></td>
                                             <td><?php echo $booking->move_out_date ? date('Y-m-d', strtotime($booking->move_out_date)) : 'N/A'; ?></td>
                                             <td><span class="status-badge approved"><?php echo ucfirst($booking->status); ?></span></td>
-                                            <td>
-                                                <div class="action-buttons">
-                                                    <button class="btn-icon" title="View Details">
-                                                        <i class="fas fa-eye"></i>
-                                                    </button>
-                                                </div>
-                                            </td>
                                         </tr>
                                     <?php endforeach; ?>
                                 <?php else: ?>
                                     <tr>
-                                        <td colspan="9" class="text-center text-muted">
+                                        <td colspan="8" class="text-center text-muted">
                                             <p>No active tenants in your assigned properties</p>
                                             <small>Tenants will appear here once bookings are approved</small>
                                         </td>
@@ -104,7 +96,6 @@
                                 <th>Lease Start</th>
                                 <th>Lease End</th>
                                 <th>Status</th>
-                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -121,18 +112,11 @@
                                         <td><?php echo date('Y-m-d', strtotime($booking->move_in_date)); ?></td>
                                         <td><?php echo $booking->move_out_date ? date('Y-m-d', strtotime($booking->move_out_date)) : 'N/A'; ?></td>
                                         <td><span class="status-badge pending">Pending</span></td>
-                                        <td>
-                                            <div class="action-buttons">
-                                                <button class="btn-icon" title="View Details">
-                                                    <i class="fas fa-eye"></i>
-                                                </button>
-                                            </div>
-                                        </td>
                                     </tr>
                                 <?php endforeach; ?>
                             <?php else: ?>
                                 <tr>
-                                    <td colspan="9" class="text-center text-muted">No pending tenants</td>
+                                    <td colspan="8" class="text-center text-muted">No pending tenants</td>
                                 </tr>
                             <?php endif; ?>
                         </tbody>
@@ -155,7 +139,6 @@
                                     <th>Lease Start</th>
                                     <th>Lease End</th>
                                     <th>Status</th>
-                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -171,13 +154,6 @@
                                         <td><?php echo date('Y-m-d', strtotime($booking->move_in_date)); ?></td>
                                         <td><?php echo $booking->move_out_date ? date('Y-m-d', strtotime($booking->move_out_date)) : 'N/A'; ?></td>
                                         <td><span class="status-badge rejected"><?php echo ucfirst($booking->status); ?></span></td>
-                                        <td>
-                                            <div class="action-buttons">
-                                                <button class="btn-icon" title="View Details">
-                                                    <i class="fas fa-eye"></i>
-                                                </button>
-                                            </div>
-                                        </td>
                                     </tr>
                                 <?php endforeach; ?>
                             </tbody>

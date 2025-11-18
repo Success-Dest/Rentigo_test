@@ -64,7 +64,6 @@
                     <table class="data-table">
                         <thead>
                             <tr>
-                                <th>ID</th>
                                 <th>Property</th>
                                 <th>Tenant</th>
                                 <th>Move-in Date</th>
@@ -78,7 +77,6 @@
                         <tbody>
                             <?php foreach ($data['pendingBookings'] as $booking): ?>
                                 <tr>
-                                    <td>#<?php echo $booking->id; ?></td>
                                     <td>
                                         <strong><?php echo htmlspecialchars($booking->address); ?></strong><br>
                                         <small><?php echo ucfirst($booking->property_type); ?> - <?php echo $booking->bedrooms; ?>BR</small>
@@ -93,15 +91,15 @@
                                     <td>Rs <?php echo number_format($booking->deposit_amount); ?></td>
                                     <td><?php echo date('M d, Y', strtotime($booking->created_at)); ?></td>
                                     <td class="actions">
-                                        <a href="<?php echo URLROOT; ?>/bookings/details/<?php echo $booking->id; ?>" class="btn btn-sm btn-primary">
-                                            <i class="fas fa-eye"></i> View
-                                        </a>
                                         <form method="POST" action="<?php echo URLROOT; ?>/bookings/approve/<?php echo $booking->id; ?>" style="display:inline;"
                                               onsubmit="return confirm('Approve this booking request?');">
                                             <button type="submit" class="btn btn-sm btn-success">
                                                 <i class="fas fa-check"></i> Approve
                                             </button>
                                         </form>
+                                        <a href="<?php echo URLROOT; ?>/bookings/details/<?php echo $booking->id; ?>" class="btn btn-sm btn-primary">
+                                            <i class="fas fa-eye"></i> View
+                                        </a>
                                         <button class="btn btn-sm btn-danger" onclick="showRejectModal(<?php echo $booking->id; ?>)">
                                             <i class="fas fa-times"></i> Reject
                                         </button>
@@ -126,7 +124,6 @@
                     <table class="data-table">
                         <thead>
                             <tr>
-                                <th>ID</th>
                                 <th>Property</th>
                                 <th>Tenant</th>
                                 <th>Move-in Date</th>
@@ -139,7 +136,6 @@
                         <tbody>
                             <?php foreach ($data['approvedBookings'] as $booking): ?>
                                 <tr>
-                                    <td>#<?php echo $booking->id; ?></td>
                                     <td>
                                         <strong><?php echo htmlspecialchars($booking->address); ?></strong><br>
                                         <small><?php echo ucfirst($booking->property_type); ?> - <?php echo $booking->bedrooms; ?>BR</small>
@@ -177,7 +173,6 @@
                     <table class="data-table">
                         <thead>
                             <tr>
-                                <th>ID</th>
                                 <th>Property</th>
                                 <th>Tenant</th>
                                 <th>Move-in Date</th>
@@ -189,7 +184,6 @@
                         <tbody>
                             <?php foreach ($data['rejectedBookings'] as $booking): ?>
                                 <tr>
-                                    <td>#<?php echo $booking->id; ?></td>
                                     <td>
                                         <strong><?php echo htmlspecialchars($booking->address); ?></strong><br>
                                         <small><?php echo ucfirst($booking->property_type); ?> - <?php echo $booking->bedrooms; ?>BR</small>
