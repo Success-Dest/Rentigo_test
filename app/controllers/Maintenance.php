@@ -198,23 +198,70 @@ class Maintenance extends Controller
         }
     }
 
-    // Update maintenance status
-    public function updateStatus($id)
-    {
-        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
-
-            $status = trim($_POST['status']);
-
-            if ($this->maintenanceModel->updateMaintenanceStatus($id, $status)) {
-                flash('maintenance_message', 'Status updated successfully', 'alert alert-success');
-            } else {
-                flash('maintenance_message', 'Failed to update status', 'alert alert-danger');
-            }
-
-            redirect('maintenance/details/' . $id);
-        }
-    }
+       // Update maintenance status
+       public function updateStatus($id)
+       {
+           if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+               $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
+   
+               $status = trim($_POST['status']);
+   
+               // Get maintenance request details
+               $maintenance = $this->maintenanceModel->getMaintenanceById($id);
+   
+               if (!$maintenance) {
+                   flash('maintenance_message', 'Maintenance request not found', 'alert alert-danger');
+                   redirect('maintenance/index');
+               }
+   
+               // Verify Property Manager has permission (if user is PM)
+               if ($_SESSION['user_type'] === 'property_manager') {
+                   $propertyModel = $this->model('M_Properties');
+                   $property = $propertyModel->getPropertyById($maintenance->property_id);
+                   
+                   if (!$property || $property->manager_id != $_SESSION['user_id']) {
+                       flash('maintenance_message', 'Unauthorized access', 'alert alert-danger');
+                       redirect('maintenance/index');
+                   }
+               }
+   
+               if ($this->maintenanceModel->updateMaintenanceStatus($id, $status)) {
+                   // Send notification to landlord if user is Property Manager
+                   if ($_SESSION['user_type'] === 'property_manager' && $maintenance->landlord_id) {
+                       $statusText = ucfirst(str_replace('_', ' ', $status));
+                       
+                       // Get current date/time
+                      $updateDateTime = date('F j, Y \a\t g:i A');
+                       
+                       // Get Property Manager name
+                       $pmName = $_SESSION['user_name'] ?? 'Property Manager';
+                       
+                       // Create notification message
+                       $notificationMessage = sprintf(
+                           'Your maintenance request "%s" has been updated to: %s by %s on %s',
+                           $maintenance->title,
+                           $statusText,
+                           $pmName,
+                           $updateDateTime
+                       );
+   
+                       $this->notificationModel->createNotification([
+                           'user_id' => $maintenance->landlord_id,
+                           'type' => 'maintenance_update',
+                           'title' => 'Maintenance Request Status Updated',
+                           'message' => $notificationMessage,
+                           'link' => 'maintenance/details/' . $id
+                       ]);
+                   }
+   
+                   flash('maintenance_message', 'Status updated successfully', 'alert alert-success');
+               } else {
+                   flash('maintenance_message', 'Failed to update status', 'alert alert-danger');
+               }
+   
+               redirect('maintenance/details/' . $id);
+           }
+       }
 
     // Complete maintenance request
     public function complete($id)

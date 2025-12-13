@@ -300,12 +300,27 @@ class Manager extends Controller
             // Send notification to tenant
             $notificationModel = $this->model('M_Notifications');
             $statusText = ucfirst(str_replace('_', ' ', $status));
+            
+            // Get current date/time
+            $updateDateTime = date('F j, Y \a\t g:i A');
+            
+            // Get Property Manager name
+            $pmName = $_SESSION['user_name'] ?? 'Property Manager';
+            
+            // Create enhanced notification message
+            $notificationMessage = sprintf(
+                'Your issue "%s" has been updated to: %s by %s on %s',
+                $issue->title,
+                $statusText,
+                $pmName,
+                $updateDateTime
+            );
 
             $notificationModel->createNotification([
                 'user_id' => $issue->tenant_id,
                 'type' => 'issue_update',
                 'title' => 'Issue Status Updated',
-                'message' => 'Your issue "' . $issue->title . '" has been updated to: ' . $statusText,
+                'message' => $notificationMessage,
                 'link' => 'issues/track'
             ]);
 
@@ -437,22 +452,60 @@ class Manager extends Controller
             $allBookings = $bookingModel->getBookingsByProperties($propertyIds);
         }
 
-        // Filter by status
+        // Get filter parameters from GET request
+        $statusFilter = $_GET['status'] ?? 'all';
+        $propertyFilter = $_GET['property_id'] ?? 'all';
+        $dateFromFilter = $_GET['date_from'] ?? '';
+        $dateToFilter = $_GET['date_to'] ?? '';
+
+        // Calculate stats for all bookings (for stats cards - always show totals)
         $pendingBookings = array_filter($allBookings, fn($b) => $b->status === 'pending');
         $approvedBookings = array_filter($allBookings, fn($b) => $b->status === 'approved');
         $rejectedBookings = array_filter($allBookings, fn($b) => $b->status === 'rejected');
+
+        // Apply filters to bookings
+        $filteredBookings = $allBookings;
+
+        // Filter by status
+        if ($statusFilter !== 'all') {
+            $filteredBookings = array_filter($filteredBookings, fn($b) => $b->status === $statusFilter);
+        }
+
+        // Filter by property
+        if ($propertyFilter !== 'all' && is_numeric($propertyFilter)) {
+            $filteredBookings = array_filter($filteredBookings, fn($b) => $b->property_id == $propertyFilter);
+        }
+
+        // Filter by date range (move-in date)
+        if (!empty($dateFromFilter)) {
+            $filteredBookings = array_filter($filteredBookings, function($b) use ($dateFromFilter) {
+                return strtotime($b->move_in_date) >= strtotime($dateFromFilter);
+            });
+        }
+
+        if (!empty($dateToFilter)) {
+            $filteredBookings = array_filter($filteredBookings, function($b) use ($dateToFilter) {
+                return strtotime($b->move_in_date) <= strtotime($dateToFilter);
+            });
+        }
+
+        // Re-index array after filtering
+        $filteredBookings = array_values($filteredBookings);
 
         $data = [
             'title' => 'Booking Management',
             'page' => 'bookings',
             'user_name' => $_SESSION['user_name'],
-            'allBookings' => $allBookings,
-            'pendingBookings' => $pendingBookings,
-            'approvedBookings' => $approvedBookings,
-            'rejectedBookings' => $rejectedBookings,
-            'pendingCount' => count($pendingBookings),
-            'approvedCount' => count($approvedBookings),
-            'rejectedCount' => count($rejectedBookings),
+            'allBookings' => $filteredBookings, // Filtered bookings for display
+            'assignedProperties' => $assignedProperties, // For property filter dropdown
+            'pendingCount' => count($pendingBookings), // Total stats
+            'approvedCount' => count($approvedBookings), // Total stats
+            'rejectedCount' => count($rejectedBookings), // Total stats
+            // Current filter values (for maintaining form state)
+            'currentStatusFilter' => $statusFilter,
+            'currentPropertyFilter' => $propertyFilter,
+            'currentDateFromFilter' => $dateFromFilter,
+            'currentDateToFilter' => $dateToFilter,
             'unread_notifications' => $this->getUnreadNotificationCount()
         ];
         $this->view('manager/v_bookings', $data);
