@@ -6,84 +6,107 @@
             <h1 class="page-title">Tenant Management</h1>
             <p class="page-subtitle">Manage tenant information and lease agreements</p>
         </div>
-        <!-- <div class="header-right">
-            <button class="btn btn-primary" onclick="openAddTenantModal()">
-                <i class="fas fa-user-plus"></i>
-                Add Tenant
-            </button>
-        </div> -->
     </div>
 
-    <div class="dashboard-section">
-        <div class="section-header">
-            <div class="search-filters">
-                <input type="text" class="search-input" placeholder="Search tenants..." id="tenantSearch">
+    <?php flash('tenant_message'); ?>
+
+    <!-- Tenant Stats -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="stat-content">
+                <h3 class="stat-label">Active</h3>
+                <div class="stat-value"><?php echo $data['activeCount'] ?? 0; ?></div>
+                <div class="stat-change">Currently active tenants</div>
             </div>
         </div>
-
-        <!-- Tenant Status Tabs -->
-        <div class="tabs-container">
-            <div class="tabs-nav">
-                <button class="tab-button active" onclick="showTab('active')">Active (<?php echo $data['activeCount'] ?? 0; ?>)</button>
-                <button class="tab-button" onclick="showTab('pending')">Pending (<?php echo $data['pendingCount'] ?? 0; ?>)</button>
-                <button class="tab-button" onclick="showTab('vacated')">Vacated (<?php echo $data['vacatedCount'] ?? 0; ?>)</button>
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-clock"></i>
             </div>
-
-            <!-- Active Tenants Tab -->
-            <div id="active-tab" class="tab-content active">
-                <?php if (($data['assignedPropertiesCount'] ?? 0) === 0): ?>
-                    <div class="empty-state">
-                        <i class="fas fa-home"></i>
-                        <h3>No Properties Assigned</h3>
-                        <p>You don't have any properties assigned to you yet. Please contact the administrator to assign properties to your account.</p>
-                    </div>
-                <?php else: ?>
-                    <div class="table-container">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Contact</th>
-                                    <th>Property</th>
-                                    <th>Monthly Rent</th>
-                                    <th>Platform Fee</th>
-                                    <th>Lease Start</th>
-                                    <th>Lease End</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php if (!empty($data['activeBookings'])): ?>
-                                    <?php foreach ($data['activeBookings'] as $booking): ?>
-                                        <tr>
-                                            <td class="font-medium"><?php echo htmlspecialchars($booking->tenant_name ?? 'N/A'); ?></td>
-                                            <td>
-                                                <div><?php echo htmlspecialchars($booking->tenant_email ?? 'N/A'); ?></div>
-                                            </td>
-                                            <td><?php echo htmlspecialchars($booking->address ?? 'N/A'); ?></td>
-                                            <td>LKR <?php echo number_format($booking->monthly_rent * 1.10 ?? 0, 0); ?></td>
-                                            <td><strong class="text-success">LKR <?php echo number_format($booking->monthly_rent * 0.10 ?? 0, 0); ?></strong></td>
-                                            <td><?php echo date('Y-m-d', strtotime($booking->move_in_date)); ?></td>
-                                            <td><?php echo $booking->move_out_date ? date('Y-m-d', strtotime($booking->move_out_date)) : 'N/A'; ?></td>
-                                            <td><span class="status-badge approved"><?php echo ucfirst($booking->status); ?></span></td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                <?php else: ?>
-                                    <tr>
-                                        <td colspan="8" class="text-center text-muted">
-                                            <p>No active tenants in your assigned properties</p>
-                                            <small>Tenants will appear here once bookings are approved</small>
-                                        </td>
-                                    </tr>
-                                <?php endif; ?>
-                            </tbody>
-                        </table>
-                    </div>
-                <?php endif; ?>
+            <div class="stat-content">
+                <h3 class="stat-label">Pending</h3>
+                <div class="stat-value"><?php echo $data['pendingCount'] ?? 0; ?></div>
+                <div class="stat-change">Awaiting approval</div>
             </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-user-slash"></i>
+            </div>
+            <div class="stat-content">
+                <h3 class="stat-label">Vacated</h3>
+                <div class="stat-value"><?php echo $data['vacatedCount'] ?? 0; ?></div>
+                <div class="stat-change">Completed or cancelled</div>
+            </div>
+        </div>
+    </div>
 
-            <!-- Pending Tenants Tab -->
-            <div id="pending-tab" class="tab-content">
+    <?php if (($data['assignedPropertiesCount'] ?? 0) === 0): ?>
+        <div class="empty-state">
+            <i class="fas fa-home"></i>
+            <h3>No Properties Assigned</h3>
+            <p>You don't have any properties assigned to you yet. Please contact the administrator to assign properties to your account.</p>
+        </div>
+    <?php else: ?>
+        <!-- Filter Section -->
+        <div class="filter-container">
+            <form method="GET" action="<?php echo URLROOT; ?>/manager/tenants" class="filter-form">
+                <div class="filter-row">
+                    <div class="filter-group">
+                        <label for="status">Status</label>
+                        <select name="status" id="status" class="form-control">
+                            <option value="all" <?php echo ($data['currentStatusFilter'] ?? 'all') === 'all' ? 'selected' : ''; ?>>All Statuses</option>
+                            <option value="active" <?php echo ($data['currentStatusFilter'] ?? '') === 'active' ? 'selected' : ''; ?>>Active</option>
+                            <option value="pending" <?php echo ($data['currentStatusFilter'] ?? '') === 'pending' ? 'selected' : ''; ?>>Pending</option>
+                            <option value="vacated" <?php echo ($data['currentStatusFilter'] ?? '') === 'vacated' ? 'selected' : ''; ?>>Vacated</option>
+                            <option value="approved" <?php echo ($data['currentStatusFilter'] ?? '') === 'approved' ? 'selected' : ''; ?>>Approved</option>
+                            <option value="completed" <?php echo ($data['currentStatusFilter'] ?? '') === 'completed' ? 'selected' : ''; ?>>Completed</option>
+                            <option value="cancelled" <?php echo ($data['currentStatusFilter'] ?? '') === 'cancelled' ? 'selected' : ''; ?>>Cancelled</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="property_id">Property</label>
+                        <select name="property_id" id="property_id" class="form-control">
+                            <option value="all" <?php echo ($data['currentPropertyFilter'] ?? 'all') === 'all' ? 'selected' : ''; ?>>All Properties</option>
+                            <?php if (!empty($data['assignedProperties'])): ?>
+                                <?php foreach ($data['assignedProperties'] as $property): ?>
+                                    <option value="<?php echo $property->id; ?>" <?php echo ($data['currentPropertyFilter'] ?? '') == $property->id ? 'selected' : ''; ?>>
+                                        <?php echo htmlspecialchars($property->address); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="date_from">From Date</label>
+                        <input type="date" name="date_from" id="date_from" class="form-control" value="<?php echo htmlspecialchars($data['currentDateFromFilter'] ?? ''); ?>">
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="date_to">To Date</label>
+                        <input type="date" name="date_to" id="date_to" class="form-control" value="<?php echo htmlspecialchars($data['currentDateToFilter'] ?? ''); ?>">
+                    </div>
+
+                    <div class="filter-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-filter"></i> Apply Filters
+                        </button>
+                        <a href="<?php echo URLROOT; ?>/manager/tenants" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Clear
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Tenants Table -->
+        <div class="table-container-wrapper">
+            <?php if (!empty($data['allBookings'])): ?>
                 <div class="table-container">
                     <table class="data-table">
                         <thead>
@@ -99,156 +122,302 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <?php if (!empty($data['pendingBookings'])): ?>
-                                <?php foreach ($data['pendingBookings'] as $booking): ?>
-                                    <tr>
-                                        <td class="font-medium"><?php echo htmlspecialchars($booking->tenant_name ?? 'N/A'); ?></td>
-                                        <td>
-                                            <div><?php echo htmlspecialchars($booking->tenant_email ?? 'N/A'); ?></div>
-                                        </td>
-                                        <td><?php echo htmlspecialchars($booking->address ?? 'N/A'); ?></td>
-                                        <td>LKR <?php echo number_format($booking->monthly_rent * 1.10 ?? 0, 0); ?></td>
-                                        <td><strong class="text-success">LKR <?php echo number_format($booking->monthly_rent * 0.10 ?? 0, 0); ?></strong></td>
-                                        <td><?php echo date('Y-m-d', strtotime($booking->move_in_date)); ?></td>
-                                        <td><?php echo $booking->move_out_date ? date('Y-m-d', strtotime($booking->move_out_date)) : 'N/A'; ?></td>
-                                        <td><span class="status-badge pending">Pending</span></td>
-                                    </tr>
-                                <?php endforeach; ?>
-                            <?php else: ?>
+                            <?php foreach ($data['allBookings'] as $booking): ?>
                                 <tr>
-                                    <td colspan="8" class="text-center text-muted">No pending tenants</td>
+                                    <td class="font-medium"><?php echo htmlspecialchars($booking->tenant_name ?? 'N/A'); ?></td>
+                                    <td>
+                                        <div><?php echo htmlspecialchars($booking->tenant_email ?? 'N/A'); ?></div>
+                                    </td>
+                                    <td><?php echo htmlspecialchars($booking->address ?? 'N/A'); ?></td>
+                                    <td>LKR <?php echo number_format($booking->monthly_rent * 1.10 ?? 0, 0); ?></td>
+                                    <td>
+                                        <?php if ($booking->status === 'active' || $booking->status === 'approved'): ?>
+                                            <strong class="text-success">LKR <?php echo number_format($booking->monthly_rent * 0.10 ?? 0, 0); ?></strong>
+                                        <?php else: ?>
+                                            <span class="text-muted">LKR <?php echo number_format($booking->monthly_rent * 0.10 ?? 0, 0); ?></span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td><?php echo date('Y-m-d', strtotime($booking->move_in_date)); ?></td>
+                                    <td><?php echo $booking->move_out_date ? date('Y-m-d', strtotime($booking->move_out_date)) : 'N/A'; ?></td>
+                                    <td>
+                                        <?php
+                                        $statusClass = '';
+                                        $statusText = ucfirst($booking->status);
+                                        switch($booking->status) {
+                                            case 'active':
+                                            case 'approved':
+                                                $statusClass = 'status-badge approved';
+                                                break;
+                                            case 'pending':
+                                                $statusClass = 'status-badge pending';
+                                                break;
+                                            case 'completed':
+                                            case 'cancelled':
+                                                $statusClass = 'status-badge rejected';
+                                                break;
+                                            default:
+                                                $statusClass = 'status-badge';
+                                        }
+                                        ?>
+                                        <span class="<?php echo $statusClass; ?>"><?php echo $statusText; ?></span>
+                                    </td>
                                 </tr>
-                            <?php endif; ?>
+                            <?php endforeach; ?>
                         </tbody>
                     </table>
                 </div>
-            </div>
-
-            <!-- Vacated Tenants Tab -->
-            <div id="vacated-tab" class="tab-content">
-                <?php if (!empty($data['vacatedBookings'])): ?>
-                    <div class="table-container">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Contact</th>
-                                    <th>Property</th>
-                                    <th>Monthly Rent</th>
-                                    <th>Platform Fee</th>
-                                    <th>Lease Start</th>
-                                    <th>Lease End</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach ($data['vacatedBookings'] as $booking): ?>
-                                    <tr>
-                                        <td class="font-medium"><?php echo htmlspecialchars($booking->tenant_name ?? 'N/A'); ?></td>
-                                        <td>
-                                            <div><?php echo htmlspecialchars($booking->tenant_email ?? 'N/A'); ?></div>
-                                        </td>
-                                        <td><?php echo htmlspecialchars($booking->address ?? 'N/A'); ?></td>
-                                        <td>LKR <?php echo number_format($booking->monthly_rent * 1.10 ?? 0, 0); ?></td>
-                                        <td><strong class="text-muted">LKR <?php echo number_format($booking->monthly_rent * 0.10 ?? 0, 0); ?></strong></td>
-                                        <td><?php echo date('Y-m-d', strtotime($booking->move_in_date)); ?></td>
-                                        <td><?php echo $booking->move_out_date ? date('Y-m-d', strtotime($booking->move_out_date)) : 'N/A'; ?></td>
-                                        <td><span class="status-badge rejected"><?php echo ucfirst($booking->status); ?></span></td>
-                                    </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
-                    </div>
-                <?php else: ?>
-                    <div class="empty-state">
-                        <i class="fas fa-users" style="font-size: 3rem; color: var(--text-muted); margin-bottom: 1rem;"></i>
-                        <p class="text-muted">No vacated tenants found</p>
-                    </div>
-                <?php endif; ?>
-            </div>
+            <?php else: ?>
+                <div class="empty-state">
+                    <i class="fas fa-users"></i>
+                    <p>No tenants found<?php echo (isset($data['currentStatusFilter']) && $data['currentStatusFilter'] !== 'all') || (isset($data['currentPropertyFilter']) && $data['currentPropertyFilter'] !== 'all') ? ' matching your filters' : ''; ?></p>
+                </div>
+            <?php endif; ?>
         </div>
-    </div>
+    <?php endif; ?>
 </div>
 
-<!-- Add Tenant Modal -->
-<div id="addTenantModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h2>Add New Tenant</h2>
-            <p class="modal-description">Enter the tenant details. All fields marked with * are required.</p>
-            <button class="modal-close" onclick="closeAddTenantModal()">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        <div class="modal-body">
-            <form id="addTenantForm">
-                <!-- Enhanced form with full name field and additional tenant information -->
-                <div class="form-group">
-                    <label for="tenantFullName">Full Name *</label>
-                    <input type="text" id="tenantFullName" name="tenantFullName" placeholder="e.g., John Doe" required>
-                </div>
+<style>
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+    }
 
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="tenantEmail">Email *</label>
-                        <input type="email" id="tenantEmail" name="tenantEmail" placeholder="john@example.com" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="tenantPhone">Phone *</label>
-                        <input type="tel" id="tenantPhone" name="tenantPhone" placeholder="(555) 123-4567" required>
-                    </div>
-                </div>
+    .stat-card {
+        background: white;
+        border-radius: 8px;
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
 
-                <div class="form-group">
-                    <label for="tenantProperty">Assigned Property *</label>
-                    <select id="tenantProperty" name="tenantProperty" required>
-                        <option value="">Select property</option>
-                        <option value="oak-street-2a">Oak Street Apt 2A</option>
-                        <option value="pine-avenue">Pine Avenue House</option>
-                        <option value="maple-drive-1b">Maple Drive Apt 1B</option>
-                        <option value="cedar-lane">Cedar Lane House</option>
-                        <option value="elm-street-3c">Elm Street Apt 3C</option>
-                    </select>
-                </div>
+    .stat-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 8px;
+        background: #45a9ea;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        color: white;
+        flex-shrink: 0;
+    }
 
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="leaseStart">Lease Start Date</label>
-                        <input type="date" id="leaseStart" name="leaseStart">
-                    </div>
-                    <div class="form-group">
-                        <label for="leaseEnd">Lease End Date</label>
-                        <input type="date" id="leaseEnd" name="leaseEnd">
-                    </div>
-                </div>
+    .stat-content {
+        flex: 1;
+    }
 
-                <!-- Added monthly rent and security deposit fields -->
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="tenantMonthlyRent">Monthly Rent</label>
-                        <input type="text" id="tenantMonthlyRent" name="tenantMonthlyRent" placeholder="$1,200">
-                    </div>
-                    <div class="form-group">
-                        <label for="securityDeposit">Security Deposit</label>
-                        <input type="text" id="securityDeposit" name="securityDeposit" placeholder="$1,200">
-                    </div>
-                </div>
+    .stat-label {
+        font-size: 14px;
+        color: #666;
+        margin-bottom: 5px;
+    }
 
-                <div class="form-group">
-                    <label for="tenantStatus">Status</label>
-                    <select id="tenantStatus" name="tenantStatus">
-                        <option value="pending">Pending</option>
-                        <option value="active">Active</option>
-                        <option value="vacated">Vacated</option>
-                    </select>
-                </div>
-            </form>
-        </div>
-        <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" onclick="closeAddTenantModal()">Cancel</button>
-            <button type="submit" class="btn btn-primary" form="addTenantForm">Add Tenant</button>
-        </div>
-    </div>
-</div>
+    .stat-value {
+        font-size: 28px;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 2px;
+    }
+
+    .stat-change {
+        font-size: 12px;
+        color: #999;
+    }
+
+    .filter-container {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        padding: 1.5rem;
+        margin-bottom: 30px;
+    }
+
+    .filter-form {
+        width: 100%;
+    }
+
+    .filter-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        align-items: end;
+    }
+
+    .filter-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .filter-group label {
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #374151;
+        margin-bottom: 0.5rem;
+    }
+
+    .filter-actions {
+        display: flex;
+        gap: 0.75rem;
+        align-items: flex-end;
+    }
+
+    .table-container-wrapper {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+    }
+
+    .table-container {
+        overflow-x: auto;
+        padding: 1.5rem;
+    }
+
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .data-table thead {
+        background: #f9fafb;
+    }
+
+    .data-table th {
+        padding: 0.75rem 1rem;
+        text-align: left;
+        font-weight: 600;
+        color: #374151;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .data-table td {
+        padding: 1rem;
+        border-top: 1px solid #e5e7eb;
+    }
+
+    .data-table tbody tr:hover {
+        background: #f9fafb;
+    }
+
+    .font-medium {
+        font-weight: 500;
+    }
+
+    .text-success {
+        color: #10b981;
+    }
+
+    .text-muted {
+        color: #6b7280;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 12px;
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+
+    .status-badge.approved {
+        background: #d1fae5;
+        color: #065f46;
+    }
+
+    .status-badge.pending {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .status-badge.rejected {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem 1rem;
+        color: #6b7280;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .empty-state i {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        opacity: 0.3;
+    }
+
+    .empty-state h3 {
+        margin-bottom: 0.5rem;
+        color: #374151;
+    }
+
+    .btn {
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-primary {
+        background: #45a9ea;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: #3a8bc7;
+    }
+
+    .btn-secondary {
+        background: #6b7280;
+        color: white;
+    }
+
+    .btn-secondary:hover {
+        background: #4b5563;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 0.625rem 0.875rem;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        font-size: 1rem;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #45a9ea;
+        box-shadow: 0 0 0 3px rgba(69, 169, 234, 0.1);
+    }
+
+    @media (max-width: 768px) {
+        .filter-row {
+            grid-template-columns: 1fr;
+        }
+
+        .filter-actions {
+            width: 100%;
+        }
+
+        .filter-actions .btn {
+            flex: 1;
+        }
+    }
+</style>
 
 <?php require APPROOT . '/views/inc/manager_footer.php'; ?>

@@ -129,22 +129,69 @@ class Manager extends Controller
             $allBookings = $bookingModel->getBookingsByProperties($propertyIds);
         }
 
-        // Separate by status
+        // Get filter parameters from GET request
+        $statusFilter = $_GET['status'] ?? 'all';
+        $propertyFilter = $_GET['property_id'] ?? 'all';
+        $dateFromFilter = $_GET['date_from'] ?? '';
+        $dateToFilter = $_GET['date_to'] ?? '';
+
+        // Calculate stats for all bookings (for stats cards - always show totals)
         $activeBookings = array_filter($allBookings, fn($b) => $b->status === 'active' || $b->status === 'approved');
         $pendingBookings = array_filter($allBookings, fn($b) => $b->status === 'pending');
         $vacatedBookings = array_filter($allBookings, fn($b) => $b->status === 'completed' || $b->status === 'cancelled');
+
+        // Apply filters to bookings
+        $filteredBookings = $allBookings;
+
+        // Filter by status
+        if ($statusFilter !== 'all') {
+            if ($statusFilter === 'active') {
+                $filteredBookings = array_filter($filteredBookings, fn($b) => $b->status === 'active' || $b->status === 'approved');
+            } elseif ($statusFilter === 'pending') {
+                $filteredBookings = array_filter($filteredBookings, fn($b) => $b->status === 'pending');
+            } elseif ($statusFilter === 'vacated') {
+                $filteredBookings = array_filter($filteredBookings, fn($b) => $b->status === 'completed' || $b->status === 'cancelled');
+            } else {
+                $filteredBookings = array_filter($filteredBookings, fn($b) => $b->status === $statusFilter);
+            }
+        }
+
+        // Filter by property
+        if ($propertyFilter !== 'all' && is_numeric($propertyFilter)) {
+            $filteredBookings = array_filter($filteredBookings, fn($b) => $b->property_id == $propertyFilter);
+        }
+
+        // Filter by date range (move-in date)
+        if (!empty($dateFromFilter)) {
+            $filteredBookings = array_filter($filteredBookings, function($b) use ($dateFromFilter) {
+                return strtotime($b->move_in_date) >= strtotime($dateFromFilter);
+            });
+        }
+
+        if (!empty($dateToFilter)) {
+            $filteredBookings = array_filter($filteredBookings, function($b) use ($dateToFilter) {
+                return strtotime($b->move_in_date) <= strtotime($dateToFilter);
+            });
+        }
+
+        // Re-index array after filtering
+        $filteredBookings = array_values($filteredBookings);
 
         $data = [
             'title' => 'Tenant Management',
             'page' => 'tenants',
             'user_name' => $_SESSION['user_name'],
             'assignedPropertiesCount' => count($assignedProperties ?? []),
-            'activeBookings' => $activeBookings,
-            'pendingBookings' => $pendingBookings,
-            'vacatedBookings' => $vacatedBookings,
-            'activeCount' => count($activeBookings),
-            'pendingCount' => count($pendingBookings),
-            'vacatedCount' => count($vacatedBookings),
+            'allBookings' => $filteredBookings, // Filtered bookings for display
+            'assignedProperties' => $assignedProperties, // For property filter dropdown
+            'activeCount' => count($activeBookings), // Total stats
+            'pendingCount' => count($pendingBookings), // Total stats
+            'vacatedCount' => count($vacatedBookings), // Total stats
+            // Current filter values (for maintaining form state)
+            'currentStatusFilter' => $statusFilter,
+            'currentPropertyFilter' => $propertyFilter,
+            'currentDateFromFilter' => $dateFromFilter,
+            'currentDateToFilter' => $dateToFilter,
             'unread_notifications' => $this->getUnreadNotificationCount()
         ];
         $this->view('manager/v_tenants', $data);
