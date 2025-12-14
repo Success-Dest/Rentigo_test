@@ -184,6 +184,131 @@ class Issues extends Controller
 
         $this->view('tenant/v_track_issues', $data);
     }
+    
+    public function details($id = null)
+    {
+        if (!$id) {
+            flash('issue_message', 'Invalid issue ID', 'alert alert-danger');
+            redirect('issues/track');
+        }
+
+        // Get issue details
+        $issue = $this->issueModel->getIssueById($id);
+
+        if (!$issue) {
+            flash('issue_message', 'Issue not found', 'alert alert-danger');
+            redirect('issues/track');
+        }
+
+        // Verify this issue belongs to the logged-in tenant
+        if ($issue->tenant_id != $_SESSION['user_id']) {
+            flash('issue_message', 'Unauthorized access', 'alert alert-danger');
+            redirect('issues/track');
+        }
+
+        // Initialize related data
+        $maintenanceRequest = null;
+        $quotations = [];
+        $serviceProvider = null;
+        $statusHistory = [];
+
+        // Get maintenance request if linked
+        if (!empty($issue->maintenance_request_id)) {
+            $maintenanceModel = $this->model('M_Maintenance');
+            $maintenanceRequest = $maintenanceModel->getMaintenanceById($issue->maintenance_request_id);
+
+            // Get quotations if maintenance request exists
+            if ($maintenanceRequest) {
+                $quotationModel = $this->model('M_MaintenanceQuotations');
+                $quotations = $quotationModel->getQuotationsByRequest($issue->maintenance_request_id);
+
+                // Get service provider if assigned
+                if (!empty($maintenanceRequest->provider_id)) {
+                    $providerModel = $this->model('M_ServiceProviders');
+                    $serviceProvider = $providerModel->getProviderById($maintenanceRequest->provider_id);
+                }
+            }
+        }
+
+        // Build status history
+        // 1. Initial creation
+        $statusHistory[] = [
+            'status' => 'pending',
+            'status_text' => 'Created',
+            'updated_by' => 'Tenant',
+            'updated_by_name' => $_SESSION['user_name'] ?? 'You',
+            'date_time' => $issue->created_at,
+            'notes' => 'Issue reported'
+        ];
+
+        // 2. Get status updates from notifications
+        $notificationModel = $this->model('M_Notifications');
+        $allNotifications = $notificationModel->getNotificationsByUser($_SESSION['user_id']);
+        
+        // Filter notifications related to this issue
+        foreach ($allNotifications as $notification) {
+            if ($notification->type === 'issue_update' && 
+                strpos($notification->message, $issue->title) !== false) {
+                // Extract status from notification message
+                preg_match('/updated to: ([^"]+)/', $notification->message, $matches);
+                $statusText = $matches[1] ?? 'Updated';
+                
+                // Extract who updated it from message
+                preg_match('/by ([^"]+) on/', $notification->message, $updaterMatches);
+                $updaterName = $updaterMatches[1] ?? 'Property Manager';
+                
+                $statusHistory[] = [
+                    'status' => strtolower(str_replace(' ', '_', $statusText)),
+                    'status_text' => $statusText,
+                    'updated_by' => 'Property Manager',
+                    'updated_by_name' => $updaterName,
+                    'date_time' => $notification->created_at,
+                    'notes' => $notification->message
+                ];
+            }
+        }
+
+        // 3. Add resolved status if applicable
+        if ($issue->status === 'resolved' && !empty($issue->resolved_at)) {
+            // Check if already in history
+            $alreadyResolved = false;
+            foreach ($statusHistory as $history) {
+                if (strpos(strtolower($history['status_text']), 'resolved') !== false) {
+                    $alreadyResolved = true;
+                    break;
+                }
+            }
+            
+            if (!$alreadyResolved) {
+                $statusHistory[] = [
+                    'status' => 'resolved',
+                    'status_text' => 'Resolved',
+                    'updated_by' => 'Property Manager',
+                    'updated_by_name' => 'Property Manager',
+                    'date_time' => $issue->resolved_at,
+                    'notes' => $issue->resolution_notes ?? 'Issue has been resolved'
+                ];
+            }
+        }
+
+        // Sort status history by date (oldest first)
+        usort($statusHistory, function($a, $b) {
+            return strtotime($a['date_time']) - strtotime($b['date_time']);
+        });
+
+        $data = [
+            'page_title' => 'Issue Details - TenantHub',
+            'page' => 'track_issues',
+            'user_name' => $_SESSION['user_name'],
+            'issue' => $issue,
+            'maintenanceRequest' => $maintenanceRequest,
+            'quotations' => $quotations,
+            'serviceProvider' => $serviceProvider,
+            'statusHistory' => $statusHistory
+        ];
+
+        $this->view('tenant/v_issue_details', $data);
+    }
 
     public function edit($id = null)
     {

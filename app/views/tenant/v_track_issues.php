@@ -129,7 +129,7 @@ $averageDaysToResolve = calculateAverageDaysToResolve($data['issues']);
                 </div>
 
                 <div class="filter-group">
-                    <button class="btn btn-primary" id="btn" type=" submit">Apply Filters</button>
+                    <button class="btn btn-primary" id="btn" type="submit">Apply Filters</button>
                 </div>
             </div>
         </form>
@@ -185,30 +185,42 @@ $averageDaysToResolve = calculateAverageDaysToResolve($data['issues']);
                                     class="status-badge <?= $issue->status; ?>"><?= ucfirst(str_replace('_', ' ', $issue->status)); ?></span>
                             </td>
                             <td><?= date("F d, Y", strtotime($issue->created_at)); ?></td>
-                            <td>
-                                <?php if ($canEdit): ?>
-                                    <a href="<?= URLROOT; ?>/issues/edit/<?= $issue->id; ?>"
-                                        class="btn btn-secondary btn-sm">
-                                        <i class="fas fa-edit"></i> Edit
+                            <td class="actions-cell">
+                                <div class="action-buttons">
+                                    <a href="<?= URLROOT; ?>/issues/details/<?= $issue->id; ?>"
+                                        class="btn btn-icon btn-primary" 
+                                        title="View Issue Details">
+                                        <i class="fas fa-eye"></i>
                                     </a>
-                                <?php else: ?>
-                                    <button class="btn btn-secondary btn-sm" disabled title="Can only edit within 1 minute of creation">
-                                        <i class="fas fa-edit"></i> Edit
-                                    </button>
-                                <?php endif; ?>
-                                <?php if ($canDelete): ?>
-                                    <a href="<?= URLROOT; ?>/issues/delete/<?= $issue->id; ?>"
-                                        class="btn btn-danger btn-sm"
-                                        onclick="return confirm('Are you sure you want to delete this issue? This action cannot be undone.');">
-                                        <i class="fas fa-trash"></i> Delete
-                                    </a>
-                                <?php else: ?>
-                                    <button class="btn btn-danger btn-sm" disabled title="Can only delete within 1 minute of creation">
-                                        <i class="fas fa-trash"></i> Delete
-                                    </button>
-                                <?php endif; ?>
+                                    <?php if ($canEdit): ?>
+                                        <a href="<?= URLROOT; ?>/issues/edit/<?= $issue->id; ?>"
+                                            class="btn btn-icon btn-secondary"
+                                            title="Edit Issue">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                    <?php else: ?>
+                                        <button class="btn btn-icon btn-secondary" 
+                                                disabled 
+                                                title="Can only edit within 1 minute of creation">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                    <?php endif; ?>
+                                    <?php if ($canDelete): ?>
+                                        <a href="<?= URLROOT; ?>/issues/delete/<?= $issue->id; ?>"
+                                            class="btn btn-icon btn-danger"
+                                            title="Delete Issue"
+                                            onclick="return confirm('Are you sure you want to delete this issue? This action cannot be undone.');">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    <?php else: ?>
+                                        <button class="btn btn-icon btn-danger" 
+                                                disabled 
+                                                title="Can only delete within 1 minute of creation">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    <?php endif; ?>
+                                </div>
                             </td>
-
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
@@ -231,5 +243,74 @@ $averageDaysToResolve = calculateAverageDaysToResolve($data['issues']);
         </div>
     </div>
 </div>
+
+<style>
+    .actions-cell {
+        white-space: nowrap;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .btn-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        border-radius: 6px;
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-size: 0.875rem;
+    }
+
+    .btn-icon:hover:not(:disabled) {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn-icon:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .btn-icon.btn-primary {
+        background: #45a9ea;
+        color: white;
+    }
+
+    .btn-icon.btn-primary:hover:not(:disabled) {
+        background: #3a8bc7;
+    }
+
+    .btn-icon.btn-secondary {
+        background: #6b7280;
+        color: white;
+    }
+
+    .btn-icon.btn-secondary:hover:not(:disabled) {
+        background: #4b5563;
+    }
+
+    .btn-icon.btn-danger {
+        background: #ef4444;
+        color: white;
+    }
+
+    .btn-icon.btn-danger:hover:not(:disabled) {
+        background: #dc2626;
+    }
+
+    .btn-icon i {
+        margin: 0;
+    }
+</style>
 
 <?php require APPROOT . '/views/inc/tenant_footer.php'; ?>
