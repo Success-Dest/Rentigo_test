@@ -1,4 +1,10 @@
-<?php require APPROOT . '/views/inc/manager_header.php'; ?>
+<?php require APPROOT . '/views/inc/manager_header.php' ?>;
+
+<?php
+// ADD PAGINATION
+require_once APPROOT . '/../app/helpers/AutoPaginate.php';
+AutoPaginate::init($data, 10); // 10  per page
+?>
 
 <div class="properties-content">
     <div class="page-header">
@@ -87,6 +93,9 @@
         </div>
     </div>
 </div>
+
+<!-- ADD PAGINATION HERE - Render at bottom -->
+<?php echo AutoPaginate::render($data['_pagination']); ?>
 
 <!-- JavaScript for client-side filtering -->
 <script>
