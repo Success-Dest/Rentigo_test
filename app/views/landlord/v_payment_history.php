@@ -24,7 +24,7 @@ AutoPaginate::init($data, 5);
         <div class="stat-content">
             <h3 class="stat-label">Total Income</h3>
             <div class="stat-value">LKR <?php echo number_format($data['totalIncome']->total_income ?? 0, 0); ?></div>
-            <div class="stat-change positive">All time earnings</div>
+            <div class="stat-change positive">Last 30 days</div>
         </div>
     </div>
 
@@ -38,8 +38,8 @@ AutoPaginate::init($data, 5);
                 <?php
                 $completedCount = 0;
                 $completedAmount = 0;
-                if (!empty($data['payments'])) {
-                    foreach ($data['payments'] as $payment) {
+                if (!empty($data['recentPayments'])) {
+                    foreach ($data['recentPayments'] as $payment) {
                         if ($payment->status === 'completed') {
                             $completedCount++;
                             $completedAmount += $payment->amount;
@@ -49,7 +49,7 @@ AutoPaginate::init($data, 5);
                 echo $completedCount;
                 ?>
             </div>
-            <div class="stat-change">LKR <?php echo number_format($completedAmount, 0); ?></div>
+            <div class="stat-change">LKR <?php echo number_format($completedAmount, 0); ?> (30 days)</div>
         </div>
     </div>
 
@@ -63,8 +63,8 @@ AutoPaginate::init($data, 5);
                 <?php
                 $pendingCount = 0;
                 $pendingAmount = 0;
-                if (!empty($data['payments'])) {
-                    foreach ($data['payments'] as $payment) {
+                if (!empty($data['recentPayments'])) {
+                    foreach ($data['recentPayments'] as $payment) {
                         if ($payment->status === 'pending') {
                             $pendingCount++;
                             $pendingAmount += $payment->amount;
@@ -74,7 +74,7 @@ AutoPaginate::init($data, 5);
                 echo $pendingCount;
                 ?>
             </div>
-            <div class="stat-change">LKR <?php echo number_format($pendingAmount, 0); ?></div>
+            <div class="stat-change">LKR <?php echo number_format($pendingAmount, 0); ?> (30 days)</div>
         </div>
     </div>
 
@@ -84,8 +84,8 @@ AutoPaginate::init($data, 5);
         </div>
         <div class="stat-content">
             <h3 class="stat-label">Total Payments</h3>
-            <div class="stat-value"><?php echo count($data['payments'] ?? []); ?></div>
-            <div class="stat-change">All transactions</div>
+            <div class="stat-value"><?php echo count($data['recentPayments'] ?? []); ?></div>
+            <div class="stat-change">Last 30 days</div>
         </div>
     </div>
 </div>

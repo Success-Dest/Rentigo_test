@@ -164,10 +164,10 @@ class M_LeaseAgreements
         return $this->db->single();
     }
 
-    // Get active leases for a landlord
+    // Get active leases for a landlord in last 30 days
     public function getActiveLeasesCount($landlord_id)
     {
-        $this->db->query('SELECT COUNT(*) as count FROM lease_agreements WHERE landlord_id = :landlord_id AND status = "active"');
+        $this->db->query('SELECT COUNT(*) as count FROM lease_agreements WHERE landlord_id = :landlord_id AND status = "active" AND ' . getDateRangeSql('created_at'));
         $this->db->bind(':landlord_id', $landlord_id);
         $result = $this->db->single();
         return $result->count;

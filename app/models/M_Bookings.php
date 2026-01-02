@@ -171,10 +171,10 @@ class M_Bookings
         return $this->db->single();
     }
 
-    // Get pending bookings count for landlord
+    // Get pending bookings count for landlord in last 30 days
     public function getPendingBookingsCount($landlord_id)
     {
-        $this->db->query('SELECT COUNT(*) as count FROM bookings WHERE landlord_id = :landlord_id AND status = "pending"');
+        $this->db->query('SELECT COUNT(*) as count FROM bookings WHERE landlord_id = :landlord_id AND status = "pending" AND ' . getDateRangeSql('created_at'));
         $this->db->bind(':landlord_id', $landlord_id);
         $result = $this->db->single();
         return $result->count;
@@ -194,7 +194,7 @@ class M_Bookings
                             SUM(CASE WHEN status = "completed" THEN 1 ELSE 0 END) as completed,
                             SUM(CASE WHEN status = "rejected" THEN 1 ELSE 0 END) as rejected,
                             SUM(CASE WHEN status = "cancelled" THEN 1 ELSE 0 END) as cancelled
-                            FROM bookings WHERE tenant_id = :user_id');
+                            FROM bookings WHERE tenant_id = :user_id AND ' . getDateRangeSql('created_at'));
         } else if ($user_type == 'landlord') {
             $this->db->query('SELECT
                             COUNT(*) as total,
@@ -204,7 +204,7 @@ class M_Bookings
                             SUM(CASE WHEN status = "completed" THEN 1 ELSE 0 END) as completed,
                             SUM(CASE WHEN status = "rejected" THEN 1 ELSE 0 END) as rejected,
                             SUM(CASE WHEN status = "cancelled" THEN 1 ELSE 0 END) as cancelled
-                            FROM bookings WHERE landlord_id = :user_id');
+                            FROM bookings WHERE landlord_id = :user_id AND ' . getDateRangeSql('created_at'));
         }
 
         $this->db->bind(':user_id', $user_id);

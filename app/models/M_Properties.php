@@ -225,25 +225,25 @@ class M_Properties
         return $this->db->execute();
     }
 
-    // Get property statistics
-    public function getPropertyStats($landlordId)
-    {
-        $this->db->query('SELECT
-                         COUNT(*) as total_properties,
-                         COUNT(CASE WHEN listing_type = "rent" THEN 1 END) as rental_properties,
-                         COUNT(CASE WHEN listing_type = "maintenance" THEN 1 END) as maintenance_properties,
-                         COUNT(CASE WHEN status = "occupied" THEN 1 END) as occupied,
-                         COUNT(CASE WHEN status = "available" THEN 1 END) as available,
-                         COUNT(CASE WHEN status IN ("available", "occupied") THEN 1 END) as active_properties,
-                         COUNT(CASE WHEN status = "maintenance" THEN 1 END) as maintenance,
-                         COUNT(CASE WHEN status = "maintenance_only" THEN 1 END) as maintenance_only,
-                         AVG(CASE WHEN listing_type = "rent" THEN rent ELSE NULL END) as average_rent,
-                         SUM(CASE WHEN status = "occupied" AND listing_type = "rent" THEN rent ELSE 0 END) as monthly_revenue
-                         FROM properties WHERE landlord_id = :landlord_id');
-        $this->db->bind(':landlord_id', $landlordId);
+    // Get property statistics (Last 30 days)
+public function getPropertyStats($landlordId)
+{
+    $this->db->query('SELECT
+                     COUNT(*) as total_properties,
+                     COUNT(CASE WHEN listing_type = "rent" THEN 1 END) as rental_properties,
+                     COUNT(CASE WHEN listing_type = "maintenance" THEN 1 END) as maintenance_properties,
+                     COUNT(CASE WHEN status = "occupied" THEN 1 END) as occupied,
+                     COUNT(CASE WHEN status = "available" THEN 1 END) as available,
+                     COUNT(CASE WHEN status IN ("available", "occupied") THEN 1 END) as active_properties,
+                     COUNT(CASE WHEN status = "maintenance" THEN 1 END) as maintenance,
+                     COUNT(CASE WHEN status = "maintenance_only" THEN 1 END) as maintenance_only,
+                     AVG(CASE WHEN listing_type = "rent" THEN rent ELSE NULL END) as average_rent,
+                     SUM(CASE WHEN status = "occupied" AND listing_type = "rent" THEN rent ELSE 0 END) as monthly_revenue
+                     FROM properties WHERE landlord_id = :landlord_id AND ' . getDateRangeSql('created_at'));
+    $this->db->bind(':landlord_id', $landlordId);
 
-        return $this->db->single();
-    }
+    return $this->db->single();
+}
 
     // NEW: Count properties by listing type
     public function countPropertiesByListingType($landlordId, $listingType)

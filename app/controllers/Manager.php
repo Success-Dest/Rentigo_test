@@ -57,36 +57,44 @@ class Manager extends Controller
         });
         $recentPayments = array_slice($combinedPayments, 0, 10);
 
-        // Calculate statistics
-        $totalProperties = count($properties);
+        // Calculate statistics (Last 30 days)
+        $propertiesLast30Days = array_filter($properties, function($p) {
+            return strtotime($p->created_at ?? '') >= strtotime('-30 days');
+        });
+
+        $totalProperties = count($propertiesLast30Days);
         $totalUnits = 0;
         $occupiedUnits = 0;
-        foreach ($properties as $property) {
+        foreach ($propertiesLast30Days as $property) {
             $totalUnits += $property->occupancy_total ?? 0;
             $occupiedUnits += $property->occupancy_occupied ?? 0;
         }
 
-        // Calculate total income from payments (10% platform service fee) + maintenance payments (100%)
+        // Calculate total income and expenses (Last 30 days)
         $totalIncome = 0;
         $totalExpenses = 0;
 
-        // Rental payment income (10% service fee)
+        // Rental payment income (10% service fee) - Filtered by 30 days
         foreach ($allPayments as $payment) {
-            if ($payment->status === 'completed') {
+            $paymentDate = $payment->payment_date ?? $payment->created_at;
+            if ($payment->status === 'completed' && strtotime($paymentDate) >= strtotime('-30 days')) {
                 // Platform earns 10% service fee from each rental payment
                 $totalIncome += ($payment->amount * 0.10);
             }
         }
 
-        // Maintenance payment income (100% - full payment amount)
-        $maintenanceIncome = $maintenanceQuotationModel->getTotalMaintenanceIncome();
+        // Maintenance payment income (100% - full payment amount) - Filtered by 30 days
+        $maintenanceIncome = $maintenanceQuotationModel->getTotalMaintenanceIncome(30);
         $totalIncome += $maintenanceIncome;
 
+        // Total Expenses (Maintenance costs) - Filtered by 30 days
         foreach ($allMaintenance as $maintenance) {
-            $totalExpenses += $maintenance->actual_cost ?? $maintenance->estimated_cost ?? 0;
+            if (strtotime($maintenance->created_at) >= strtotime('-30 days')) {
+                $totalExpenses += $maintenance->actual_cost ?? $maintenance->estimated_cost ?? 0;
+            }
         }
 
-        // Get issue statistics
+        // Get issue statistics (This already includes 30-day filter in the model update)
         $issueModel = $this->model('M_Issue');
         $issueStats = $issueModel->getIssueStats($manager_id, 'manager');
 

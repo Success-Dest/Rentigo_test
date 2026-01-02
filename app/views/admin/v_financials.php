@@ -24,7 +24,7 @@ AutoPaginate::init($data, 10);
             <div class="stat-info">
                 <h3 class="stat-number">LKR <?php echo number_format($data['totalRevenue'] ?? 0, 0); ?></h3>
                 <p class="stat-label">Platform Revenue</p>
-                <span class="stat-change">10% from rental + full maintenance payments</span>
+                <span class="stat-change">Fees from last 30 days</span>
             </div>
         </div>
 
@@ -35,7 +35,7 @@ AutoPaginate::init($data, 10);
             <div class="stat-info">
                 <h3 class="stat-number">LKR <?php echo number_format($data['collected'] ?? 0, 0); ?></h3>
                 <p class="stat-label">Collected Fees</p>
-                <span class="stat-change positive">From completed payments</span>
+                <span class="stat-change positive">Completed in last 30 days</span>
             </div>
         </div>
 
@@ -46,7 +46,7 @@ AutoPaginate::init($data, 10);
             <div class="stat-info">
                 <h3 class="stat-number">LKR <?php echo number_format($data['pending'] ?? 0, 0); ?></h3>
                 <p class="stat-label">Pending Fees</p>
-                <span class="stat-change"><?php echo $data['pendingCount'] ?? 0; ?> transactions</span>
+                <span class="stat-change"><?php echo $data['pendingCount'] ?? 0; ?> pending (30 days)</span>
             </div>
         </div>
 
@@ -57,7 +57,7 @@ AutoPaginate::init($data, 10);
             <div class="stat-info">
                 <h3 class="stat-number">LKR <?php echo number_format($data['overdue'] ?? 0, 0); ?></h3>
                 <p class="stat-label">Overdue Fees</p>
-                <span class="stat-change negative"><?php echo $data['overdueCount'] ?? 0; ?> transactions</span>
+                <span class="stat-change negative"><?php echo $data['overdueCount'] ?? 0; ?> overdue (30 days)</span>
             </div>
         </div>
     </div>

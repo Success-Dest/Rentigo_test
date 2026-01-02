@@ -18,7 +18,7 @@
         <div class="stat-content">
             <h3 class="stat-label">Total Income</h3>
             <div class="stat-value">LKR <?php echo number_format($data['totalIncome'] ?? 0, 0); ?></div>
-            <div class="stat-change">All time earnings</div>
+            <div class="stat-change">Fees from last 30 days</div>
         </div>
     </div>
     <div class="stat-card info">
@@ -71,7 +71,7 @@
                     echo number_format(($data['totalIncome'] ?? 0) - $maintenanceCosts, 0);
                 ?>
             </div>
-            <div class="stat-change">After expenses</div>
+            <div class="stat-change">After expenses (30 days)</div>
         </div>
     </div>
 </div>

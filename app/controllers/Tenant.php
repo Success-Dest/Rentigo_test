@@ -33,11 +33,22 @@ class Tenant extends Controller
     // Main dashboard page
     public function index()
     {
-        // Get dashboard data
+        // Get dashboard data - Filtered by 30 days where applicable
         $activeBooking = $this->bookingModel->getActiveBookingByTenant($_SESSION['user_id']);
         $activeLease = $this->leaseModel->getActiveLeaseByTenant($_SESSION['user_id']);
-        $pendingPayments = $this->paymentModel->getPendingPaymentsByTenant($_SESSION['user_id']);
-        $recentIssues = $this->issueModel->getRecentIssues($_SESSION['user_id'], 5);
+        
+        // Filter pending payments by last 30 days
+        $allPendingPayments = $this->paymentModel->getPendingPaymentsByTenant($_SESSION['user_id']);
+        $pendingPayments = array_filter($allPendingPayments, function($p) {
+            return strtotime($p->created_at ?? '') >= strtotime('-30 days');
+        });
+
+        // Filter recent issues by last 30 days
+        $allRecentIssues = $this->issueModel->getRecentIssues($_SESSION['user_id'], 5);
+        $recentIssues = array_filter($allRecentIssues, function($i) {
+            return strtotime($i->created_at ?? '') >= strtotime('-30 days');
+        });
+
         $bookingStats = $this->bookingModel->getBookingStats($_SESSION['user_id'], 'tenant');
         $unreadNotifications = $this->notificationModel->getUnreadCount($_SESSION['user_id']);
 
@@ -81,26 +92,40 @@ class Tenant extends Controller
     }
 
     public function pay_rent()
-    {
-        // Get pending payments for the tenant
-        $pendingPayments = $this->paymentModel->getPendingPaymentsByTenant($_SESSION['user_id']);
-        $paymentHistory = $this->paymentModel->getPaymentsByTenant($_SESSION['user_id']);
-        $totalPayments = $this->paymentModel->getTotalPaymentsByTenant($_SESSION['user_id']);
-        $overduePayments = $this->paymentModel->getOverduePayments($_SESSION['user_id']);
+{
+    // Get all pending and overdue payments for the tenant (Full lists for sections)
+    $pendingPayments = $this->paymentModel->getPendingPaymentsByTenant($_SESSION['user_id']);
+    $paymentHistory = $this->paymentModel->getPaymentsByTenant($_SESSION['user_id']);
+    $overduePayments = $this->paymentModel->getOverduePayments($_SESSION['user_id']);
+    
+    // Get 30-day stats for cards
+    $stats30Days = $this->paymentModel->getTotalPaymentsByTenant($_SESSION['user_id'], 30);
+    
+    // Filter lists for 30-day stats counts
+    $pendingCount30Days = array_filter($pendingPayments, function($p) {
+        return strtotime($p->created_at ?? '') >= strtotime('-30 days');
+    });
+    
+    $overdueCount30Days = array_filter($overduePayments, function($p) {
+        $date = $p->payment_date ?? $p->created_at;
+        return strtotime($date) >= strtotime('-30 days');
+    });
 
-        $data = [
-            'title' => 'Pay Rent - TenantHub',
-            'page' => 'pay_rent',
-            'user_name' => $_SESSION['user_name'],
-            'pendingPayments' => $pendingPayments,
-            'paymentHistory' => $paymentHistory,
-            'totalPayments' => $totalPayments,
-            'overduePayments' => $overduePayments,
-            'unread_notifications' => $this->getUnreadNotificationCount()
-        ];
+    $data = [
+        'title' => 'Pay Rent - TenantHub',
+        'page' => 'pay_rent',
+        'user_name' => $_SESSION['user_name'],
+        'pendingPayments' => $pendingPayments, // Full list for section
+        'paymentHistory' => $paymentHistory,
+        'overduePayments' => $overduePayments, // Full list for section (if used in UI outside cards)
+        'totalPayments' => $stats30Days, // 30-day stats for cards
+        'pendingCount30' => count($pendingCount30Days),
+        'overdueCount30' => count($overdueCount30Days),
+        'unread_notifications' => $this->getUnreadNotificationCount()
+    ];
 
-        $this->view('tenant/v_pay_rent', $data);
-    }
+    $this->view('tenant/v_pay_rent', $data);
+}
 
     public function agreements()
     {

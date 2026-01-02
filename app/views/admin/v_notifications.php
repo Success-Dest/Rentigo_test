@@ -25,7 +25,7 @@
             <div class="stat-info">
                 <h3 class="stat-number"><?php echo $data['stats']->total_sent ?? 0; ?></h3>
                 <p class="stat-label">Total Sent</p>
-                <span class="stat-change">All notifications</span>
+                <span class="stat-change">Last 30 days</span>
             </div>
         </div>
 
@@ -36,7 +36,7 @@
             <div class="stat-info">
                 <h3 class="stat-number"><?php echo $data['stats']->total_recipients ?? 0; ?></h3>
                 <p class="stat-label">Recipients</p>
-                <span class="stat-change">Unique users</span>
+                <span class="stat-change">Unique (30 days)</span>
             </div>
         </div>
 
@@ -47,7 +47,7 @@
             <div class="stat-info">
                 <h3 class="stat-number"><?php echo $data['stats']->read_count ?? 0; ?></h3>
                 <p class="stat-label">Read</p>
-                <span class="stat-change positive">Acknowledged</span>
+                <span class="stat-change positive">Read (30 days)</span>
             </div>
         </div>
 
@@ -58,7 +58,7 @@
             <div class="stat-info">
                 <h3 class="stat-number"><?php echo $data['stats']->unread_count ?? 0; ?></h3>
                 <p class="stat-label">Unread</p>
-                <span class="stat-change">Pending</span>
+                <span class="stat-change">Unread (30 days)</span>
             </div>
         </div>
     </div>

@@ -153,10 +153,10 @@ class M_MaintenanceQuotations
         return $payment && $payment->status === 'completed';
     }
 
-    // Get total maintenance income (for admin)
-    public function getTotalMaintenanceIncome()
+    // Get total maintenance income in the last X days (for admin)
+    public function getTotalMaintenanceIncome($days = 30)
     {
-        $this->db->query('SELECT SUM(amount) as total_income FROM maintenance_payments WHERE status = "completed"');
+        $this->db->query('SELECT SUM(amount) as total_income FROM maintenance_payments WHERE status = "completed" AND ' . getDateRangeSql('payment_date', $days));
         $result = $this->db->single();
         return $result->total_income ?? 0;
     }

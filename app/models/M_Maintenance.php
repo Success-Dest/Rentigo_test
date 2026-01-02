@@ -216,7 +216,7 @@ class M_Maintenance
                       FROM maintenance_requests m
                       LEFT JOIN properties p ON m.property_id = p.id
                       LEFT JOIN maintenance_payments mp ON m.id = mp.request_id
-                      WHERE p.manager_id = :manager_id';
+                      WHERE p.manager_id = :manager_id AND ' . getDateRangeSql('m.created_at');
         } else {
             $query = 'SELECT
                       COUNT(*) as total,
@@ -231,8 +231,11 @@ class M_Maintenance
                       FROM maintenance_requests m
                       LEFT JOIN maintenance_payments mp ON m.id = mp.request_id';
 
+            $dateFilter = getDateRangeSql('m.created_at');
             if ($landlord_id) {
-                $query .= ' WHERE m.landlord_id = :landlord_id';
+                $query .= ' WHERE m.landlord_id = :landlord_id AND ' . $dateFilter;
+            } else {
+                $query .= ' WHERE ' . $dateFilter;
             }
         }
 
@@ -250,26 +253,17 @@ class M_Maintenance
     // Get pending maintenance count
     public function getPendingMaintenanceCount($landlord_id = null, $manager_id = null)
     {
-        if ($manager_id) {
-            $query = 'SELECT COUNT(*) as count
-                      FROM maintenance_requests m
-                      LEFT JOIN properties p ON m.property_id = p.id
-                      WHERE p.manager_id = :manager_id AND m.status = "pending"';
-        } else {
-            $query = 'SELECT COUNT(*) as count FROM maintenance_requests';
-            if ($landlord_id) {
-                $query .= ' WHERE landlord_id = :landlord_id AND status = "pending"';
-            } else {
-                $query .= ' WHERE status = "pending"';
-            }
-        }
-
-        $this->db->query($query);
-
+        $dateFilter = getDateRangeSql('m.created_at');
         if ($landlord_id) {
+            $this->db->query('SELECT COUNT(*) as count FROM maintenance_requests m WHERE m.landlord_id = :landlord_id AND m.status = "pending" AND ' . $dateFilter);
             $this->db->bind(':landlord_id', $landlord_id);
         } else if ($manager_id) {
+            $this->db->query('SELECT COUNT(*) as count FROM maintenance_requests m 
+                              LEFT JOIN properties p ON m.property_id = p.id 
+                              WHERE p.manager_id = :manager_id AND m.status = "pending" AND ' . $dateFilter);
             $this->db->bind(':manager_id', $manager_id);
+        } else {
+            $this->db->query('SELECT COUNT(*) as count FROM maintenance_requests m WHERE m.status = "pending" AND ' . $dateFilter);
         }
 
         $result = $this->db->single();

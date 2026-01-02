@@ -318,7 +318,7 @@ class M_Notifications
         return $this->db->resultSet();
     }
 
-    // Get notification statistics for admin
+    // Get notification statistics for admin (Last 30 Days)
     public function getNotificationStats()
     {
         $this->db->query("SELECT
@@ -326,7 +326,8 @@ class M_Notifications
                             COUNT(DISTINCT user_id) as total_recipients,
                             COUNT(CASE WHEN is_read = 1 THEN 1 END) as read_count,
                             COUNT(CASE WHEN is_read = 0 THEN 1 END) as unread_count
-                         FROM notifications");
+                         FROM notifications
+                         WHERE " . getDateRangeSql('created_at'));
 
         return $this->db->single();
     }

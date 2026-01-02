@@ -26,7 +26,7 @@ AutoPaginate::init($data, 5);
                 </div>
                 <div class="stat-details">
                     <h4>LKR <?php echo number_format(($data['totalPayments']->total_paid ?? 0) * 1.10, 2); ?></h4>
-                    <p>Total Paid</p>
+                    <p>Total Paid (30 Days)</p>
                 </div>
             </div>
             <div class="stat-card">
@@ -35,7 +35,7 @@ AutoPaginate::init($data, 5);
                 </div>
                 <div class="stat-details">
                     <h4><?php echo $data['totalPayments']->total_payments ?? 0; ?></h4>
-                    <p>Payments Made</p>
+                    <p>Payments Made (30 Days)</p>
                 </div>
             </div>
             <div class="stat-card <?php echo !empty($data['pendingPayments']) ? 'warning' : ''; ?>">
@@ -43,8 +43,8 @@ AutoPaginate::init($data, 5);
                     <i class="fas fa-clock"></i>
                 </div>
                 <div class="stat-details">
-                    <h4><?php echo count($data['pendingPayments'] ?? []); ?></h4>
-                    <p>Pending Payments</p>
+                    <h4><?php echo $data['pendingCount30'] ?? 0; ?></h4>
+                    <p>Pending (30 Days)</p>
                 </div>
             </div>
             <div class="stat-card <?php echo !empty($data['overduePayments']) ? 'danger' : ''; ?>">
@@ -52,8 +52,8 @@ AutoPaginate::init($data, 5);
                     <i class="fas fa-exclamation-circle"></i>
                 </div>
                 <div class="stat-details">
-                    <h4><?php echo count($data['overduePayments'] ?? []); ?></h4>
-                    <p>Overdue</p>
+                    <h4><?php echo $data['overdueCount30'] ?? 0; ?></h4>
+                    <p>Overdue (30 Days)</p>
                 </div>
             </div>
         </div>

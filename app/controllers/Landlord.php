@@ -41,24 +41,41 @@ class Landlord extends Controller
 
     public function dashboard()
     {
-        // Get dashboard statistics
+        // Get dashboard statistics - Filtered by 30 days (Models already updated)
         $propertyStats = $this->propertyModel->getPropertyStatsByLandlord($_SESSION['user_id']);
         $bookingStats = $this->bookingModel->getBookingStats($_SESSION['user_id'], 'landlord');
         $pendingBookings = $this->bookingModel->getPendingBookingsCount($_SESSION['user_id']);
         $totalIncome = $this->paymentModel->getTotalIncomeByLandlord($_SESSION['user_id']);
         $activeLeases = $this->leaseModel->getActiveLeasesCount($_SESSION['user_id']);
         $pendingMaintenance = $this->maintenanceModel->getPendingMaintenanceCount($_SESSION['user_id']);
-        $recentBookings = $this->bookingModel->getBookingsByLandlord($_SESSION['user_id']);
-        $recentPayments = $this->paymentModel->getRecentPayments($_SESSION['user_id'], 'landlord', 5);
+        
+        // Filter recent bookings by last 30 days
+        $allRecentBookings = $this->bookingModel->getBookingsByLandlord($_SESSION['user_id']);
+        $recentBookings = array_filter($allRecentBookings, function($b) {
+            return strtotime($b->created_at ?? '') >= strtotime('-30 days');
+        });
+
+        // Filter recent payments by last 30 days
+        $allRecentPayments = $this->paymentModel->getRecentPayments($_SESSION['user_id'], 'landlord', 10);
+        $recentPayments = array_filter($allRecentPayments, function($p) {
+            $date = $p->payment_date ?? $p->created_at;
+            return strtotime($date) >= strtotime('-30 days');
+        });
+
         $unreadNotifications = $this->notificationModel->getUnreadCount($_SESSION['user_id']);
 
-        // Get issue statistics
+        // Get issue statistics (Updated in model)
         $issueModel = $this->model('M_Issue');
         $issueStats = $issueModel->getIssueStats($_SESSION['user_id'], 'landlord');
 
         // Limit recent bookings to 5
         if (count($recentBookings) > 5) {
             $recentBookings = array_slice($recentBookings, 0, 5);
+        }
+        
+        // Limit recent payments to 5
+        if (count($recentPayments) > 5) {
+            $recentPayments = array_slice($recentPayments, 0, 5);
         }
 
         $data = [
@@ -140,17 +157,26 @@ class Landlord extends Controller
 
     public function payment_history()
     {
-        // Get all payments for landlord
+        // Get all payments for landlord (Full history for table)
         $payments = $this->paymentModel->getPaymentsByLandlord($_SESSION['user_id']);
+        
+        // Get summary statistics for last 30 days
         $totalIncome = $this->paymentModel->getTotalIncomeByLandlord($_SESSION['user_id']);
         $paymentStats = $this->paymentModel->getPaymentStatsByLandlord($_SESSION['user_id']);
+
+        // Filter payments for 30-day stat cards
+        $recentPayments = array_filter($payments, function($p) {
+            $date = $p->payment_date ?? $p->created_at;
+            return strtotime($date) >= strtotime('-30 days');
+        });
 
         $data = [
             'title' => 'Payment History',
             'page' => 'payment_history',
             'user_name' => $_SESSION['user_name'],
-            'payments' => $payments,
-            'totalIncome' => $totalIncome,
+            'payments' => $payments, // Full history
+            'recentPayments' => $recentPayments, // 30-day filtered for cards
+            'totalIncome' => (object)['total_income' => $totalIncome],
             'paymentStats' => $paymentStats,
             'unread_notifications' => $this->getUnreadNotificationCount()
         ];

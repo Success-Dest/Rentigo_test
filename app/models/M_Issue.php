@@ -273,6 +273,14 @@ class M_Issue
             $whereClause = 'WHERE i.tenant_id = :user_id';
         }
 
+        // Add date filter for last 30 days
+        $dateFilter = getDateRangeSql('i.created_at');
+        if (empty($whereClause)) {
+            $whereClause = "WHERE $dateFilter";
+        } else {
+            $whereClause .= " AND $dateFilter";
+        }
+
         $this->db->query("
             SELECT
                 COUNT(*) as total_issues,

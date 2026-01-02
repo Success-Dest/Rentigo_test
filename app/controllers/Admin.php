@@ -27,32 +27,27 @@ class Admin extends Controller
         $allBookings = $bookingModel->getAllBookings();
         $allPayments = $paymentModel->getAllPayments();
         $pendingPMs = $this->userModel->getPendingPMs();
+        // Calculate 30-day revenue (10% platform service fee from rentals + 100% maintenance payments)
+        $rentalRevenue = $paymentModel->getPlatformRentalIncome(30);
+        $maintenanceRevenue = $maintenanceQuotationModel->getTotalMaintenanceIncome(30);
+        $total30DayRevenue = $rentalRevenue + $maintenanceRevenue;
 
-        // Calculate active tenants (approved and active bookings)
-        $activeBookings = array_filter($allBookings, fn($b) => $b->status === 'active' || $b->status === 'approved');
+        // Calculate active tenants (approved and active bookings created in last 30 days)
+        $activeBookings = array_filter($allBookings, function($b) {
+            $isCorrectStatus = ($b->status === 'active' || $b->status === 'approved');
+            $isWithin30Days = strtotime($b->created_at) >= strtotime('-30 days');
+            return $isCorrectStatus && $isWithin30Days;
+        });
 
-        // Calculate monthly revenue (10% platform service fee from rentals + 100% maintenance payments)
-        $currentMonth = date('Y-m');
-        $monthlyRevenue = 0;
+        // Filter total properties (last 30 days)
+        $propertiesLast30Days = array_filter($allProperties, function($p) {
+            return strtotime($p->created_at) >= strtotime('-30 days');
+        });
 
-        // Rental payment income (10% service fee)
-        foreach ($allPayments as $payment) {
-            if ($payment->status === 'completed' &&
-                date('Y-m', strtotime($payment->payment_date)) === $currentMonth) {
-                // Platform earns 10% service fee from each rental payment
-                $monthlyRevenue += ($payment->amount * 0.10);
-            }
-        }
-
-        // Maintenance payment income (100% - full payment amount)
-        $maintenancePayments = $maintenanceQuotationModel->getAllMaintenancePayments();
-        foreach ($maintenancePayments as $payment) {
-            if ($payment->status === 'completed' &&
-                date('Y-m', strtotime($payment->payment_date)) === $currentMonth) {
-                // Platform earns 100% from maintenance payments
-                $monthlyRevenue += $payment->amount;
-            }
-        }
+        // Filter pending approvals (last 30 days)
+        $pendingApprovalsLast30Days = array_filter($pendingPMs, function($pm) {
+            return strtotime($pm->created_at) >= strtotime('-30 days');
+        });
 
         // Get recent properties (last 10)
         $recentProperties = array_slice($allProperties, -10);
@@ -61,10 +56,10 @@ class Admin extends Controller
         $data = [
             'title' => 'Admin Dashboard - Rentigo',
             'page' => 'dashboard',
-            'totalProperties' => count($allProperties),
+            'totalProperties' => count($propertiesLast30Days),
             'activeTenants' => count($activeBookings),
-            'monthlyRevenue' => $monthlyRevenue,
-            'pendingApprovals' => count($pendingPMs),
+            'monthlyRevenue' => $total30DayRevenue,
+            'pendingApprovals' => count($pendingApprovalsLast30Days),
             'recentProperties' => $recentProperties
         ];
         $this->view('admin/v_dashboard', $data);
@@ -110,34 +105,40 @@ class Admin extends Controller
         $pendingCount = 0;
         $overdueCount = 0;
 
-        // Calculate rental payment fees (10% service fee)
+        // Calculate rental payment fees (10% service fee) - Filtered by 30 days for stats
         foreach ($allPayments as $payment) {
-            // Platform earns 10% service fee from each rental payment
-            $totalRevenue += ($payment->amount * 0.10);
-            if ($payment->status === 'completed') {
-                $collected += ($payment->amount * 0.10);
-            } elseif ($payment->status === 'pending') {
-                $pending += ($payment->amount * 0.10);
-                $pendingCount++;
-            } elseif ($payment->status === 'overdue') {
-                $overdue += ($payment->amount * 0.10);
-                $overdueCount++;
+            $date = $payment->payment_date ?? $payment->created_at;
+            if (strtotime($date) >= strtotime('-30 days')) {
+                // Platform earns 10% service fee from each rental payment
+                $totalRevenue += ($payment->amount * 0.10);
+                if ($payment->status === 'completed') {
+                    $collected += ($payment->amount * 0.10);
+                } elseif ($payment->status === 'pending') {
+                    $pending += ($payment->amount * 0.10);
+                    $pendingCount++;
+                } elseif ($payment->status === 'overdue') {
+                    $overdue += ($payment->amount * 0.10);
+                    $overdueCount++;
+                }
             }
         }
 
-        // Calculate maintenance payment income (100% goes to platform)
+        // Calculate maintenance payment income (100% goes to platform) - Filtered by 30 days for stats
         foreach ($maintenancePayments as $payment) {
-            // Platform receives full maintenance payment amount as income
-            $totalRevenue += $payment->amount;
-            if ($payment->status === 'completed') {
-                $collected += $payment->amount;
-            } elseif ($payment->status === 'pending') {
-                $pending += $payment->amount;
-                $pendingCount++;
-            } elseif ($payment->status === 'failed') {
-                // Treat failed as overdue for maintenance
-                $overdue += $payment->amount;
-                $overdueCount++;
+            $date = $payment->payment_date ?? $payment->created_at;
+            if (strtotime($date) >= strtotime('-30 days')) {
+                // Platform receives full maintenance payment amount as income
+                $totalRevenue += $payment->amount;
+                if ($payment->status === 'completed') {
+                    $collected += $payment->amount;
+                } elseif ($payment->status === 'pending') {
+                    $pending += $payment->amount;
+                    $pendingCount++;
+                } elseif ($payment->status === 'failed') {
+                    // Treat failed as overdue for maintenance
+                    $overdue += $payment->amount;
+                    $overdueCount++;
+                }
             }
         }
 
