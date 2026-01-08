@@ -89,57 +89,40 @@ AutoPaginate::init($data, 5);
         </div>
     </div>
 
-    <!-- Filter Section -->
-    <div class="dashboard-section">
-        <div class="section-header">
-            <h3>Filter Issues</h3>
-        </div>
-
-        <form method="POST" action="">
-            <div class="filters-row">
-                <div class="filter-group">
-                    <label>Status</label>
-                    <select class="form-select" name="statusFilter">
-                        <option value="">All Status</option>
-                        <option value="pending" <?= $statusFilter == 'pending' ? 'selected' : ''; ?>>Pending</option>
-                        <option value="in_progress" <?= $statusFilter == 'in_progress' ? 'selected' : ''; ?>>In Progress
-                        </option>
-                        <option value="resolved" <?= $statusFilter == 'resolved' ? 'selected' : ''; ?>>Resolved</option>
-                    </select>
-                </div>
-
-                <div class="filter-group">
-                    <label>Priority</label>
-                    <select class="form-select" name="priorityFilter">
-                        <option value="">All Priorities</option>
-                        <option value="low" <?= $priorityFilter == 'low' ? 'selected' : ''; ?>>Low</option>
-                        <option value="medium" <?= $priorityFilter == 'medium' ? 'selected' : ''; ?>>Medium</option>
-                        <option value="high" <?= $priorityFilter == 'high' ? 'selected' : ''; ?>>High</option>
-                        <option value="emergency" <?= $priorityFilter == 'emergency' ? 'selected' : ''; ?>>Emergency
-                        </option>
-                    </select>
-                </div>
-
-                <div class="filter-group">
-                    <label>Category</label>
-                    <select class="form-select" name="categoryFilter">
-                        <option value="">All Categories</option>
-                        <option value="Plumbing" <?= $categoryFilter == 'Plumbing' ? 'selected' : ''; ?>>Plumbing</option>
-                        <option value="Electrical" <?= $categoryFilter == 'Electrical' ? 'selected' : ''; ?>>Electrical
-                        </option>
-                        <option value="Heating/Cooling" <?= $categoryFilter == 'Heating/Cooling' ? 'selected' : ''; ?>>
-                            Heating/Cooling</option>
-                        <option value="Maintenance" <?= $categoryFilter == 'Maintenance' ? 'selected' : ''; ?>>Maintenance
-                        </option>
-                    </select>
-                </div>
-
-                <div class="filter-group">
-                    <button class="btn btn-primary" id="btn" type="submit">Apply Filters</button>
-                </div>
+    <!-- Search and Filter Section -->
+    <form method="POST" action="">
+        <div class="search-filter-content">
+            <div class="filter-dropdown-wrapper">
+                <select class="form-select" name="statusFilter">
+                    <option value="">All Status</option>
+                    <option value="pending" <?= $statusFilter == 'pending' ? 'selected' : ''; ?>>Pending</option>
+                    <option value="in_progress" <?= $statusFilter == 'in_progress' ? 'selected' : ''; ?>>In Progress</option>
+                    <option value="resolved" <?= $statusFilter == 'resolved' ? 'selected' : ''; ?>>Resolved</option>
+                </select>
             </div>
-        </form>
-    </div>
+            <div class="filter-dropdown-wrapper">
+                <select class="form-select" name="priorityFilter">
+                    <option value="">All Priorities</option>
+                    <option value="low" <?= $priorityFilter == 'low' ? 'selected' : ''; ?>>Low</option>
+                    <option value="medium" <?= $priorityFilter == 'medium' ? 'selected' : ''; ?>>Medium</option>
+                    <option value="high" <?= $priorityFilter == 'high' ? 'selected' : ''; ?>>High</option>
+                    <option value="emergency" <?= $priorityFilter == 'emergency' ? 'selected' : ''; ?>>Emergency</option>
+                </select>
+            </div>
+            <div class="filter-dropdown-wrapper">
+                <select class="form-select" name="categoryFilter">
+                    <option value="">All Categories</option>
+                    <option value="Plumbing" <?= $categoryFilter == 'Plumbing' ? 'selected' : ''; ?>>Plumbing</option>
+                    <option value="Electrical" <?= $categoryFilter == 'Electrical' ? 'selected' : ''; ?>>Electrical</option>
+                    <option value="Heating/Cooling" <?= $categoryFilter == 'Heating/Cooling' ? 'selected' : ''; ?>>Heating/Cooling</option>
+                    <option value="Maintenance" <?= $categoryFilter == 'Maintenance' ? 'selected' : ''; ?>>Maintenance</option>
+                </select>
+            </div>
+            <button class="btn btn-secondary" type="submit">
+                <i class="fas fa-filter"></i> Filter
+            </button>
+        </div>
+    </form>
 
     <!-- Issues Table -->
     <div class="dashboard-section">

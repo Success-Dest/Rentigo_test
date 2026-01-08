@@ -9,23 +9,19 @@
         </div>
     </div>
 
-    <!-- Filters Section -->
-    <div class="filters-section">
-        <div class="filters-row">
-            <div class="filter-group">
-                <label>Location</label>
+    <!-- Search and Filter Section -->
+    <form method="GET" action="<?php echo URLROOT; ?>/tenantproperties/search">
+        <div class="search-filter-content">
+            <div class="search-input-wrapper">
                 <input type="text" class="form-input" placeholder="Enter location" id="locationFilter">
             </div>
-            <div class="filter-group">
-                <label>Min Price</label>
-                <input type="number" class="form-input" placeholder="0" id="minPriceFilter">
+            <div class="filter-dropdown-wrapper">
+                <input type="number" class="form-input" placeholder="Min Price" id="minPriceFilter">
             </div>
-            <div class="filter-group">
-                <label>Max Price</label>
-                <input type="number" class="form-input" placeholder="50,000" id="maxPriceFilter">
+            <div class="filter-dropdown-wrapper">
+                <input type="number" class="form-input" placeholder="Max Price" id="maxPriceFilter">
             </div>
-            <div class="filter-group">
-                <label>Property Type</label>
+            <div class="filter-dropdown-wrapper">
                 <select class="form-select" id="typeFilter">
                     <option value="">All Types</option>
                     <option value="Apartment">Apartment</option>
@@ -33,11 +29,11 @@
                     <option value="Studio">Studio</option>
                 </select>
             </div>
-            <div class="filter-group">
-                <button class="btn btn-primary" id="searchBtn">Search</button>
-            </div>
+            <button type="button" class="btn btn-secondary" id="searchBtn">
+                <i class="fas fa-search"></i> Search
+            </button>
         </div>
-    </div>
+    </form>
 
     <!-- Results Section -->
     <div class="table-section">
