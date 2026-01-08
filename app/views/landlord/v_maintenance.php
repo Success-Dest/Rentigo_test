@@ -13,14 +13,6 @@ AutoPaginate::init($data, 5);
         <p class="page-subtitle">Manage property maintenance and repairs</p>
     </div>
     <div class="header-actions">
-        <select class="form-control" id="statusFilter">
-            <option value="">All Requests</option>
-            <option value="pending">Pending</option>
-            <option value="scheduled">Scheduled</option>
-            <option value="in_progress">In Progress</option>
-            <option value="completed">Completed</option>
-            <option value="cancelled">Cancelled</option>
-        </select>
         <button>
             <a href="<?php echo URLROOT; ?>/maintenance/create" class="btn btn-primary">
                 <i class="fas fa-plus"></i> New Request
@@ -72,6 +64,55 @@ AutoPaginate::init($data, 5);
             <div class="stat-value">LKR <?php echo number_format($data['maintenanceStats']->total_cost ?? 0, 2); ?></div>
             <div class="stat-change">Maintenance expenses</div>
         </div>
+    </div>
+</div>
+
+<!-- Filter Section -->
+<div class="content-card" style="margin-bottom: 2rem;">
+    <div class="card-body">
+        <form method="GET" action="<?php echo URLROOT; ?>/maintenance/index" id="filterForm">
+            <div class="filter-grid">
+                <div class="filter-group">
+                    <label for="filter_status">Status</label>
+                    <select name="filter_status" id="filter_status" class="form-control">
+                        <option value="" <?php echo empty($data['filter_status']) ? 'selected' : ''; ?>>All Statuses</option>
+                        <option value="pending" <?php echo $data['filter_status'] === 'pending' ? 'selected' : ''; ?>>Pending</option>
+                        <option value="scheduled" <?php echo $data['filter_status'] === 'scheduled' ? 'selected' : ''; ?>>Scheduled</option>
+                        <option value="in_progress" <?php echo $data['filter_status'] === 'in_progress' ? 'selected' : ''; ?>>In Progress</option>
+                        <option value="completed" <?php echo $data['filter_status'] === 'completed' ? 'selected' : ''; ?>>Completed</option>
+                        <option value="cancelled" <?php echo $data['filter_status'] === 'cancelled' ? 'selected' : ''; ?>>Cancelled</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="filter_priority">Priority</label>
+                    <select name="filter_priority" id="filter_priority" class="form-control">
+                        <option value="" <?php echo empty($data['filter_priority']) ? 'selected' : ''; ?>>All Priorities</option>
+                        <option value="low" <?php echo $data['filter_priority'] === 'low' ? 'selected' : ''; ?>>Low</option>
+                        <option value="medium" <?php echo $data['filter_priority'] === 'medium' ? 'selected' : ''; ?>>Medium</option>
+                        <option value="high" <?php echo $data['filter_priority'] === 'high' ? 'selected' : ''; ?>>High</option>
+                        <option value="emergency" <?php echo $data['filter_priority'] === 'emergency' ? 'selected' : ''; ?>>Emergency</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="filter_date_from">Created Date From</label>
+                    <input type="date" name="filter_date_from" id="filter_date_from" class="form-control" 
+                           value="<?php echo htmlspecialchars($data['filter_date_from'] ?? ''); ?>">
+                </div>
+                <div class="filter-group">
+                    <label for="filter_date_to">Created Date To</label>
+                    <input type="date" name="filter_date_to" id="filter_date_to" class="form-control" 
+                           value="<?php echo htmlspecialchars($data['filter_date_to'] ?? ''); ?>">
+                </div>
+                <div class="filter-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-filter"></i> Apply Filters
+                    </button>
+                    <a href="<?php echo URLROOT; ?>/maintenance/index" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Clear Filters
+                    </a>
+                </div>
+            </div>
+        </form>
     </div>
 </div>
 
@@ -211,6 +252,52 @@ AutoPaginate::init($data, 5);
 <?php echo AutoPaginate::render($data['_pagination']); ?>
 
 <style>
+    /* Filter Styles */
+    .filter-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        align-items: end;
+    }
+
+    .filter-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .filter-group label {
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: var(--text-primary, #333);
+        font-size: 0.9rem;
+    }
+
+    .filter-actions {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+    }
+
+    .filter-actions .btn {
+        white-space: nowrap;
+    }
+
+    @media (max-width: 768px) {
+        .filter-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .filter-actions {
+            flex-direction: column;
+            width: 100%;
+        }
+        
+        .filter-actions .btn {
+            width: 100%;
+        }
+    }
+
+    /* Existing Styles */
     .quotation-status {
         margin: 10px 0;
     }
@@ -306,30 +393,6 @@ AutoPaginate::init($data, 5);
 </style>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Filter functionality
-        const statusFilter = document.getElementById('statusFilter');
-        if (statusFilter) {
-            statusFilter.addEventListener('change', function() {
-                const selectedStatus = this.value.toLowerCase();
-                const requestCards = document.querySelectorAll('.request-card');
-
-                requestCards.forEach(card => {
-                    if (selectedStatus === '') {
-                        card.style.display = 'block';
-                    } else {
-                        const cardStatus = card.getAttribute('data-status');
-                        if (cardStatus === selectedStatus) {
-                            card.style.display = 'block';
-                        } else {
-                            card.style.display = 'none';
-                        }
-                    }
-                });
-            });
-        }
-    });
-
     function editRequest(requestId) {
         window.location.href = '<?php echo URLROOT; ?>/maintenance/edit/' + requestId;
     }

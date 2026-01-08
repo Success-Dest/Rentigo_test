@@ -27,21 +27,78 @@ class Maintenance extends Controller
         $user_type = $_SESSION['user_type'];
 
         if ($user_type == 'landlord') {
-            $maintenanceRequests = $this->maintenanceModel->getMaintenanceByLandlord($_SESSION['user_id']);
+            $allMaintenanceRequests = $this->maintenanceModel->getMaintenanceByLandlord($_SESSION['user_id']);
             $maintenanceStats = $this->maintenanceModel->getMaintenanceStats($_SESSION['user_id']);
         } else if ($user_type == 'property_manager') {
-            $maintenanceRequests = $this->maintenanceModel->getMaintenanceByManager($_SESSION['user_id']);
+            $allMaintenanceRequests = $this->maintenanceModel->getMaintenanceByManager($_SESSION['user_id']);
             $maintenanceStats = $this->maintenanceModel->getMaintenanceStats(null, $_SESSION['user_id']);
         } else {
             redirect('users/login');
         }
 
+        // ==================== APPLY FILTERS ====================
+        $filteredMaintenanceRequests = $allMaintenanceRequests;
+        
+        // Get filter parameters
+        $filterStatus = $_GET['filter_status'] ?? '';
+        $filterPriority = $_GET['filter_priority'] ?? '';
+        $filterDateFrom = $_GET['filter_date_from'] ?? '';
+        $filterDateTo = $_GET['filter_date_to'] ?? '';
+
+        // Apply Status Filter
+        if (!empty($filterStatus)) {
+            $filteredMaintenanceRequests = array_filter($filteredMaintenanceRequests, function($request) use ($filterStatus) {
+                return strtolower($request->status) === strtolower($filterStatus);
+            });
+        }
+
+        // Apply Priority Filter
+        if (!empty($filterPriority)) {
+            $filteredMaintenanceRequests = array_filter($filteredMaintenanceRequests, function($request) use ($filterPriority) {
+                return strtolower($request->priority) === strtolower($filterPriority);
+            });
+        }
+
+        // Apply Date Range Filter (on created_at)
+        if (!empty($filterDateFrom) || !empty($filterDateTo)) {
+            $filteredMaintenanceRequests = array_filter($filteredMaintenanceRequests, function($request) use ($filterDateFrom, $filterDateTo) {
+                $createdDate = strtotime($request->created_at);
+                
+                // Check FROM date
+                if (!empty($filterDateFrom)) {
+                    $fromDate = strtotime($filterDateFrom);
+                    if ($createdDate < $fromDate) {
+                        return false;
+                    }
+                }
+                
+                // Check TO date
+                if (!empty($filterDateTo)) {
+                    $toDate = strtotime($filterDateTo . ' 23:59:59'); // End of day
+                    if ($createdDate > $toDate) {
+                        return false;
+                    }
+                }
+                
+                return true;
+            });
+        }
+
+        // Re-index array after filtering
+        $filteredMaintenanceRequests = array_values($filteredMaintenanceRequests);
+
         $data = [
             'title' => 'Maintenance Requests',
             'page' => 'maintenance',
             'user_name' => $_SESSION['user_name'],
-            'maintenanceRequests' => $maintenanceRequests,
-            'maintenanceStats' => $maintenanceStats
+            'maintenanceRequests' => $filteredMaintenanceRequests,
+            'maintenanceStats' => $maintenanceStats,
+            
+            // Pass filter values back to view for persistence
+            'filter_status' => $filterStatus,
+            'filter_priority' => $filterPriority,
+            'filter_date_from' => $filterDateFrom,
+            'filter_date_to' => $filterDateTo,
         ];
 
         if ($user_type == 'landlord') {

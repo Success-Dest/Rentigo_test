@@ -110,16 +110,64 @@ class Landlord extends Controller
     public function bookings()
     {
         // Get all bookings for landlord's properties
-        $bookings = $this->bookingModel->getBookingsByLandlord($_SESSION['user_id']);
+        $allBookings = $this->bookingModel->getBookingsByLandlord($_SESSION['user_id']);
         $bookingStats = $this->bookingModel->getBookingStats($_SESSION['user_id'], 'landlord');
+
+        // ==================== APPLY FILTERS ====================
+        $filteredBookings = $allBookings;
+        
+        // Get filter parameters
+        $filterStatus = $_GET['filter_status'] ?? '';
+        $filterDateFrom = $_GET['filter_date_from'] ?? '';
+        $filterDateTo = $_GET['filter_date_to'] ?? '';
+
+        // Apply Status Filter
+        if (!empty($filterStatus)) {
+            $filteredBookings = array_filter($filteredBookings, function($booking) use ($filterStatus) {
+                return strtolower($booking->status) === strtolower($filterStatus);
+            });
+        }
+
+        // Apply Date Range Filter (on move_in_date)
+        if (!empty($filterDateFrom) || !empty($filterDateTo)) {
+            $filteredBookings = array_filter($filteredBookings, function($booking) use ($filterDateFrom, $filterDateTo) {
+                $moveInDate = strtotime($booking->move_in_date);
+                
+                // Check FROM date
+                if (!empty($filterDateFrom)) {
+                    $fromDate = strtotime($filterDateFrom);
+                    if ($moveInDate < $fromDate) {
+                        return false;
+                    }
+                }
+                
+                // Check TO date
+                if (!empty($filterDateTo)) {
+                    $toDate = strtotime($filterDateTo . ' 23:59:59'); // End of day
+                    if ($moveInDate > $toDate) {
+                        return false;
+                    }
+                }
+                
+                return true;
+            });
+        }
+
+        // Re-index array after filtering
+        $filteredBookings = array_values($filteredBookings);
 
         $data = [
             'title' => 'Property Bookings',
             'page' => 'bookings',
             'user_name' => $_SESSION['user_name'],
-            'bookings' => $bookings,
+            'bookings' => $filteredBookings,
             'bookingStats' => $bookingStats,
-            'unread_notifications' => $this->getUnreadNotificationCount()
+            'unread_notifications' => $this->getUnreadNotificationCount(),
+            
+            // Pass filter values back to view for persistence
+            'filter_status' => $filterStatus,
+            'filter_date_from' => $filterDateFrom,
+            'filter_date_to' => $filterDateTo,
         ];
         $this->view('landlord/v_bookings', $data);
     }
