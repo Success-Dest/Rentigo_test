@@ -49,55 +49,43 @@ AutoPaginate::init($data, 5);
     </div>
 </div>
 
-<!-- Filter Section -->
-<div class="filter-container">
-    <form method="GET" action="<?php echo URLROOT; ?>/manager/bookings" class="filter-form">
-        <div class="filter-row">
-            <div class="filter-group">
-                <label for="status">Status</label>
-                <select name="status" id="status" class="form-control">
-                    <option value="all" <?php echo ($data['currentStatusFilter'] ?? 'all') === 'all' ? 'selected' : ''; ?>>All Statuses</option>
-                    <option value="pending" <?php echo ($data['currentStatusFilter'] ?? '') === 'pending' ? 'selected' : ''; ?>>Pending</option>
-                    <option value="approved" <?php echo ($data['currentStatusFilter'] ?? '') === 'approved' ? 'selected' : ''; ?>>Approved</option>
-                    <option value="rejected" <?php echo ($data['currentStatusFilter'] ?? '') === 'rejected' ? 'selected' : ''; ?>>Rejected</option>
-                </select>
-            </div>
-
-            <div class="filter-group">
-                <label for="property_id">Property</label>
-                <select name="property_id" id="property_id" class="form-control">
-                    <option value="all" <?php echo ($data['currentPropertyFilter'] ?? 'all') === 'all' ? 'selected' : ''; ?>>All Properties</option>
-                    <?php if (!empty($data['assignedProperties'])): ?>
-                        <?php foreach ($data['assignedProperties'] as $property): ?>
-                            <option value="<?php echo $property->id; ?>" <?php echo ($data['currentPropertyFilter'] ?? '') == $property->id ? 'selected' : ''; ?>>
-                                <?php echo htmlspecialchars($property->address); ?>
-                            </option>
-                        <?php endforeach; ?>
-                    <?php endif; ?>
-                </select>
-            </div>
-
-            <div class="filter-group">
-                <label for="date_from">From Date</label>
-                <input type="date" name="date_from" id="date_from" class="form-control" value="<?php echo htmlspecialchars($data['currentDateFromFilter'] ?? ''); ?>">
-            </div>
-
-            <div class="filter-group">
-                <label for="date_to">To Date</label>
-                <input type="date" name="date_to" id="date_to" class="form-control" value="<?php echo htmlspecialchars($data['currentDateToFilter'] ?? ''); ?>">
-            </div>
-
-            <div class="filter-actions">
-                <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-filter"></i> Apply Filters
-                </button>
-                <a href="<?php echo URLROOT; ?>/manager/bookings" class="btn btn-secondary">
-                    <i class="fas fa-times"></i> Clear
-                </a>
-            </div>
+<!-- Search and Filter Section -->
+<form method="GET" action="<?php echo URLROOT; ?>/manager/bookings">
+    <div class="search-filter-content">
+        <div class="filter-dropdown-wrapper">
+            <select name="status" class="form-select">
+                <option value="all" <?php echo ($data['currentStatusFilter'] ?? 'all') === 'all' ? 'selected' : ''; ?>>All Statuses</option>
+                <option value="pending" <?php echo ($data['currentStatusFilter'] ?? '') === 'pending' ? 'selected' : ''; ?>>Pending</option>
+                <option value="approved" <?php echo ($data['currentStatusFilter'] ?? '') === 'approved' ? 'selected' : ''; ?>>Approved</option>
+                <option value="rejected" <?php echo ($data['currentStatusFilter'] ?? '') === 'rejected' ? 'selected' : ''; ?>>Rejected</option>
+            </select>
         </div>
-    </form>
-</div>
+        <div class="filter-dropdown-wrapper">
+            <select name="property_id" class="form-select">
+                <option value="all" <?php echo ($data['currentPropertyFilter'] ?? 'all') === 'all' ? 'selected' : ''; ?>>All Properties</option>
+                <?php if (!empty($data['assignedProperties'])): ?>
+                    <?php foreach ($data['assignedProperties'] as $property): ?>
+                        <option value="<?php echo $property->id; ?>" <?php echo ($data['currentPropertyFilter'] ?? '') == $property->id ? 'selected' : ''; ?>>
+                            <?php echo htmlspecialchars($property->address); ?>
+                        </option>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </select>
+        </div>
+        <div class="filter-dropdown-wrapper">
+            <input type="date" name="date_from" class="form-input" placeholder="From Date" value="<?php echo htmlspecialchars($data['currentDateFromFilter'] ?? ''); ?>">
+        </div>
+        <div class="filter-dropdown-wrapper">
+            <input type="date" name="date_to" class="form-input" placeholder="To Date" value="<?php echo htmlspecialchars($data['currentDateToFilter'] ?? ''); ?>">
+        </div>
+        <button type="submit" class="btn btn-secondary">
+            <i class="fas fa-filter"></i> Filter
+        </button>
+        <a href="<?php echo URLROOT; ?>/manager/bookings" class="btn btn-outline">
+            <i class="fas fa-times"></i> Clear
+        </a>
+    </div>
+</form>
 
 <!-- Bookings Table -->
 <div class="table-container-wrapper">
