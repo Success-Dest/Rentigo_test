@@ -17,7 +17,7 @@ AutoPaginate::init($data, 5);
     </div>
 
     <!-- Search Bar -->
-    <div class="dashboard-section">
+    <div class="dashboard-section" style="max-width: 400px; margin-left: 7px">
         <div class="search-container">
             <i class="fas fa-search search-icon"></i>
             <input type="text" class="search-input" placeholder="Search providers..." id="providerSearch">

@@ -9,7 +9,7 @@
     </div>
 
     <!-- Search Bar -->
-    <div class="dashboard-section">
+    <div class="dashboard-section" style="max-width: 400px;">
         <div class="search-container">
             <i class="fas fa-search search-icon"></i>
             <input type="text" class="search-input" placeholder="Search issues..." id="issueSearch">

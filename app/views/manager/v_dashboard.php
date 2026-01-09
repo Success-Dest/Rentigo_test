@@ -75,7 +75,7 @@
     </div>
 
     <!-- Unpaid Tenants Section -->
-    <div class="dashboard-section" style="margin-top: 1.5rem;">
+    <div class="dashboard-section" style="margin-top: 0.5rem;">
         <div class="section-header">
             <h2>Unpaid Tenants (Overdue)</h2>
         </div>
